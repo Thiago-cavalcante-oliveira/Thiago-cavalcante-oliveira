@@ -1,0 +1,30 @@
+{
+  "name": "manual-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "generate:new": "node --loader ts-node/esm generateManualNew.ts",
+    "generate:friendly": "node --loader ts-node/esm generateManualFriendly.ts",
+    "pdf": "node --loader ts-node/esm scripts/generatePDF.ts",
+    "full:new": "npm run generate:new && npm run pdf",
+    "pdf:cli": "node --loader ts-node/esm scripts/pdfCli.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.15.0",
+    "@playwright/test": "^1.54.1",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^16.4.5",
+    "md-to-pdf": "^5.2.4",
+    "minio": "^8.0.5",
+    "playwright": "^1.54.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "ts-node": {
+    "esm": true
+  }
+}

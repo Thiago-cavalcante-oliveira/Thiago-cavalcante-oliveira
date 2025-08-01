@@ -1,0 +1,241 @@
+import { defineAgent, z } from 'agnos';
+import { Client } from 'minio';
+import { v4 as uuidv4 } from 'uuid';
+
+// Configuração do cliente MinIO
+const minioClient = new Client({
+  endPoint: 'seu-servidor-minio.com',
+  port: 9000,
+  useSSL: true,
+  accessKey: process.env.MINIO_ACCESS_KEY,
+  secretKey: process.env.MINIO_SECRET_KEY
+});
+
+const BUCKET_NAME = 'web-manuals';
+
+export const manualWriterAgent = defineAgent({
+  id: 'manual-writer-agent-final',
+  name: 'Gerador de Manual para Usuários Iniciantes',
+  description: 'Cria manuais passo-a-passo com foco em usuários leigos e suporte visual',
+  inputSchema: z.object({
+    url: z.string().url(),
+    pageHtml: z.string().max(50000),
+    mainScreenshot: z.string().describe("Base64 da screenshot da página completa"),
+    elementScreenshots: z.array(z.object({
+      selector: z.string(),
+      states: z.array(z.enum(["default", "hover", "active", "focused"])),
+      images: z.array(z.string()).describe("Base64 das imagens em cada estado")
+    })).optional(),
+    modalScreenshots: z.array(z.object({
+      selector: z.string(),
+      openTrigger: z.string(),
+      image: z.string().describe("Base64 da screenshot do modal aberto")
+    })).optional(),
+    domInteractions: z.array(z.object({
+      selector: z.string(),
+      action: z.string(),
+      resultHtml: z.string().optional(),
+      screenshot: z.string().optional().describe("Base64 da screenshot após a ação")
+    })),
+    breadcrumb: z.array(z.string())
+  }),
+  async run({ input, llm }) {
+    const { url, pageHtml, domInteractions, breadcrumb, 
+            mainScreenshot, elementScreenshots, modalScreenshots } = input;
+
+    // 1. Função para upload de imagens no MinIO
+    const uploadImage = async (base64: string, prefix: string): Promise<string> => {
+      const cleanBase64 = base64.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(cleanBase64, 'base64');
+      const objectName = `${prefix}/${uuidv4()}.png`;
+      
+      await minioClient.putObject(BUCKET_NAME, objectName, buffer, {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'max-age=31536000'
+      });
+      
+      return `https://${minioClient.options.endPoint}/${BUCKET_NAME}/${objectName}`;
+    };
+
+    // 2. Upload de todas as imagens
+    const mainScreenshotUrl = await uploadImage(mainScreenshot, 'main');
+    
+    const elementScreenshotUrls = [];
+    if (elementScreenshots) {
+      for (const element of elementScreenshots) {
+        const stateUrls: Record<string, string> = {};
+        for (const [index, state] of element.states.entries()) {
+          stateUrls[state] = await uploadImage(element.images[index], `elements/${element.selector}`);
+        }
+        elementScreenshotUrls.push({
+          selector: element.selector,
+          stateUrls
+        });
+      }
+    }
+    
+    const modalScreenshotUrls = [];
+    if (modalScreenshots) {
+      for (const modal of modalScreenshots) {
+        modalScreenshotUrls.push({
+          selector: modal.selector,
+          url: await uploadImage(modal.image, `modals/${modal.selector}`),
+          openTrigger: modal.openTrigger
+        });
+      }
+    }
+    
+    const interactionScreenshotUrls = [];
+    for (const [index, interaction] of domInteractions.entries()) {
+      if (interaction.screenshot) {
+        interactionScreenshotUrls.push({
+          index,
+          url: await uploadImage(interaction.screenshot, `interactions/${index}`)
+        });
+      }
+    }
+
+    // 3. Construção do contexto otimizado para usuários leigos
+    const context = `
+## PERFIL DO USUÁRIO FINAL
+Está usando o sistema pela primeira vez. Não conhece termos técnicos. Aprende melhor com exemplos visuais e instruções passo-a-passo.
+
+## REGRAS DE ESCRITA OBRIGATÓRIAS
+1. Use linguagem simples e direta no imperativo ("Clique...", "Digite...")
+2. Evite jargões técnicos - use equivalentes leigos:
+   - "Modal" → "Janela pop-up"
+   - "Seletor" → "Elemento"
+   - "Hover" → "Passar o mouse"
+3. Sempre que mencionar um elemento:
+   - Descreva sua aparência ("botão vermelho com ícone X")
+   - Mencione sua localização ("no canto inferior direito")
+   - Inclua imagem de referência quando disponível
+4. Estruture o conteúdo por tarefas práticas, não por elementos técnicos
+5. Para cada 3 ações, inclua um exemplo prático entre \`\`\`exemplo ... \`\`\`
+
+## ESTRUTURA DE CADA SEÇÃO
+### [Nome da Tarefa] (ex: "Fazer login no sistema")
+**Para que serve:** [1-2 frases explicando o objetivo]
+
+**Passo-a-passo:**
+1. [Ação inicial] + ![Imagem relevante](${url_imagem})
+2. [Próxima ação]...
+3. [Indicador de conclusão bem-sucedida]
+
+**Dicas:**
+- [Problema comum + solução simples]
+- [Atalho útil, se existir]
+
+**Exemplo Prático:**
+\`\`\`exemplo
+"Exemplo: Para recuperar sua senha:
+  1. Clique em 'Esqueci minha senha'
+  2. Digite seu email cadastrado
+  3. Verifique sua caixa de entrada"
+\`\`\`
+
+⚠️ **Atenção:** [Alertas sobre ações destrutivas ou irreversíveis]
+
+## DADOS VISUAIS DISPONÍVEIS
+### Screenshot Principal:
+![Página completa](${mainScreenshotUrl})
+
+### Elementos Interativos:
+${
+  elementScreenshotUrls.map(el => `
+- **${el.selector}**  
+  ${
+    Object.entries(el.stateUrls).map(([state, url]) => 
+      `- Estado ${state}: ![${el.selector} ${state}](${url})`
+    ).join('\n  ')
+  }
+`).join('\n') || 'Nenhum elemento capturado'
+}
+
+### Janelas Pop-up:
+${
+  modalScreenshotUrls.map(modal => 
+    `- **${modal.selector}** (aparece ao ${modal.openTrigger}): ![${modal.selector}](${modal.url})`
+  ).join('\n') || 'Nenhuma janela pop-up capturada'
+}
+
+### Resultado de Ações:
+${
+  interactionScreenshotUrls.map(item => 
+    `- Ação ${item.index + 1}: ![Resultado ação ${item.index + 1}](${item.url})`
+  ).join('\n') || 'Nenhum resultado de ação capturado'
+}
+
+## EXEMPLO DE SAÍDA ESPERADA
+\`\`\`markdown
+## Como salvar seu trabalho
+
+**Para que serve:**  
+Guarda temporariamente suas alterações para evitar perdas de dados.
+
+### Passo-a-passo:
+1. Localize o botão de disquete ![Ícone salvar](${elementScreenshotUrls[0]?.stateUrls.default || ''}) no canto superior direito  
+2. Clique uma vez e observe o ícone de carregamento ![Carregando](${elementScreenshotUrls[1]?.stateUrls.active || ''})
+3. Aguarde até aparecer a mensagem "Salvo com sucesso"  
+
+⚠️ **Importante:**  
+- Não feche o navegador enquanto o ícone de carregamento estiver visível  
+- Salve a cada 10 minutos para evitar perdas
+
+**Exemplo:**  
+\`\`\`exemplo
+"Para salvar um novo cliente:
+  1. Preencha todos os campos marcados com (*)
+  2. Clique no botão de disquete
+  3. Aguarde o aviso verde de confirmação"
+\`\`\`
+\`\`\`
+
+## CONTEXTO TÉCNICO
+**URL da página:** ${url}  
+**Navegação até aqui:** ${breadcrumb.join(' > ')}  
+**HTML resumido:** ${pageHtml.substring(0, 1000)}${pageHtml.length > 1000 ? '...' : ''}
+`;
+
+    // 4. Geração do manual com LLM
+    const response = await llm.prompt(context, {
+      model: 'gpt-4-turbo',
+      temperature: 0.2, // Menor temperatura para mais consistência
+      max_tokens: 4096,
+      system_message: 'Você é um especialista em documentação para usuários iniciantes'
+    });
+
+    // 5. Pós-processamento para garantir qualidade
+    const finalContent = response
+      .replace(/!\[\]\(undefined\)/g, '') // Remove imagens inválidas
+      .replace(/\[Imagem relevante\]\(\)/g, '') 
+      .replace(/\b(modal|seletor|DOM|hover|click)\b/gi, match => {
+        // Traduz termos técnicos remanescentes
+        const translations: Record<string, string> = {
+          'modal': 'janela pop-up',
+          'seletor': 'elemento',
+          'DOM': 'estrutura da página',
+          'hover': 'passar o mouse',
+          'click': 'clicar'
+        };
+        return translations[match.toLowerCase()] || match;
+      });
+
+    // 6. Retorno estruturado
+    return {
+      markdownManual: finalContent,
+      visualAssets: {
+        mainScreenshotUrl,
+        elementScreenshotUrls,
+        modalScreenshotUrls,
+        interactionScreenshotUrls
+      },
+      metadata: {
+        originalUrl: url,
+        breadcrumb,
+        generatedAt: new Date().toISOString(),
+        targetAudience: "first-time-users"
+      }
+    };
+  },
+});
