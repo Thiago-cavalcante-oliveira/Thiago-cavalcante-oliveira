@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "test:enhanced": "node --loader ts-node/esm testEnhancedSAEB.ts",
+    "test:google": "node --loader ts-node/esm testGoogle.ts",
+    "test:debug": "DEBUG_MODE=true node --loader ts-node/esm testGoogle.ts",
     "pdf": "node --loader ts-node/esm scripts/generatePDF.ts",
     "pdf:cli": "node --loader ts-node/esm scripts/pdfCli.ts"
   },

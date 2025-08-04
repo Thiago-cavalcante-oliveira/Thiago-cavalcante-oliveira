@@ -1,7 +1,7 @@
 import { APP_CONFIG } from '../config/index.js';
 import { GeminiService } from '../services/gemini.js';
 import { AgentService, AgentInput } from '../services/AgentService.js';
-import { EnhancedNavigationService } from '../services/EnhancedNavigationService.js';
+import { SimpleNavigationService } from '../services/SimpleNavigationService.js';
 import { AutoOutputService } from '../services/AutoOutputService.js';
 import { FileUtils, UrlUtils, TimeUtils, LogUtils } from '../utils/index.js';
 import type { ManualSection, InteractiveElement, AuthCredentials, InteractionResult } from '../types/index.js';
@@ -11,16 +11,17 @@ import * as path from 'path';
 export class EnhancedManualGenerator {
   private geminiService: GeminiService;
   private agentService: AgentService;
-  private navigationService: EnhancedNavigationService;
+  private navigationService: SimpleNavigationService;
   private outputService: AutoOutputService;
   private sections: ManualSection[] = [];
   private screenshots: string[] = [];
   private interactionResults: InteractionResult[] = [];
+  private successfulInteractions: InteractionResult[] = [];
 
   constructor() {
     this.geminiService = new GeminiService();
     this.agentService = new AgentService();
-    this.navigationService = new EnhancedNavigationService();
+    this.navigationService = new SimpleNavigationService();
     this.outputService = new AutoOutputService(APP_CONFIG.OUTPUT_DIR);
     
     // Garantir que o diretório de saída existe
@@ -224,17 +225,41 @@ export class EnhancedManualGenerator {
         this.interactionResults.push(result);
         
         if (result.success) {
-          // Capturar screenshot após interação bem-sucedida
-          const screenshotPath = path.join(
-            APP_CONFIG.OUTPUT_DIR, 
-            `screenshot_${screenshotCounter + 1}.png`
-          );
+          this.successfulInteractions.push(result);
           
-          await this.navigationService.takeScreenshot(screenshotPath);
-          this.screenshots.push(screenshotPath);
+          // Screenshot já capturado pela NavigationService se necessário
+          if (result.filename) {
+            this.screenshots.push(result.filename);
+            console.log(`📷 Screenshot capturado: ${result.filename}`);
+          }
+
+          // Se uma nova página foi explorada, adicionar ao manual
+          if (result.newPageExplored && result.content) {
+            console.log(`📄 Nova página explorada, adicionando conteúdo ao manual`);
+            
+            this.sections.push({
+              title: `Página: ${result.finalUrl}`,
+              content: result.content,
+              screenshot: result.filename || '',
+              url: result.finalUrl
+            });
+            
+            if (result.newPageElements && result.newPageElements.length > 0) {
+              console.log(`📊 Nova página tem ${result.newPageElements.length} elementos interativos`);
+            }
+          }
+
+          if (result.modalContent) {
+            console.log(`� Modal: ${result.modalContent.substring(0, 100)}...`);
+          }
           
-          console.log(`📷 Screenshot ${screenshotCounter + 1} capturado: ${element.text}`);
-          screenshotCounter++;
+          if (result.urlChanged) {
+            console.log(`🌐 Navegação: ${result.initialUrl} → ${result.finalUrl}`);
+          }
+          
+          console.log(`✅ Sucesso: ${element.text}`);
+        } else {
+          console.log(`⚠️ Falhou: ${result.error || 'Erro desconhecido'}`);
         }
         
         // Pequena pausa entre interações
