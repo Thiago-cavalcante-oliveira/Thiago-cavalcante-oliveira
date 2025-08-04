@@ -1,0 +1,253 @@
+{
+  message: 'Server running on port 5000',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:18'
+}
+{
+  message: 'Environment: development',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:18'
+}
+{
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:18',
+  message: 'Database info: Starting a postgresql pool with 9 connections.',
+  target: 'quaint::pooled',
+  level: 'info'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:18'
+}
+{
+  message: 'Client connected: NjMexb-RyN5p9P1TAAAB',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: ZOmrMBbs5p7z3A4GAAAD',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: S66105dyMuAA-QUnAAAF',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: iR1nr-0CMz_A-QxjAAAH',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: uWLWgXSmO1QU4aQqAAAJ',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: 8xSMisajqVXnjXUDAAAL',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: TZuzd409ZjCLbIM3AAAN',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: JyZ2-kHNHuPIgc8aAAAP',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: 6kGgnz7k-7kLE2uaAAAR',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: _lj3PX6UkhHcEq4UAAAT',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:19'
+}
+{
+  message: 'Client connected: mvQJl5vfyOahdwAZAAAV',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:20'
+}
+{
+  message: 'Client connected: HhOcECNItNFyZezmAAAX',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:20'
+}
+{
+  message: 'Client connected: Fy305sIxmZUXv_1tAAAZ',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:22'
+}
+{
+  message: 'Client connected: MCPX0CgBZsqiS5c1AAAb',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:23'
+}
+{
+  message: 'Client connected: EaMowo3TNsPAnlewAAAd',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:26'
+}
+{
+  message: 'Client connected: XEe272nosYNDmZ2vAAAf',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:27'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Trae/1.100.3 Chrome/132.0.6834.210 Electron/34.5.1 Safari/537.36',
+  timestamp: '2025-08-04 16:52:28',
+  level: 'info',
+  message: 'GET /'
+}
+{
+  message: 'Client connected: 9yPtGPR-yLukh6CyAAAh',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:42'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 16:52:42',
+  level: 'info',
+  message: 'GET /api/manuals'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 16:52:42',
+  level: 'info',
+  message: 'GET /api/manuals/recent'
+}
+{
+  message: 'Client connected: pa_e1B9LOWEFgWZ_AAAj',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:43'
+}
+{
+  message: 'Client connected: ZERIAhsa7YfC6lHQAAAl',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:48'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 16:52:48',
+  level: 'info',
+  message: 'GET /api/manuals'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 16:52:48',
+  level: 'info',
+  message: 'GET /api/manuals/recent'
+}
+{
+  message: 'Client connected: OKvPyIDDLGogx2YKAAAn',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:49'
+}
+{
+  message: 'Client connected: db3HQkXzIIX5vYsNAAAp',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:57'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Trae/1.100.3 Chrome/132.0.6834.210 Electron/34.5.1 Safari/537.36',
+  timestamp: '2025-08-04 16:52:58',
+  level: 'info',
+  message: 'GET /api/manuals'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Trae/1.100.3 Chrome/132.0.6834.210 Electron/34.5.1 Safari/537.36',
+  timestamp: '2025-08-04 16:52:58',
+  level: 'info',
+  message: 'GET /api/manuals/recent'
+}
+{
+  message: 'Client connected: Pe2PVhxKq6L_mfiOAAAr',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:52:58'
+}
+{
+  message: 'Client connected: dXoFsSfksarpnPsFAAAt',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:56:44'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 17:01:02',
+  level: 'info',
+  message: 'GET /api/manuals'
+}
+{
+  service: 'manual-manager-backend',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  timestamp: '2025-08-04 17:01:02',
+  level: 'info',
+  message: 'GET /api/manuals/recent'
+}
+{
+  message: 'Client connected: xXeedZMO8uWZgd3aAAAv',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 17:01:04'
+}
+{
+  message: 'Client connected: fEwWalYPvpHQ9-xrAAAx',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 17:01:26'
+}
+{
+  message: 'Client connected: 3XwOEesXQOPL22BwAAAz',
+  level: 'info',
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 17:02:39'
+}

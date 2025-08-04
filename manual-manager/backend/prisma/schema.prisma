@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  avatar    String?
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  manuals   Manual[]
+  sessions  UserSession[]
+  logs      AuditLog[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model Manual {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  status      ManualStatus @default(PENDING)
+  markdown    String?
+  html        String?
+  screenshots Json?       // Array de URLs dos screenshots
+  metadata    Json?       // Metadados adicionais
+  settings    Json?       // Configurações específicas do manual
+  createdBy   String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  publishedAt DateTime?
+
+  // Relacionamentos
+  user         User           @relation(fields: [createdBy], references: [id])
+  generations  Generation[]
+  sections     ManualSection[]
+  tags         ManualTag[]
+
+  @@map("manuals")
+}
+
+model ManualSection {
+  id        String   @id @default(uuid())
+  manualId  String
+  title     String
+  content   String
+  order     Int
+  type      SectionType @default(CONTENT)
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  manual Manual @relation(fields: [manualId], references: [id], onDelete: Cascade)
+
+  @@map("manual_sections")
+}
+
+model Generation {
+  id        String           @id @default(uuid())
+  manualId  String
+  status    GenerationStatus @default(PENDING)
+  progress  Int              @default(0)
+  logs      Json?            // Logs do processo de geração
+  error     String?
+  startedAt DateTime         @default(now())
+  endedAt   DateTime?
+
+  // Relacionamentos
+  manual Manual @relation(fields: [manualId], references: [id], onDelete: Cascade)
+
+  @@map("generations")
+}
+
+model Tag {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  color       String?  @default("#3B82F6")
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Relacionamentos
+  manuals ManualTag[]
+
+  @@map("tags")
+}
+
+model ManualTag {
+  manualId String
+  tagId    String
+
+  // Relacionamentos
+  manual Manual @relation(fields: [manualId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([manualId, tagId])
+  @@map("manual_tags")
+}
+
+model Configuration {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  category  String   @default("general")
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("configurations")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  resource  String
+  resourceId String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+  VIEWER
+}
+
+enum ManualStatus {
+  PENDING
+  GENERATING
+  COMPLETED
+  ERROR
+  PUBLISHED
+  ARCHIVED
+}
+
+enum GenerationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  ERROR
+  CANCELLED
+}
+
+enum SectionType {
+  CONTENT
+  SCREENSHOT
+  INTERACTION
+  NAVIGATION
+  SUMMARY
+}
