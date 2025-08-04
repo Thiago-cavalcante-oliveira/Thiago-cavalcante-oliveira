@@ -34,14 +34,17 @@ export const APP_CONFIG = {
     maxOutputTokens: 2048,
   },
   
-  // Configurações do Playwright
+  // Modo de execução (debug ou produção)
+  DEBUG_MODE: process.env.DEBUG_MODE === 'true' || process.argv.includes('--debug'),
+  
+  // Configurações do Playwright (adaptáveis ao modo)
   PLAYWRIGHT_CONFIG: {
-    headless: false, // Mostrar navegador em tempo real
-    slowMo: 1000, // Adicionar delay de 1 segundo entre ações para visualização
+    headless: process.env.DEBUG_MODE === 'true' || process.argv.includes('--debug') ? false : true,
+    slowMo: process.env.DEBUG_MODE === 'true' || process.argv.includes('--debug') ? 1000 : 0,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--start-maximized' // Iniciar maximizado para melhor visualização
+      ...(process.env.DEBUG_MODE === 'true' || process.argv.includes('--debug') ? ['--start-maximized'] : [])
     ]
   },
   
@@ -54,19 +57,19 @@ export const APP_CONFIG = {
   // User Agent
   USER_AGENT: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   
-  // Timeouts (em milissegundos) - Aumentados para melhor visualização
+  // Timeouts (em milissegundos) - Adaptáveis ao modo
   TIMEOUTS: {
     PAGE_LOAD: 45000,
     ELEMENT_WAIT: 5000,
     SCROLL_DELAY: 500,
-    INTERACTION_DELAY: 3000, // Mais tempo para visualizar as interações
+    INTERACTION_DELAY: process.env.DEBUG_MODE === 'true' || process.argv.includes('--debug') ? 3000 : 1000,
     MODAL_WAIT: 5000,
     CONTENT_LOAD: 10000
   },
   
-  // Limites
+  // Limites - Removido limite de elementos interativos
   LIMITS: {
-    MAX_INTERACTIVE_ELEMENTS: 10,
+    MAX_INTERACTIVE_ELEMENTS: -1, // -1 = sem limite
     MAX_CONTENT_LENGTH: 8000,
     MAX_PREVIEW_LENGTH: 200
   }

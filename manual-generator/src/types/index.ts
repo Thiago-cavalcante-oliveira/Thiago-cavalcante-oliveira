@@ -1,10 +1,17 @@
 export interface InteractiveElement {
   selector: string;
   text: string;
-  type: 'button' | 'link' | 'clickable';
+  name: string; // Nome do elemento
+  type: 'button' | 'link' | 'clickable' | 'input' | 'textarea' | 'select';
   id?: string;
   className?: string;
-  context?: 'navigation' | 'expandable' | 'card' | 'action' | 'link' | 'text';
+  context?: 'navigation' | 'expandable' | 'card' | 'action' | 'link' | 'text' | 'form' | 'modal' | 'menu' | 'content';
+  href?: string;
+  boundingBox?: any;
+  coordinates?: { x: number; y: number }; // Coordenadas do elemento
+  size?: { width: number; height: number }; // Tamanho do elemento
+  isVisible?: boolean; // Se o elemento está visível
+  score?: number; // Score de relevância para priorização
   element?: any; // Para debug purposes
 }
 
@@ -21,6 +28,8 @@ export interface InteractionResult {
   initialUrl: string;
   finalUrl: string;
   error?: string;
+  newPageExplored?: boolean; // Se uma nova página foi explorada
+  newPageElements?: InteractiveElement[]; // Elementos encontrados na nova página
 }
 
 export interface RetryConfig {

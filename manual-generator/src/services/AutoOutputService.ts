@@ -347,6 +347,13 @@ export class AutoOutputService {
 
   private async generatePDF(markdownContent: string, outputPath: string): Promise<void> {
     try {
+      // Corrigir caminhos das imagens para caminhos absolutos
+      const correctedMarkdown = this.fixImagePathsForPDF(markdownContent);
+      
+      // Criar arquivo CSS temporário
+      const tempCssPath = path.join(this.outputDir, 'temp-pdf-styles.css');
+      fs.writeFileSync(tempCssPath, this.getPDFStyles(), 'utf8');
+      
       const pdfConfig = {
         dest: outputPath,
         pdf_options: {
@@ -370,16 +377,46 @@ export class AutoOutputService {
             </div>
           `
         },
-        stylesheet: [this.getPDFStyles()]
+        stylesheet: [tempCssPath]
       };
 
-      await mdToPdf({ content: markdownContent }, pdfConfig);
+      await mdToPdf({ content: correctedMarkdown }, pdfConfig);
+      
+      // Limpar arquivo CSS temporário
+      if (fs.existsSync(tempCssPath)) {
+        fs.unlinkSync(tempCssPath);
+      }
+      
       console.log(`✅ PDF gerado: ${outputPath}`);
       
     } catch (error) {
       console.error(`❌ Erro na geração do PDF: ${error instanceof Error ? error.message : error}`);
       throw error;
     }
+  }
+
+  private fixImagePathsForPDF(markdownContent: string): string {
+    // Converter caminhos relativos para absolutos
+    return markdownContent.replace(
+      /!\[([^\]]*)\]\(([^)]+)\)/g, 
+      (match, alt, imagePath) => {
+        // Se o caminho já é absoluto, manter como está
+        if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+          return match;
+        }
+        
+        // Converter para caminho absoluto
+        const absolutePath = path.resolve(this.outputDir, imagePath);
+        
+        // Verificar se o arquivo existe
+        if (fs.existsSync(absolutePath)) {
+          return `![${alt}](file://${absolutePath})`;
+        } else {
+          console.warn(`⚠️ Imagem não encontrada para PDF: ${imagePath}`);
+          return `![${alt}](${imagePath})`;
+        }
+      }
+    );
   }
 
   private getPDFStyles(): string {
