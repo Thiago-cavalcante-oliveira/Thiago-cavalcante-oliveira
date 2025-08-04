@@ -3,10 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "generate:new": "node --loader ts-node/esm generateManualNew.ts",
-    "generate:friendly": "node --loader ts-node/esm generateManualFriendly.ts",
+    "test:enhanced": "node --loader ts-node/esm testEnhancedSAEB.ts",
     "pdf": "node --loader ts-node/esm scripts/generatePDF.ts",
-    "full:new": "npm run generate:new && npm run pdf",
     "pdf:cli": "node --loader ts-node/esm scripts/pdfCli.ts"
   },
   "dependencies": {
