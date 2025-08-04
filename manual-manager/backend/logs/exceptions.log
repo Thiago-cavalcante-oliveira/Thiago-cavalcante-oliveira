@@ -1,0 +1,3083 @@
+{
+  error: [96msrc/routes/auth.ts[0m:[93m25[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m25[0m router.post('/login', async (req, res) => {
+  [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m86[0m:[93m26[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m86[0m router.post('/register', async (req, res) => {
+  [7m  [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m136[0m:[93m24[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m136[0m router.post('/logout', async (req, res) => {
+  [7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m155[0m router.get('/verify', async (req, res) => {
+  [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:29:48 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 194121,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 336871424,
+      heapTotal: 249864192,
+      heapUsed: 217193288,
+      external: 7904062,
+      arrayBuffers: 4888695
+    }
+  },
+  os: { loadavg: [ 1.21, 1.46, 1.23 ], uptime: 19983.44 },
+  trace: [
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:29:48'
+}
+{
+  error: [96msrc/routes/auth.ts[0m:[93m25[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m25[0m router.post('/login', async (req, res) => {
+  [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m86[0m:[93m26[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m86[0m router.post('/register', async (req, res) => {
+  [7m  [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m136[0m:[93m24[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m136[0m router.post('/logout', async (req, res) => {
+  [7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m155[0m router.get('/verify', async (req, res) => {
+  [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:30:23 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 195360,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 334352384,
+      heapTotal: 246927360,
+      heapUsed: 220103072,
+      external: 7904110,
+      arrayBuffers: 4888743
+    }
+  },
+  os: { loadavg: [ 1.98, 1.62, 1.29 ], uptime: 20017.98 },
+  trace: [
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:30:23'
+}
+{
+  error: [96msrc/routes/auth.ts[0m:[93m25[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m25[0m router.post('/login', async (req, res) => {
+  [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m86[0m:[93m26[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m86[0m router.post('/register', async (req, res) => {
+  [7m  [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m136[0m:[93m24[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m136[0m router.post('/logout', async (req, res) => {
+  [7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m155[0m router.get('/verify', async (req, res) => {
+  [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:30:42 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 196071,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 338595840,
+      heapTotal: 251174912,
+      heapUsed: 215514296,
+      external: 7897133,
+      arrayBuffers: 4888759
+    }
+  },
+  os: { loadavg: [ 2.57, 1.76, 1.35 ], uptime: 20037.47 },
+  trace: [
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:30:42'
+}
+{
+  error: [96msrc/routes/auth.ts[0m:[93m25[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m25[0m router.post('/login', async (req, res) => {
+  [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m86[0m:[93m26[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m86[0m router.post('/register', async (req, res) => {
+  [7m  [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m136[0m:[93m24[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m136[0m router.post('/logout', async (req, res) => {
+  [7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m155[0m router.get('/verify', async (req, res) => {
+  [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:31:15 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 197122,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 336228352,
+      heapTotal: 249602048,
+      heapUsed: 217093736,
+      external: 7904022,
+      arrayBuffers: 4888655
+    }
+  },
+  os: { loadavg: [ 4, 2.16, 1.49 ], uptime: 20070.61 },
+  trace: [
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:31:15'
+}
+{
+  error: [96msrc/routes/auth.ts[0m:[93m25[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m25[0m router.post('/login', async (req, res) => {
+  [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m86[0m:[93m26[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m86[0m router.post('/register', async (req, res) => {
+  [7m  [0m [91m                         ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m136[0m:[93m24[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m136[0m router.post('/logout', async (req, res) => {
+  [7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~[0m
+  [96msrc/routes/auth.ts[0m:[93m155[0m:[93m23[0m - [91merror[0m[90m TS7030: [0mNot all code paths return a value.
+  
+  [7m155[0m router.get('/verify', async (req, res) => {
+  [7m   [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+  ,
+  level: 'error',
+  message: 'uncaughtException: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  stack: 'TSError: ⨯ Unable to compile TypeScript:\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m25\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m25\x1B[0m router.post('/login', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m86\x1B[0m:\x1B[93m26\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m86\x1B[0m router.post('/register', async (req, res) => {\n" +
+    '\x1B[7m  \x1B[0m \x1B[91m                         ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m136\x1B[0m:\x1B[93m24\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m136\x1B[0m router.post('/logout', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                       ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\x1B[96msrc/routes/auth.ts\x1B[0m:\x1B[93m155\x1B[0m:\x1B[93m23\x1B[0m - \x1B[91merror\x1B[0m\x1B[90m TS7030: \x1B[0mNot all code paths return a value.\n' +
+    '\n' +
+    "\x1B[7m155\x1B[0m router.get('/verify', async (req, res) => {\n" +
+    '\x1B[7m   \x1B[0m \x1B[91m                      ~~~~~~~~~~~~~~~~~~~~~\x1B[0m\n' +
+    '\n' +
+    '    at createTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:859:12)\n' +
+    '    at reportTSError (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:863:19)\n' +
+    '    at getOutput (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1077:36)\n' +
+    '    at Object.compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1433:41)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1617:30)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:31:44 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 198200,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 337117184,
+      heapTotal: 250388480,
+      heapUsed: 224085736,
+      external: 7903934,
+      arrayBuffers: 4888567
+    }
+  },
+  os: { loadavg: [ 4.45, 2.44, 1.61 ], uptime: 20099.78 },
+  trace: [
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'createTSError',
+      line: 859,
+      method: null,
+      native: false
+    },
+    {
+      column: 19,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'reportTSError',
+      line: 863,
+      method: null,
+      native: false
+    },
+    {
+      column: 36,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'getOutput',
+      line: 1077,
+      method: null,
+      native: false
+    },
+    {
+      column: 41,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.compile',
+      line: 1433,
+      method: 'compile',
+      native: false
+    },
+    {
+      column: 30,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1617,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:31:44'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:33:03 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 200577,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 240635904,
+      heapTotal: 88055808,
+      heapUsed: 61797024,
+      external: 8041291,
+      arrayBuffers: 4893803
+    }
+  },
+  os: { loadavg: [ 3.13, 2.5, 1.7 ], uptime: 20177.98 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:33:03'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:33:13 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 200927,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 165605376,
+      heapTotal: 87601152,
+      heapUsed: 60873552,
+      external: 7924055,
+      arrayBuffers: 4893831
+    }
+  },
+  os: { loadavg: [ 3.59, 2.62, 1.75 ], uptime: 20188.7 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:33:13'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:36:01 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 206185,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 357052416,
+      heapTotal: 266092544,
+      heapUsed: 232272104,
+      external: 7935856,
+      arrayBuffers: 4905632
+    }
+  },
+  os: { loadavg: [ 5.07, 3.19, 2.09 ], uptime: 20356.69 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:36:01'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:42:47 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 218270,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 355704832,
+      heapTotal: 265568256,
+      heapUsed: 232665888,
+      external: 7935824,
+      arrayBuffers: 4905600
+    }
+  },
+  os: { loadavg: [ 1.06, 1.36, 1.6 ], uptime: 20762.41 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:42:47'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:42:58 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 218877,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 358486016,
+      heapTotal: 267927552,
+      heapUsed: 232717424,
+      external: 7928127,
+      arrayBuffers: 4897903
+    }
+  },
+  os: { loadavg: [ 1.37, 1.41, 1.61 ], uptime: 20773.79 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:42:58'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:43:31 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 220118,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 354340864,
+      heapTotal: 263208960,
+      heapUsed: 233968536,
+      external: 7948559,
+      arrayBuffers: 4918335
+    }
+  },
+  os: { loadavg: [ 2.19, 1.61, 1.67 ], uptime: 20806.86 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:43:31'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:44:14 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 222301,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 167895040,
+      heapTotal: 87863296,
+      heapUsed: 61032216,
+      external: 7923999,
+      arrayBuffers: 4893775
+    }
+  },
+  os: { loadavg: [ 2.81, 1.84, 1.75 ], uptime: 20849.53 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:44:14'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:45:56 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 226618,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 167305216,
+      heapTotal: 88125440,
+      heapUsed: 60797216,
+      external: 7911224,
+      arrayBuffers: 4881000
+    }
+  },
+  os: { loadavg: [ 1.51, 1.67, 1.69 ], uptime: 20951.78 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:45:56'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Object..js (node:internal/modules/cjs/loader:1895:10)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:47:20 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 230067,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js'
+    ],
+    memoryUsage: {
+      rss: 78950400,
+      heapTotal: 33558528,
+      heapUsed: 17640544,
+      external: 2210078,
+      arrayBuffers: 18835
+    }
+  },
+  os: { loadavg: [ 2.36, 1.97, 1.8 ], uptime: 21035.66 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js',
+      function: null,
+      line: 133,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Object..js',
+      line: 1895,
+      method: '.js',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    },
+    {
+      column: 24,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'wrapModuleLoad',
+      line: 235,
+      method: null,
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:47:20'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Object..js (node:internal/modules/cjs/loader:1895:10)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:47:32 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 230501,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js'
+    ],
+    memoryUsage: {
+      rss: 79892480,
+      heapTotal: 34082816,
+      heapUsed: 17610120,
+      external: 2210078,
+      arrayBuffers: 18835
+    }
+  },
+  os: { loadavg: [ 2.13, 1.94, 1.8 ], uptime: 21047.79 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js',
+      function: null,
+      line: 133,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Object..js',
+      line: 1895,
+      method: '.js',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    },
+    {
+      column: 24,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'wrapModuleLoad',
+      line: 235,
+      method: null,
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:47:32'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Object..js (node:internal/modules/cjs/loader:1895:10)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js:133:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:47:50 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 231088,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [ '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node' ],
+    memoryUsage: {
+      rss: 80150528,
+      heapTotal: 34344960,
+      heapUsed: 17324136,
+      external: 2283145,
+      arrayBuffers: 18835
+    }
+  },
+  os: { loadavg: [ 1.79, 1.87, 1.78 ], uptime: 21064.94 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/dist/index.js',
+      function: null,
+      line: 133,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Object..js',
+      line: 1895,
+      method: '.js',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:diagnostics_channel',
+      function: 'TracingChannel.traceSync',
+      line: 322,
+      method: 'traceSync',
+      native: false
+    },
+    {
+      column: 24,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'wrapModuleLoad',
+      line: 235,
+      method: null,
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:47:50'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:48:06 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 231496,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 353673216,
+      heapTotal: 262684672,
+      heapUsed: 232925904,
+      external: 7948551,
+      arrayBuffers: 4918327
+    }
+  },
+  os: { loadavg: [ 1.85, 1.88, 1.78 ], uptime: 21081.08 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:48:06'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:49:05 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 233498,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 355356672,
+      heapTotal: 264257536,
+      heapUsed: 241975872,
+      external: 7948607,
+      arrayBuffers: 4918383
+    }
+  },
+  os: { loadavg: [ 2.58, 1.99, 1.82 ], uptime: 21140.01 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:49:05'
+}
+{
+  error: Error: listen EADDRINUSE: address already in use :::5000
+      at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+      at listenInCluster (node:net:1997:12)
+      at Server.listen (node:net:2102:7)
+      at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)
+      at Module._compile (node:internal/modules/cjs/loader:1730:14)
+      at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)
+      at node:internal/modules/cjs/loader:1895:10
+      at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)
+      at Module.load (node:internal/modules/cjs/loader:1465:32)
+      at Function._load (node:internal/modules/cjs/loader:1282:12) {
+    code: 'EADDRINUSE',
+    errno: -98,
+    syscall: 'listen',
+    address: '::',
+    port: 5000
+  },
+  level: 'error',
+  message: 'uncaughtException: listen EADDRINUSE: address already in use :::5000\n' +
+    'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  stack: 'Error: listen EADDRINUSE: address already in use :::5000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Object.<anonymous> (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts:161:8)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n' +
+    '    at Module.m._compile (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1618:23)\n' +
+    '    at node:internal/modules/cjs/loader:1895:10\n' +
+    '    at Object.require.extensions.<computed> [as .ts] (/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts:1621:12)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1282:12)',
+  exception: true,
+  date: 'Mon Aug 04 2025 16:50:13 GMT-0300 (Brasilia Standard Time)',
+  process: {
+    pid: 235768,
+    uid: 1000,
+    gid: 1000,
+    cwd: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend',
+    execPath: '/home/thiagotco/.nvm/versions/node/v22.17.1/bin/node',
+    version: 'v22.17.1',
+    argv: [
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/.bin/ts-node',
+      '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts'
+    ],
+    memoryUsage: {
+      rss: 354344960,
+      heapTotal: 263942144,
+      heapUsed: 235191808,
+      external: 7948575,
+      arrayBuffers: 4918351
+    }
+  },
+  os: { loadavg: [ 1.73, 1.81, 1.76 ], uptime: 21208.1 },
+  trace: [
+    {
+      column: 16,
+      file: 'node:net',
+      function: 'Server.setupListenHandle [as _listen2]',
+      line: 1940,
+      method: 'setupListenHandle [as _listen2]',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:net',
+      function: 'listenInCluster',
+      line: 1997,
+      method: null,
+      native: false
+    },
+    {
+      column: 7,
+      file: 'node:net',
+      function: 'Server.listen',
+      line: 2102,
+      method: 'listen',
+      native: false
+    },
+    {
+      column: 8,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/src/index.ts',
+      function: null,
+      line: 161,
+      method: null,
+      native: false
+    },
+    {
+      column: 14,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module._compile',
+      line: 1730,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 23,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Module.m._compile',
+      line: 1618,
+      method: '_compile',
+      native: false
+    },
+    {
+      column: 10,
+      file: 'node:internal/modules/cjs/loader',
+      function: null,
+      line: 1895,
+      method: null,
+      native: false
+    },
+    {
+      column: 12,
+      file: '/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-manager/backend/node_modules/ts-node/src/index.ts',
+      function: 'Object.require.extensions.<computed> [as .ts]',
+      line: 1621,
+      method: 'ts]',
+      native: false
+    },
+    {
+      column: 32,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Module.load',
+      line: 1465,
+      method: 'load',
+      native: false
+    },
+    {
+      column: 12,
+      file: 'node:internal/modules/cjs/loader',
+      function: 'Function._load',
+      line: 1282,
+      method: '_load',
+      native: false
+    }
+  ],
+  service: 'manual-manager-backend',
+  timestamp: '2025-08-04 16:50:13'
+}
