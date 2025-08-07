@@ -1,0 +1,1567 @@
+{
+  "url": "https://www.google.com",
+  "title": "Google",
+  "mainScreenshot": "output/screenshots/main_page.png",
+  "description": "Documentação completa da página: Google",
+  "elements": [
+    {
+      "element": {
+        "selector": "textarea#APjFqb.gLFyf:nth-of-type(1)",
+        "text": "Pesquisar",
+        "type": "input",
+        "context": "hierarchical",
+        "id": "APjFqb",
+        "className": "gLFyf",
+        "href": "",
+        "boundingBox": {
+          "x": 716,
+          "y": 377,
+          "width": 403,
+          "height": 50,
+          "top": 377,
+          "left": 716
+        },
+        "functionality": "Campo de entrada de texto",
+        "instructions": "Digite o texto desejado no campo \"Pesquisar\"",
+        "priority": 1,
+        "score": 10
+      },
+      "screenshotPath": "output/screenshots/elements/element_01_input_pesquisar.png",
+      "elementBounds": {
+        "x": 716,
+        "y": 377,
+        "width": 403,
+        "height": 50,
+        "top": 377,
+        "left": 716
+      },
+      "functionality": "Campo de entrada de texto",
+      "instructions": "Digite o texto desejado no campo \"Pesquisar\"",
+      "hierarchy": 1
+    },
+    {
+      "element": {
+        "selector": "input.gNO89b:nth-of-type(4)",
+        "text": "Pesquisa Google",
+        "type": "button",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gNO89b",
+        "href": "",
+        "boundingBox": {
+          "x": 816,
+          "y": 457,
+          "width": 141,
+          "height": 36,
+          "top": 457,
+          "left": 816
+        },
+        "functionality": "Botão de ação",
+        "instructions": "Clique no botão \"Pesquisa Google\" para executar a ação",
+        "priority": 2,
+        "score": 20
+      },
+      "screenshotPath": "output/screenshots/elements/element_02_button_pesquisa_google.png",
+      "elementBounds": {
+        "x": 816,
+        "y": 457,
+        "width": 141,
+        "height": 36,
+        "top": 457,
+        "left": 816
+      },
+      "functionality": "Botão de ação",
+      "instructions": "Clique no botão \"Pesquisa Google\" para executar a ação",
+      "hierarchy": 1
+    },
+    {
+      "element": {
+        "selector": "input.RNmpXc:nth-of-type(5)",
+        "text": "Estou com sorte",
+        "type": "button",
+        "context": "hierarchical",
+        "id": "",
+        "className": "RNmpXc",
+        "href": "",
+        "boundingBox": {
+          "x": 969,
+          "y": 457,
+          "width": 135,
+          "height": 36,
+          "top": 457,
+          "left": 969
+        },
+        "functionality": "Botão de ação",
+        "instructions": "Clique no botão \"Estou com sorte\" para executar a ação",
+        "priority": 2,
+        "score": 20
+      },
+      "screenshotPath": "output/screenshots/elements/element_03_button_estou_com_sorte.png",
+      "elementBounds": {
+        "x": 969,
+        "y": 457,
+        "width": 135,
+        "height": 36,
+        "top": 457,
+        "left": 969
+      },
+      "functionality": "Botão de ação",
+      "instructions": "Clique no botão \"Estou com sorte\" para executar a ação",
+      "hierarchy": 1
+    },
+    {
+      "element": {
+        "selector": "a.gb_X:nth-of-type(1)",
+        "text": "Gmail",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gb_X",
+        "href": "https://mail.google.com/mail/&ogbl",
+        "boundingBox": {
+          "x": 1655,
+          "y": 17,
+          "width": 34,
+          "height": 24,
+          "top": 17,
+          "left": 1655
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Gmail\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_04_link_gmail.png",
+      "elementBounds": {
+        "x": 1655,
+        "y": 17,
+        "width": 34,
+        "height": 24,
+        "top": 17,
+        "left": 1655
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Gmail\" para navegar",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "a.gb_X:nth-of-type(2)",
+        "text": "Imagens",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gb_X",
+        "href": "https://www.google.com/imghp?hl=pt-BR&ogbl",
+        "boundingBox": {
+          "x": 1704,
+          "y": 17,
+          "width": 50,
+          "height": 24,
+          "top": 17,
+          "left": 1704
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Imagens\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_05_link_imagens.png",
+      "elementBounds": {
+        "x": 1704,
+        "y": 17,
+        "width": 50,
+        "height": 24,
+        "top": 17,
+        "left": 1704
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Imagens\" para navegar",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "a.gb_B:nth-of-type(3)",
+        "text": "Google Apps",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gb_B",
+        "href": "https://www.google.com.br/intl/pt-BR/about/products",
+        "boundingBox": {
+          "x": 1769,
+          "y": 9,
+          "width": 40,
+          "height": 40,
+          "top": 9,
+          "left": 1769
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Google Apps\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_06_link_google_apps.png",
+      "elementBounds": {
+        "x": 1769,
+        "y": 9,
+        "width": 40,
+        "height": 40,
+        "top": 9,
+        "left": 1769
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Google Apps\" para navegar",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "a.gb_A:nth-of-type(4)",
+        "text": "Fazer login",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gb_A",
+        "href": "https://accounts.google.com/ServiceLogin?hl=pt-BR&passive=true&continue=https://www.google.com/&ec=futura_exp_og_so_72776762_e",
+        "boundingBox": {
+          "x": 1817,
+          "y": 9,
+          "width": 93,
+          "height": 40,
+          "top": 9,
+          "left": 1817
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Fazer login\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_07_link_fazer_login.png",
+      "elementBounds": {
+        "x": 1817,
+        "y": 9,
+        "width": 93,
+        "height": 40,
+        "top": 9,
+        "left": 1817
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Fazer login\" para navegar",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "a:nth-of-type(5)",
+        "text": "English",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "",
+        "href": "https://www.google.com/setprefs?sig=0_f1FRD0IMiSzUxDkFlkIxv1U7WpA%3D&hl=en&source=homepage&sa=X&ved=0ahUKEwjOwPudhvWOAxXYkIkEHYoZIGwQ2ZgBCBU",
+        "boundingBox": {
+          "x": 1034,
+          "y": 542,
+          "width": 43,
+          "height": 15,
+          "top": 542,
+          "left": 1034
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"English\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_08_link_english.png",
+      "elementBounds": {
+        "x": 1034,
+        "y": 542,
+        "width": 43,
+        "height": 15,
+        "top": 542,
+        "left": 1034
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"English\" para navegar",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(6)",
+        "text": "Sobre",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://about.google/?utm_source=google-BR&utm_medium=referral&utm_campaign=hp-footer&fg=1",
+        "boundingBox": {
+          "x": 20,
+          "y": 1034,
+          "width": 67,
+          "height": 46,
+          "top": 1034,
+          "left": 20
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Sobre\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_09_link_sobre.png",
+      "elementBounds": {
+        "x": 20,
+        "y": 1034,
+        "width": 67,
+        "height": 46,
+        "top": 1034,
+        "left": 20
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Sobre\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(7)",
+        "text": "Publicidade",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://www.google.com/intl/pt-BR_br/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1",
+        "boundingBox": {
+          "x": 87,
+          "y": 1034,
+          "width": 102,
+          "height": 46,
+          "top": 1034,
+          "left": 87
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Publicidade\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_10_link_publicidade.png",
+      "elementBounds": {
+        "x": 87,
+        "y": 1034,
+        "width": 102,
+        "height": 46,
+        "top": 1034,
+        "left": 87
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Publicidade\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(8)",
+        "text": "Negócios",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpbfooter&fg=1",
+        "boundingBox": {
+          "x": 190,
+          "y": 1034,
+          "width": 88,
+          "height": 46,
+          "top": 1034,
+          "left": 190
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Negócios\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_11_link_neg_cios.png",
+      "elementBounds": {
+        "x": 190,
+        "y": 1034,
+        "width": 88,
+        "height": 46,
+        "top": 1034,
+        "left": 190
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Negócios\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(9)",
+        "text": "Como funciona a Pesquisa",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://google.com/search/howsearchworks/?fg=1",
+        "boundingBox": {
+          "x": 278,
+          "y": 1034,
+          "width": 197,
+          "height": 46,
+          "top": 1034,
+          "left": 278
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Como funciona a Pesquisa\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_12_link_como_funciona_a_pesquisa.png",
+      "elementBounds": {
+        "x": 278,
+        "y": 1034,
+        "width": 197,
+        "height": 46,
+        "top": 1034,
+        "left": 278
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Como funciona a Pesquisa\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(10)",
+        "text": "Privacidade",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://policies.google.com/privacy?hl=pt-BR&fg=1",
+        "boundingBox": {
+          "x": 1601,
+          "y": 1034,
+          "width": 103,
+          "height": 46,
+          "top": 1034,
+          "left": 1601
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Privacidade\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_13_link_privacidade.png",
+      "elementBounds": {
+        "x": 1601,
+        "y": 1034,
+        "width": 103,
+        "height": 46,
+        "top": 1034,
+        "left": 1601
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Privacidade\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.pHiOh:nth-of-type(11)",
+        "text": "Termos",
+        "type": "link",
+        "context": "hierarchical",
+        "id": "",
+        "className": "pHiOh",
+        "href": "https://policies.google.com/terms?hl=pt-BR&fg=1",
+        "boundingBox": {
+          "x": 1704,
+          "y": 1034,
+          "width": 76,
+          "height": 46,
+          "top": 1034,
+          "left": 1704
+        },
+        "functionality": "Link de navegação",
+        "instructions": "Clique em \"Termos\" para navegar",
+        "priority": 4,
+        "score": 40
+      },
+      "screenshotPath": "output/screenshots/elements/element_14_link_termos.png",
+      "elementBounds": {
+        "x": 1704,
+        "y": 1034,
+        "width": 76,
+        "height": 46,
+        "top": 1034,
+        "left": 1704
+      },
+      "functionality": "Link de navegação",
+      "instructions": "Clique em \"Termos\" para navegar",
+      "hierarchy": 3
+    },
+    {
+      "element": {
+        "selector": "a.gb_B:nth-of-type(1)",
+        "text": "Google Apps",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gb_B",
+        "href": "https://www.google.com.br/intl/pt-BR/about/products",
+        "boundingBox": {
+          "x": 1769,
+          "y": 9,
+          "width": 40,
+          "height": 40,
+          "top": 9,
+          "left": 1769
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Google Apps\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_15_interactive_google_apps.png",
+      "elementBounds": {
+        "x": 1769,
+        "y": 9,
+        "width": 40,
+        "height": 40,
+        "top": 9,
+        "left": 1769
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Google Apps\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.Umvnrc:nth-of-type(3)",
+        "text": "Ferramentas de inserção de texto",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "Umvnrc",
+        "href": "",
+        "boundingBox": {
+          "x": 1123,
+          "y": 377,
+          "width": 40,
+          "height": 50,
+          "top": 377,
+          "left": 1123
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Ferramentas de inserção de texto\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_16_interactive_ferramentas_de_inser_o_de_text.png",
+      "elementBounds": {
+        "x": 1123,
+        "y": 377,
+        "width": 40,
+        "height": 50,
+        "top": 377,
+        "left": 1123
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Ferramentas de inserção de texto\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.XDyW0e:nth-of-type(4)",
+        "text": "Pesquisar por voz",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "XDyW0e",
+        "href": "",
+        "boundingBox": {
+          "x": 1163,
+          "y": 377,
+          "width": 40,
+          "height": 50,
+          "top": 377,
+          "left": 1163
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Pesquisar por voz\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_17_interactive_pesquisar_por_voz.png",
+      "elementBounds": {
+        "x": 1163,
+        "y": 377,
+        "width": 40,
+        "height": 50,
+        "top": 377,
+        "left": 1163
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Pesquisar por voz\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.nDcEnd:nth-of-type(5)",
+        "text": "Pesquisa por imagem",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "nDcEnd",
+        "href": "",
+        "boundingBox": {
+          "x": 1203,
+          "y": 377,
+          "width": 40,
+          "height": 50,
+          "top": 377,
+          "left": 1203
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Pesquisa por imagem\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_18_interactive_pesquisa_por_imagem.png",
+      "elementBounds": {
+        "x": 1203,
+        "y": 377,
+        "width": 40,
+        "height": 50,
+        "top": 377,
+        "left": 1203
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Pesquisa por imagem\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "input.gNO89b:nth-of-type(14)",
+        "text": "Pesquisa Google",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "gNO89b",
+        "href": "",
+        "boundingBox": {
+          "x": 816,
+          "y": 457,
+          "width": 141,
+          "height": 36,
+          "top": 457,
+          "left": 816
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Pesquisa Google\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_19_interactive_pesquisa_google.png",
+      "elementBounds": {
+        "x": 816,
+        "y": 457,
+        "width": 141,
+        "height": 36,
+        "top": 457,
+        "left": 816
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Pesquisa Google\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.cvSVBe:nth-of-type(16)",
+        "text": "Não conectar",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "cvSVBe btku5b fCrZyc NQYJvc FR7ZSc qVhvac",
+        "href": "",
+        "boundingBox": {
+          "x": 1549,
+          "y": 952,
+          "width": 150,
+          "height": 44,
+          "top": 952,
+          "left": 1549
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Não conectar\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_20_interactive_n_o_conectar.png",
+      "elementBounds": {
+        "x": 1549,
+        "y": 952,
+        "width": 150,
+        "height": 44,
+        "top": 952,
+        "left": 1549
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Não conectar\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.cvSVBe:nth-of-type(17)",
+        "text": "Fazer login",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "cvSVBe btku5b fCrZyc NQYJvc qVhvac expUPd",
+        "href": "",
+        "boundingBox": {
+          "x": 1715,
+          "y": 952,
+          "width": 133,
+          "height": 44,
+          "top": 952,
+          "left": 1715
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Fazer login\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_21_interactive_fazer_login.png",
+      "elementBounds": {
+        "x": 1715,
+        "y": 952,
+        "width": 133,
+        "height": 44,
+        "top": 952,
+        "left": 1715
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Fazer login\"",
+      "hierarchy": 2
+    },
+    {
+      "element": {
+        "selector": "div.CcNe6e:nth-of-type(15)",
+        "text": "Configurações",
+        "type": "interactive",
+        "context": "hierarchical",
+        "id": "",
+        "className": "CcNe6e",
+        "href": "",
+        "boundingBox": {
+          "x": 1780,
+          "y": 1034,
+          "width": 120,
+          "height": 46,
+          "top": 1034,
+          "left": 1780
+        },
+        "functionality": "Elemento interativo",
+        "instructions": "Interaja com \"Configurações\"",
+        "priority": 5,
+        "score": 50
+      },
+      "screenshotPath": "output/screenshots/elements/element_22_interactive_configura_es.png",
+      "elementBounds": {
+        "x": 1780,
+        "y": 1034,
+        "width": 120,
+        "height": 46,
+        "top": 1034,
+        "left": 1780
+      },
+      "functionality": "Elemento interativo",
+      "instructions": "Interaja com \"Configurações\"",
+      "hierarchy": 2
+    }
+  ],
+  "hierarchy": {
+    "sections": [
+      {
+        "name": "Elementos Principais",
+        "elements": [
+          {
+            "element": {
+              "selector": "textarea#APjFqb.gLFyf:nth-of-type(1)",
+              "text": "Pesquisar",
+              "type": "input",
+              "context": "hierarchical",
+              "id": "APjFqb",
+              "className": "gLFyf",
+              "href": "",
+              "boundingBox": {
+                "x": 716,
+                "y": 377,
+                "width": 403,
+                "height": 50,
+                "top": 377,
+                "left": 716
+              },
+              "functionality": "Campo de entrada de texto",
+              "instructions": "Digite o texto desejado no campo \"Pesquisar\"",
+              "priority": 1,
+              "score": 10
+            },
+            "screenshotPath": "output/screenshots/elements/element_01_input_pesquisar.png",
+            "elementBounds": {
+              "x": 716,
+              "y": 377,
+              "width": 403,
+              "height": 50,
+              "top": 377,
+              "left": 716
+            },
+            "functionality": "Campo de entrada de texto",
+            "instructions": "Digite o texto desejado no campo \"Pesquisar\"",
+            "hierarchy": 1
+          },
+          {
+            "element": {
+              "selector": "input.gNO89b:nth-of-type(4)",
+              "text": "Pesquisa Google",
+              "type": "button",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gNO89b",
+              "href": "",
+              "boundingBox": {
+                "x": 816,
+                "y": 457,
+                "width": 141,
+                "height": 36,
+                "top": 457,
+                "left": 816
+              },
+              "functionality": "Botão de ação",
+              "instructions": "Clique no botão \"Pesquisa Google\" para executar a ação",
+              "priority": 2,
+              "score": 20
+            },
+            "screenshotPath": "output/screenshots/elements/element_02_button_pesquisa_google.png",
+            "elementBounds": {
+              "x": 816,
+              "y": 457,
+              "width": 141,
+              "height": 36,
+              "top": 457,
+              "left": 816
+            },
+            "functionality": "Botão de ação",
+            "instructions": "Clique no botão \"Pesquisa Google\" para executar a ação",
+            "hierarchy": 1
+          },
+          {
+            "element": {
+              "selector": "input.RNmpXc:nth-of-type(5)",
+              "text": "Estou com sorte",
+              "type": "button",
+              "context": "hierarchical",
+              "id": "",
+              "className": "RNmpXc",
+              "href": "",
+              "boundingBox": {
+                "x": 969,
+                "y": 457,
+                "width": 135,
+                "height": 36,
+                "top": 457,
+                "left": 969
+              },
+              "functionality": "Botão de ação",
+              "instructions": "Clique no botão \"Estou com sorte\" para executar a ação",
+              "priority": 2,
+              "score": 20
+            },
+            "screenshotPath": "output/screenshots/elements/element_03_button_estou_com_sorte.png",
+            "elementBounds": {
+              "x": 969,
+              "y": 457,
+              "width": 135,
+              "height": 36,
+              "top": 457,
+              "left": 969
+            },
+            "functionality": "Botão de ação",
+            "instructions": "Clique no botão \"Estou com sorte\" para executar a ação",
+            "hierarchy": 1
+          }
+        ]
+      },
+      {
+        "name": "Elementos Secundários",
+        "elements": [
+          {
+            "element": {
+              "selector": "a.gb_X:nth-of-type(1)",
+              "text": "Gmail",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gb_X",
+              "href": "https://mail.google.com/mail/&ogbl",
+              "boundingBox": {
+                "x": 1655,
+                "y": 17,
+                "width": 34,
+                "height": 24,
+                "top": 17,
+                "left": 1655
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Gmail\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_04_link_gmail.png",
+            "elementBounds": {
+              "x": 1655,
+              "y": 17,
+              "width": 34,
+              "height": 24,
+              "top": 17,
+              "left": 1655
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Gmail\" para navegar",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "a.gb_X:nth-of-type(2)",
+              "text": "Imagens",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gb_X",
+              "href": "https://www.google.com/imghp?hl=pt-BR&ogbl",
+              "boundingBox": {
+                "x": 1704,
+                "y": 17,
+                "width": 50,
+                "height": 24,
+                "top": 17,
+                "left": 1704
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Imagens\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_05_link_imagens.png",
+            "elementBounds": {
+              "x": 1704,
+              "y": 17,
+              "width": 50,
+              "height": 24,
+              "top": 17,
+              "left": 1704
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Imagens\" para navegar",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "a.gb_B:nth-of-type(3)",
+              "text": "Google Apps",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gb_B",
+              "href": "https://www.google.com.br/intl/pt-BR/about/products",
+              "boundingBox": {
+                "x": 1769,
+                "y": 9,
+                "width": 40,
+                "height": 40,
+                "top": 9,
+                "left": 1769
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Google Apps\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_06_link_google_apps.png",
+            "elementBounds": {
+              "x": 1769,
+              "y": 9,
+              "width": 40,
+              "height": 40,
+              "top": 9,
+              "left": 1769
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Google Apps\" para navegar",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "a.gb_A:nth-of-type(4)",
+              "text": "Fazer login",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gb_A",
+              "href": "https://accounts.google.com/ServiceLogin?hl=pt-BR&passive=true&continue=https://www.google.com/&ec=futura_exp_og_so_72776762_e",
+              "boundingBox": {
+                "x": 1817,
+                "y": 9,
+                "width": 93,
+                "height": 40,
+                "top": 9,
+                "left": 1817
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Fazer login\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_07_link_fazer_login.png",
+            "elementBounds": {
+              "x": 1817,
+              "y": 9,
+              "width": 93,
+              "height": 40,
+              "top": 9,
+              "left": 1817
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Fazer login\" para navegar",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "a:nth-of-type(5)",
+              "text": "English",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "",
+              "href": "https://www.google.com/setprefs?sig=0_f1FRD0IMiSzUxDkFlkIxv1U7WpA%3D&hl=en&source=homepage&sa=X&ved=0ahUKEwjOwPudhvWOAxXYkIkEHYoZIGwQ2ZgBCBU",
+              "boundingBox": {
+                "x": 1034,
+                "y": 542,
+                "width": 43,
+                "height": 15,
+                "top": 542,
+                "left": 1034
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"English\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_08_link_english.png",
+            "elementBounds": {
+              "x": 1034,
+              "y": 542,
+              "width": 43,
+              "height": 15,
+              "top": 542,
+              "left": 1034
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"English\" para navegar",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "a.gb_B:nth-of-type(1)",
+              "text": "Google Apps",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gb_B",
+              "href": "https://www.google.com.br/intl/pt-BR/about/products",
+              "boundingBox": {
+                "x": 1769,
+                "y": 9,
+                "width": 40,
+                "height": 40,
+                "top": 9,
+                "left": 1769
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Google Apps\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_15_interactive_google_apps.png",
+            "elementBounds": {
+              "x": 1769,
+              "y": 9,
+              "width": 40,
+              "height": 40,
+              "top": 9,
+              "left": 1769
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Google Apps\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.Umvnrc:nth-of-type(3)",
+              "text": "Ferramentas de inserção de texto",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "Umvnrc",
+              "href": "",
+              "boundingBox": {
+                "x": 1123,
+                "y": 377,
+                "width": 40,
+                "height": 50,
+                "top": 377,
+                "left": 1123
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Ferramentas de inserção de texto\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_16_interactive_ferramentas_de_inser_o_de_text.png",
+            "elementBounds": {
+              "x": 1123,
+              "y": 377,
+              "width": 40,
+              "height": 50,
+              "top": 377,
+              "left": 1123
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Ferramentas de inserção de texto\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.XDyW0e:nth-of-type(4)",
+              "text": "Pesquisar por voz",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "XDyW0e",
+              "href": "",
+              "boundingBox": {
+                "x": 1163,
+                "y": 377,
+                "width": 40,
+                "height": 50,
+                "top": 377,
+                "left": 1163
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Pesquisar por voz\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_17_interactive_pesquisar_por_voz.png",
+            "elementBounds": {
+              "x": 1163,
+              "y": 377,
+              "width": 40,
+              "height": 50,
+              "top": 377,
+              "left": 1163
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Pesquisar por voz\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.nDcEnd:nth-of-type(5)",
+              "text": "Pesquisa por imagem",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "nDcEnd",
+              "href": "",
+              "boundingBox": {
+                "x": 1203,
+                "y": 377,
+                "width": 40,
+                "height": 50,
+                "top": 377,
+                "left": 1203
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Pesquisa por imagem\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_18_interactive_pesquisa_por_imagem.png",
+            "elementBounds": {
+              "x": 1203,
+              "y": 377,
+              "width": 40,
+              "height": 50,
+              "top": 377,
+              "left": 1203
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Pesquisa por imagem\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "input.gNO89b:nth-of-type(14)",
+              "text": "Pesquisa Google",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "gNO89b",
+              "href": "",
+              "boundingBox": {
+                "x": 816,
+                "y": 457,
+                "width": 141,
+                "height": 36,
+                "top": 457,
+                "left": 816
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Pesquisa Google\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_19_interactive_pesquisa_google.png",
+            "elementBounds": {
+              "x": 816,
+              "y": 457,
+              "width": 141,
+              "height": 36,
+              "top": 457,
+              "left": 816
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Pesquisa Google\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.cvSVBe:nth-of-type(16)",
+              "text": "Não conectar",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "cvSVBe btku5b fCrZyc NQYJvc FR7ZSc qVhvac",
+              "href": "",
+              "boundingBox": {
+                "x": 1549,
+                "y": 952,
+                "width": 150,
+                "height": 44,
+                "top": 952,
+                "left": 1549
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Não conectar\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_20_interactive_n_o_conectar.png",
+            "elementBounds": {
+              "x": 1549,
+              "y": 952,
+              "width": 150,
+              "height": 44,
+              "top": 952,
+              "left": 1549
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Não conectar\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.cvSVBe:nth-of-type(17)",
+              "text": "Fazer login",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "cvSVBe btku5b fCrZyc NQYJvc qVhvac expUPd",
+              "href": "",
+              "boundingBox": {
+                "x": 1715,
+                "y": 952,
+                "width": 133,
+                "height": 44,
+                "top": 952,
+                "left": 1715
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Fazer login\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_21_interactive_fazer_login.png",
+            "elementBounds": {
+              "x": 1715,
+              "y": 952,
+              "width": 133,
+              "height": 44,
+              "top": 952,
+              "left": 1715
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Fazer login\"",
+            "hierarchy": 2
+          },
+          {
+            "element": {
+              "selector": "div.CcNe6e:nth-of-type(15)",
+              "text": "Configurações",
+              "type": "interactive",
+              "context": "hierarchical",
+              "id": "",
+              "className": "CcNe6e",
+              "href": "",
+              "boundingBox": {
+                "x": 1780,
+                "y": 1034,
+                "width": 120,
+                "height": 46,
+                "top": 1034,
+                "left": 1780
+              },
+              "functionality": "Elemento interativo",
+              "instructions": "Interaja com \"Configurações\"",
+              "priority": 5,
+              "score": 50
+            },
+            "screenshotPath": "output/screenshots/elements/element_22_interactive_configura_es.png",
+            "elementBounds": {
+              "x": 1780,
+              "y": 1034,
+              "width": 120,
+              "height": 46,
+              "top": 1034,
+              "left": 1780
+            },
+            "functionality": "Elemento interativo",
+            "instructions": "Interaja com \"Configurações\"",
+            "hierarchy": 2
+          }
+        ]
+      },
+      {
+        "name": "Elementos de Navegação",
+        "elements": [
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(6)",
+              "text": "Sobre",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://about.google/?utm_source=google-BR&utm_medium=referral&utm_campaign=hp-footer&fg=1",
+              "boundingBox": {
+                "x": 20,
+                "y": 1034,
+                "width": 67,
+                "height": 46,
+                "top": 1034,
+                "left": 20
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Sobre\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_09_link_sobre.png",
+            "elementBounds": {
+              "x": 20,
+              "y": 1034,
+              "width": 67,
+              "height": 46,
+              "top": 1034,
+              "left": 20
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Sobre\" para navegar",
+            "hierarchy": 3
+          },
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(7)",
+              "text": "Publicidade",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://www.google.com/intl/pt-BR_br/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1",
+              "boundingBox": {
+                "x": 87,
+                "y": 1034,
+                "width": 102,
+                "height": 46,
+                "top": 1034,
+                "left": 87
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Publicidade\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_10_link_publicidade.png",
+            "elementBounds": {
+              "x": 87,
+              "y": 1034,
+              "width": 102,
+              "height": 46,
+              "top": 1034,
+              "left": 87
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Publicidade\" para navegar",
+            "hierarchy": 3
+          },
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(8)",
+              "text": "Negócios",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpbfooter&fg=1",
+              "boundingBox": {
+                "x": 190,
+                "y": 1034,
+                "width": 88,
+                "height": 46,
+                "top": 1034,
+                "left": 190
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Negócios\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_11_link_neg_cios.png",
+            "elementBounds": {
+              "x": 190,
+              "y": 1034,
+              "width": 88,
+              "height": 46,
+              "top": 1034,
+              "left": 190
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Negócios\" para navegar",
+            "hierarchy": 3
+          },
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(9)",
+              "text": "Como funciona a Pesquisa",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://google.com/search/howsearchworks/?fg=1",
+              "boundingBox": {
+                "x": 278,
+                "y": 1034,
+                "width": 197,
+                "height": 46,
+                "top": 1034,
+                "left": 278
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Como funciona a Pesquisa\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_12_link_como_funciona_a_pesquisa.png",
+            "elementBounds": {
+              "x": 278,
+              "y": 1034,
+              "width": 197,
+              "height": 46,
+              "top": 1034,
+              "left": 278
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Como funciona a Pesquisa\" para navegar",
+            "hierarchy": 3
+          },
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(10)",
+              "text": "Privacidade",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://policies.google.com/privacy?hl=pt-BR&fg=1",
+              "boundingBox": {
+                "x": 1601,
+                "y": 1034,
+                "width": 103,
+                "height": 46,
+                "top": 1034,
+                "left": 1601
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Privacidade\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_13_link_privacidade.png",
+            "elementBounds": {
+              "x": 1601,
+              "y": 1034,
+              "width": 103,
+              "height": 46,
+              "top": 1034,
+              "left": 1601
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Privacidade\" para navegar",
+            "hierarchy": 3
+          },
+          {
+            "element": {
+              "selector": "a.pHiOh:nth-of-type(11)",
+              "text": "Termos",
+              "type": "link",
+              "context": "hierarchical",
+              "id": "",
+              "className": "pHiOh",
+              "href": "https://policies.google.com/terms?hl=pt-BR&fg=1",
+              "boundingBox": {
+                "x": 1704,
+                "y": 1034,
+                "width": 76,
+                "height": 46,
+                "top": 1034,
+                "left": 1704
+              },
+              "functionality": "Link de navegação",
+              "instructions": "Clique em \"Termos\" para navegar",
+              "priority": 4,
+              "score": 40
+            },
+            "screenshotPath": "output/screenshots/elements/element_14_link_termos.png",
+            "elementBounds": {
+              "x": 1704,
+              "y": 1034,
+              "width": 76,
+              "height": 46,
+              "top": 1034,
+              "left": 1704
+            },
+            "functionality": "Link de navegação",
+            "instructions": "Clique em \"Termos\" para navegar",
+            "hierarchy": 3
+          }
+        ]
+      }
+    ]
+  }
+}

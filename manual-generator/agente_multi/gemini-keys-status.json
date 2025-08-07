@@ -1,0 +1,34 @@
+{
+  "keys": [
+    {
+      "key": "AIzaSyBSbrE6vZ8ARSVQVhLKoUUEehuyaPG59Es",
+      "isActive": true,
+      "lastUsed": "1970-01-01T00:00:00.000Z",
+      "requestCount": 0,
+      "quotaExhausted": true,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-07T03:00:00.000Z",
+      "lastError": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-1.5-flash\"},\"quotaValue\":\"50\"}]},{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"10s\"}]"
+    },
+    {
+      "key": "AIzaSyDyAm5Dz_1HKsxu1LxZtvVrzzGbDWQpi3g",
+      "isActive": true,
+      "lastUsed": "2025-08-07T00:25:18.411Z",
+      "requestCount": 9,
+      "quotaExhausted": false,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-07T03:00:00.000Z"
+    },
+    {
+      "key": "AIzaSyDFnPXGMrv-RAz9ErnnsXGb-25GtlPgfm0",
+      "isActive": true,
+      "lastUsed": "2025-08-07T00:25:12.299Z",
+      "requestCount": 8,
+      "quotaExhausted": false,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-07T03:00:00.000Z"
+    }
+  ],
+  "currentKeyIndex": 0,
+  "rotationStrategy": "health-based"
+}
