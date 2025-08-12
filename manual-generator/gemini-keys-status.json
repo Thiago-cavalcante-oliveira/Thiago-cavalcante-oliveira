@@ -1,0 +1,33 @@
+{
+  "keys": [
+    {
+      "key": "AIzaSyBSbrE6vZ8ARSVQVhLKoUUEehuyaPG59Es",
+      "isActive": true,
+      "lastUsed": "2025-08-12T15:28:09.633Z",
+      "requestCount": 3,
+      "quotaExhausted": false,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-13T03:00:00.000Z"
+    },
+    {
+      "key": "AIzaSyDyAm5Dz_1HKsxu1LxZtvVrzzGbDWQpi3g",
+      "isActive": true,
+      "lastUsed": "2025-08-12T15:26:33.280Z",
+      "requestCount": 2,
+      "quotaExhausted": false,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-13T03:00:00.000Z"
+    },
+    {
+      "key": "AIzaSyDFnPXGMrv-RAz9ErnnsXGb-25GtlPgfm0",
+      "isActive": true,
+      "lastUsed": "2025-08-12T15:28:01.552Z",
+      "requestCount": 2,
+      "quotaExhausted": false,
+      "dailyLimit": 50,
+      "resetTime": "2025-08-13T03:00:00.000Z"
+    }
+  ],
+  "currentKeyIndex": 0,
+  "rotationStrategy": "health-based"
+}

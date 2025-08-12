@@ -10,6 +10,13 @@ async function testManualGeneration(url: string, username: string, password: str
 
   const testConfig = {
     targetUrl: url,
+    authConfig: {
+      type: 'basic',
+      credentials: {
+        username,
+        password
+      }
+    },
     credentials: {
       username,
       password,

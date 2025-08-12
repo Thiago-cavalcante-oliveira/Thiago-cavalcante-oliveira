@@ -266,14 +266,19 @@ export class OrchestratorAgent extends BaseAgent {
       let authContext = null;
 
       // FASE 1: Login e Autenticação (apenas se necessário)
-      if (config.credentials) {
+      if (config.credentials || config.authConfig) {
         this.log('📋 FASE 1: Executando LoginAgent com credenciais fornecidas');
-        const loginCredentials = {
-          username: config.credentials.username,
-          password: config.credentials.password,
-          loginUrl: config.credentials.loginUrl || config.targetUrl,
-          customSteps: config.credentials.customSteps
-        };
+        const loginCredentials = config.credentials || (config.authConfig?.credentials ? {
+          username: config.authConfig.credentials.username || '',
+          password: config.authConfig.credentials.password || '',
+          loginUrl: config.targetUrl,
+          customSteps: [
+            { type: 'fill' as const, selector: 'input[type="text"]', value: config.authConfig.credentials.username },
+            { type: 'fill' as const, selector: 'input[type="password"]', value: config.authConfig.credentials.password },
+            { type: 'click' as const, selector: 'button[type="submit"]' },
+            { type: 'wait' as const, selector: '', timeout: 3000 }
+          ]
+        } : undefined);
 
         this.log('📋 FASE 1: Executando LoginAgent');
         const loginResult = await this.executeAgentTask('LoginAgent', 'authenticate', {

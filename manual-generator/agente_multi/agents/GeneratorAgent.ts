@@ -1,5 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
-import { MinIOService } from '../services/MinIOService';
+import { BaseAgent, AgentConfig, TaskData, TaskResult, type AgentCapability } from '../core/AgnoSCore.js';
+import { MinIOService } from '../services/MinIOService.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
@@ -31,11 +31,24 @@ export interface GeneratedDocuments {
 }
 
 export class GeneratorAgent extends BaseAgent {
+  protected declare config: AgentConfig;
+
   private minioService: MinIOService;
   private outputDir: string;
   private currentDocuments: GeneratedDocuments | null = null;
-
+  private logDir: string;
+  private logFile: string;
   private prompt: string;
+
+  private async logToFile(message: string, stage: string = 'generator'): Promise<void> {
+    try {
+      await fs.mkdir(this.logDir, { recursive: true });
+      const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
+      await fs.appendFile(this.logFile, logMsg, 'utf-8');
+    } catch (error) {
+      console.error(`Erro ao salvar log: ${error}`);
+    }
+  }
 
   constructor(prompt: string) {
     const config: AgentConfig = {
@@ -55,6 +68,8 @@ export class GeneratorAgent extends BaseAgent {
     this.prompt = prompt;
     this.minioService = new MinIOService();
     this.outputDir = path.join(process.cwd(), 'output', 'final_documents');
+    this.logDir = path.join(process.cwd(), 'output', 'logs');
+    this.logFile = path.join(this.logDir, 'generator-agent.log');
   }
 
   async initialize(): Promise<void> {
