@@ -1,67 +1,57 @@
-import 'dotenv/config';
-import { AgnoSCore } from './core/AgnoSCore.js';
-import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
+import { AgnoSCore } from './core/AgnoSCore';
+import { OrchestratorAgent } from './agents/OrchestratorAgent';
 
-async function testManualGeneration() {
-  console.log('🧪 Iniciando teste de geração de manual...');
+async function testManualGeneration(url: string, username: string, password: string) {
+  const core = new AgnoSCore();
+  const orchestratorAgent = new OrchestratorAgent();
+  core.registerAgent(orchestratorAgent);
 
-  try {
-    // Criar o core do sistema
-    const core = new AgnoSCore();
+  await core.start();
 
-    // Criar e registrar o agente orquestrador
-    const orchestratorAgent = new OrchestratorAgent();
-    core.registerAgent(orchestratorAgent);
+  const testConfig = {
+    targetUrl: url,
+    credentials: {
+      username,
+      password,
+      loginUrl: url,
+      customSteps: [
+        { type: 'fill', selector: 'input[type="text"]', value: username },
+        { type: 'fill', selector: 'input[type="password"]', value: password },
+        { type: 'click', selector: 'button[type="submit"]' },
+        { type: 'wait', selector: '', timeout: 3000 }
+      ]
+    },
+    enableScreenshots: true,
+    outputFormats: ['markdown'],
+    maxRetries: 1,
+    timeoutMinutes: 2
+  };
 
-    // Iniciar o sistema
-    await core.start();
+  const result = await core.executeTask(
+    'OrchestratorAgent',
+    'generate_manual',
+    testConfig,
+    'high'
+  );
 
-    console.log('✅ Sistema iniciado com sucesso!');
-
-    // Configuração de teste
-    const testConfig = {
-      targetUrl: 'https://www.google.com',
-      enableScreenshots: true,
-      outputFormats: ['markdown', 'html', 'pdf'] as const,
-      maxRetries: 2,
-      timeoutMinutes: 10
-    };
-
-    console.log(`🎯 Testando geração de manual para: ${testConfig.targetUrl}`);
-
-    // Executar tarefa de orquestração
-    const result = await core.executeTask(
-      'OrchestratorAgent',
-      'orchestrate_manual_generation',
-      testConfig,
-      'high'
-    );
-
-    if (result.success) {
-      console.log('✅ Teste de geração de manual concluído com sucesso!');
-      console.log('📊 Resultado:', result);
-      
-      if (result.markdownReport) {
-        console.log('\n📄 Relatório em Markdown:');
-        console.log('='.repeat(50));
-        console.log(result.markdownReport);
-        console.log('='.repeat(50));
-      }
-    } else {
-      console.log('❌ Teste falhou:', result.error);
+  if (result.success) {
+    console.log('✅ Manual gerado com sucesso!');
+    if (result.markdownReport) {
+      console.log(result.markdownReport);
     }
-
-    // Parar o sistema
-    await core.stop();
-
-  } catch (error) {
-    console.error('❌ Erro durante o teste:', error);
-    process.exit(1);
+  } else {
+    console.error('❌ Falha:', result.error);
   }
+
+  await core.stop();
 }
 
-// Executar o teste
-testManualGeneration().catch((error) => {
-  console.error('❌ Erro fatal no teste:', error);
+// Get command line arguments
+const [url = '', username = '', password = ''] = process.argv.slice(2);
+
+if (!url || !username || !password) {
+  console.error('Usage: ts-node test-manual-generation.ts <url> <username> <password>');
   process.exit(1);
-});
+}
+
+testManualGeneration(url, username, password).catch(console.error);

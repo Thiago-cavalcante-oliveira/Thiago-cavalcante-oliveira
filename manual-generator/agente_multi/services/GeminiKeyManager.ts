@@ -58,11 +58,12 @@ export class GeminiKeyManager {
       throw new Error('Nenhuma chave API do Gemini configurada');
     }
 
+    const now = new Date();
     // Inicializar status das chaves
     this.keyManager.keys = keys.map(key => ({
       key,
       isActive: true,
-      lastUsed: new Date(0),
+      lastUsed: now,
       requestCount: 0,
       quotaExhausted: false,
       dailyLimit: this.DAILY_LIMIT_FREE_TIER,
@@ -88,14 +89,22 @@ export class GeminiKeyManager {
     try {
       const data = await fs.readFile(this.statusFile, 'utf-8');
       const saved = JSON.parse(data) as ApiKeyManager;
+      const now = new Date();
       
       // Manter apenas chaves que ainda existem na configuração
       const currentKeys = this.keyManager.keys.map(k => k.key);
       saved.keys = saved.keys.filter(k => currentKeys.includes(k.key));
       
+      // Garantir que lastUsed e resetTime sejam Dates
+      saved.keys = saved.keys.map(key => ({
+        ...key,
+        lastUsed: new Date(key.lastUsed || now),
+        resetTime: new Date(key.resetTime || this.getNextResetTime())
+      }));
+      
       // Resetar contadores diários se necessário
       saved.keys.forEach(key => {
-        if (key.resetTime && new Date() > new Date(key.resetTime)) {
+        if (key.resetTime && now > key.resetTime) {
           key.requestCount = 0;
           key.quotaExhausted = false;
           key.resetTime = this.getNextResetTime();

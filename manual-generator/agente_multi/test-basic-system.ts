@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { AgnoSCore } from './core/AgnoSCore.js';
+import { AgnoSCore } from './core/AgnoSCore';
 
 async function testBasicSystem() {
   console.log('🧪 TESTE BÁSICO DO SISTEMA');
@@ -30,13 +30,20 @@ async function testBasicSystem() {
       
       console.log('✅ Todos os agentes importados com sucesso');
       
-      // 4. Registrar agentes (teste de compatibilidade)
+      // 4. Carregar prompts e registrar agentes (teste de compatibilidade)
+      const fs = await import('fs/promises');
+      const baseDir = new URL('.', import.meta.url).pathname;
+      
+      const analysisPrompt = await fs.readFile(`${baseDir}/prompts/analysis.prompt.txt`, 'utf-8');
+      const contentPrompt = await fs.readFile(`${baseDir}/prompts/content.prompt.txt`, 'utf-8');
+      const generatorPrompt = await fs.readFile(`${baseDir}/prompts/generator.prompt.txt`, 'utf-8');
+      
       const agents = [
         new OrchestratorAgent(),
         new CrawlerAgent(),
-        new AnalysisAgent(),
-        new ContentAgent(),
-        new GeneratorAgent(),
+        new AnalysisAgent(analysisPrompt.replace('# Prompt para AnalysisAgent', '').trim()),
+        new ContentAgent(contentPrompt.replace('# Prompt para ContentAgent', '').trim()),
+        new GeneratorAgent(generatorPrompt.replace('# Prompt para GeneratorAgent', '').trim()),
         new ScreenshotAgent(),
         new LoginAgent()
       ];

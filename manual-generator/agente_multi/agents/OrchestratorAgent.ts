@@ -1,11 +1,12 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { MinIOService } from '../services/MinIOService.js';
-import { LoginAgent } from './LoginAgent.js';
-import { CrawlerAgent } from './CrawlerAgent.js';
-import { AnalysisAgent } from './AnalysisAgent.js';
-import { ContentAgent } from './ContentAgent.js';
-import { GeneratorAgent } from './GeneratorAgent.js';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { MinIOService } from '../services/MinIOService';
+import { LoginAgent } from './LoginAgent';
+import { CrawlerAgent } from './CrawlerAgent';
+import { AnalysisAgent } from './AnalysisAgent';
+import { ContentAgent } from './ContentAgent';
+import { GeneratorAgent } from './GeneratorAgent';
 import { Browser, Page, chromium } from 'playwright';
+import { ElementGroup } from './interfaces/CrawlerTypes';
 
 export interface OrchestrationConfig {
   maxRetries: number;
@@ -13,6 +14,17 @@ export interface OrchestrationConfig {
   enableScreenshots: boolean;
   outputFormats: ('markdown' | 'html' | 'pdf')[];
   targetUrl: string;
+  credentials?: {
+    username: string;
+    password: string;
+    loginUrl?: string;
+    customSteps?: Array<{
+      type: 'fill' | 'click' | 'wait' | 'waitForSelector';
+      selector: string;
+      value?: string;
+      timeout?: number;
+    }>;
+  };
   authConfig?: {
     type: 'basic' | 'oauth' | 'custom';
     credentials?: {
@@ -38,6 +50,7 @@ export interface OrchestrationResult {
   statistics: {
     pagesProcessed: number;
     elementsAnalyzed: number;
+    totalElements: number;
     screenshotsCaptured: number;
     wordCount: number;
   };
@@ -54,6 +67,14 @@ export class OrchestratorAgent extends BaseAgent {
   private page: Page | null = null;
   private currentExecution: OrchestrationResult | null = null;
 
+  protected log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
+    const timestamp = new Date().toISOString();
+    const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
+    console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
+  }
+
+  private readonly agentConfig: AgentConfig;
+
   constructor() {
     const config: AgentConfig = {
       name: 'OrchestratorAgent',
@@ -69,6 +90,7 @@ export class OrchestratorAgent extends BaseAgent {
     };
 
     super(config);
+    this.agentConfig = config;
     this.minioService = new MinIOService();
     this.initializeAgents();
   }
@@ -94,22 +116,41 @@ export class OrchestratorAgent extends BaseAgent {
     this.log('OrchestratorAgent inicializado - pronto para orquestrar pipeline completo');
   }
 
-  private initializeAgents(): void {
+  private async loadPrompt(path: string): Promise<string> {
+    const fs = await import('fs/promises');
+    try {
+      const content = await fs.readFile(path, 'utf-8');
+      return content.replace('# Prompt para', '').trim();
+    } catch (error) {
+      this.log(`Erro ao carregar prompt de ${path}: ${error}`, 'error');
+      return '';
+    }
+  }
+
+  private async initializeAgents(): Promise<void> {
+    const baseDir = new URL('.', import.meta.url).pathname;
+    const promptsDir = new URL('../prompts', import.meta.url).pathname;
+
+    // Load prompts
+    const analysisPrompt = await this.loadPrompt(`${promptsDir}/analysis.prompt.txt`);
+    const contentPrompt = await this.loadPrompt(`${promptsDir}/content.prompt.txt`);
+    const generatorPrompt = await this.loadPrompt(`${promptsDir}/generator.prompt.txt`);
+
     this.agents.set('LoginAgent', new LoginAgent());
     this.agents.set('CrawlerAgent', new CrawlerAgent());
-    this.agents.set('AnalysisAgent', new AnalysisAgent());
-    this.agents.set('ContentAgent', new ContentAgent());
-    this.agents.set('GeneratorAgent', new GeneratorAgent());
+    this.agents.set('AnalysisAgent', new AnalysisAgent(analysisPrompt));
+    this.agents.set('ContentAgent', new ContentAgent(contentPrompt));
+    this.agents.set('GeneratorAgent', new GeneratorAgent(generatorPrompt));
 
     // Inicializar todos os agentes
-    this.agents.forEach(async (agent, name) => {
+    for (const [name, agent] of this.agents.entries()) {
       try {
         await agent.initialize();
         this.log(`Agente ${name} inicializado com sucesso`);
       } catch (error) {
         this.log(`Erro ao inicializar ${name}: ${error}`, 'error');
       }
-    });
+    }
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -146,20 +187,17 @@ export class OrchestratorAgent extends BaseAgent {
   }
 
   private async handleManualGeneration(task: TaskData): Promise<TaskResult> {
-    const { url, outputFormat, includeScreenshots, authRequired, maxDepth, title } = task.data;
+    const { targetUrl, outputFormats, enableScreenshots, authConfig, maxRetries, timeoutMinutes } = task.data;
     
-    this.log(`📖 Iniciando geração de manual: ${title || url}`);
+    this.log(`📖 Iniciando geração de manual: ${targetUrl}`);
     
     const config: OrchestrationConfig = {
-      maxRetries: 3,
-      timeoutMinutes: 10,
-      enableScreenshots: includeScreenshots || true,
-      outputFormats: outputFormat ? [outputFormat] : ['markdown'],
-      targetUrl: url,
-      authConfig: authRequired ? {
-        type: 'basic',
-        credentials: task.data.credentials
-      } : undefined
+      maxRetries: maxRetries || 3,
+      timeoutMinutes: timeoutMinutes || 10,
+      enableScreenshots: enableScreenshots || true,
+      outputFormats: outputFormats || ['markdown'],
+      targetUrl: targetUrl,
+      authConfig: authConfig
     };
     
     try {
@@ -211,6 +249,7 @@ export class OrchestratorAgent extends BaseAgent {
       statistics: {
         pagesProcessed: 0,
         elementsAnalyzed: 0,
+        totalElements: 0,
         screenshotsCaptured: 0,
         wordCount: 0
       },
@@ -221,14 +260,24 @@ export class OrchestratorAgent extends BaseAgent {
     this.currentExecution = result;
 
     try {
+      this.log('DEBUG: Início do pipeline, config:', 'info');
+      this.log(JSON.stringify(config, null, 2));
       let sessionData = null;
       let authContext = null;
 
       // FASE 1: Login e Autenticação (apenas se necessário)
-      if (config.authConfig) {
+      if (config.credentials) {
+        this.log('📋 FASE 1: Executando LoginAgent com credenciais fornecidas');
+        const loginCredentials = {
+          username: config.credentials.username,
+          password: config.credentials.password,
+          loginUrl: config.credentials.loginUrl || config.targetUrl,
+          customSteps: config.credentials.customSteps
+        };
+
         this.log('📋 FASE 1: Executando LoginAgent');
         const loginResult = await this.executeAgentTask('LoginAgent', 'authenticate', {
-          credentials: config.authConfig.credentials,
+          credentials: loginCredentials,
           page: this.page
         });
 
@@ -242,7 +291,7 @@ export class OrchestratorAgent extends BaseAgent {
         authContext = {
           loginScreenshot: loginResult.data?.loginScreenshot,
           postLoginScreenshot: loginResult.data?.postLoginScreenshot,
-          authType: config.authConfig.type
+          authType: config.authConfig?.type || 'basic'
         };
       } else {
         this.log('⏭️ FASE 1: Pulando LoginAgent - autenticação não necessária');
@@ -264,14 +313,93 @@ export class OrchestratorAgent extends BaseAgent {
 
       result.agentsExecuted.push('CrawlerAgent');
       result.reports['CrawlerAgent'] = await this.agents.get('CrawlerAgent')!.generateMarkdownReport(crawlerResult);
-      result.statistics.pagesProcessed = crawlerResult.data?.pagesProcessed || 0;
-      result.statistics.elementsAnalyzed = crawlerResult.data?.totalElements || 0;
-      result.statistics.screenshotsCaptured = crawlerResult.data?.screenshots?.length || 0;
+      
+      if (!result.statistics) {
+        result.statistics = {
+          pagesProcessed: 1,
+          elementsAnalyzed: 0,
+          totalElements: 0,
+          screenshotsCaptured: 0,
+          wordCount: 0
+        };
+      }
+
+      try {
+        // Processa dados do CrawlerAgent e ajusta estrutura
+        if (!crawlerResult.data) {
+          this.log('ERRO: crawlerResult.data está undefined!', 'error');
+          throw new Error('Crawler result missing data');
+        }
+
+        // Log para debug
+        this.log(`DEBUG: Dados do crawler: ${JSON.stringify(crawlerResult.data, null, 2)}`);
+
+        // Garantir robustez ao acessar stats
+        let totalElements = 0;
+        if (crawlerResult.data && typeof crawlerResult.data === 'object') {
+          if (crawlerResult.data.stats && typeof crawlerResult.data.stats.totalElements === 'number') {
+            totalElements = crawlerResult.data.stats.totalElements;
+          } else {
+            this.log('AVISO: stats ou totalElements ausente em crawlerResult.data', 'warn');
+            this.log(`DEBUG: crawlerResult.data.stats: ${JSON.stringify(crawlerResult.data.stats)}`);
+          }
+        } else {
+          this.log('AVISO: crawlerResult.data não é um objeto esperado', 'warn');
+        }
+
+        const stats = {
+          pagesProcessed: 1,
+          elementsAnalyzed: totalElements,
+          totalElements: totalElements,
+          screenshotsCaptured: 0,
+          wordCount: 0
+        };
+
+        // Atualiza as estatísticas no resultado
+        result.statistics = stats;
+
+        this.log(`📊 Estatísticas atualizadas: ${JSON.stringify(stats)}`);
+
+      } catch (error) {
+        this.log(`ERRO ao processar dados do crawler: ${error}`, 'error');
+        if (error instanceof Error && error.stack) {
+          this.log(`STACK: ${error.stack}`, 'error');
+        }
+        console.error('Error processing crawler data:', error);
+        throw error;
+      }
 
       // FASE 3: Análise com IA
-      this.log('🧠 FASE 3: Executando AnalysisAgent');
+  this.log('🧠 FASE 3: Executando AnalysisAgent');
+  this.log('DEBUG: Antes de executar AnalysisAgent, result.statistics:', 'info');
+  this.log(JSON.stringify(result.statistics));
+      
+      // Garantir que temos os dados mínimos necessários
+      const crawlerData = crawlerResult.data || {};
+      
+      // Criar objeto com campos padrão
+      const elements = crawlerData.elements || [];
+      
+      // Construir resultado estruturado manualmente
+      const structuredResults = {
+        url: crawlerData.url,
+        title: crawlerData.title,
+        elements: elements,
+        workflows: crawlerData.workflows || [],
+        stats: crawlerData.stats || {
+          staticElements: elements.filter((e: ElementGroup) => e.primary.isStatic).length,
+          interactiveElements: elements.filter((e: ElementGroup) => !e.primary.isStatic).length,
+          totalElements: elements.length
+        },
+        metadata: crawlerData.metadata || {
+          timestamp: new Date().toISOString(),
+          loadTime: 0,
+          elementCount: elements.length
+        }
+      };
+      
       const analysisResult = await this.executeAgentTask('AnalysisAgent', 'analyze_crawl_data', {
-        crawlResults: crawlerResult.data?.crawlResults,
+  crawlResults: [structuredResults],
         sessionData: sessionData,
         authContext: authContext
       });
@@ -289,7 +417,7 @@ export class OrchestratorAgent extends BaseAgent {
         crawlAnalysis: analysisResult.data,
         sessionData: sessionData,
         authContext: authContext,
-        rawData: crawlerResult.data?.crawlResults
+        rawData: structuredResults
       });
 
       if (!contentResult.success) {
@@ -306,7 +434,7 @@ export class OrchestratorAgent extends BaseAgent {
         crawlAnalysis: analysisResult.data,
         sessionData: sessionData,
         authContext: authContext,
-        rawData: crawlerResult.data?.crawlResults
+        rawData: structuredResults
       });
 
       if (!generatorResult.success) {
@@ -337,10 +465,14 @@ export class OrchestratorAgent extends BaseAgent {
       await this.generateFinalReport(result);
 
     } catch (error) {
+      // Captura de erro detalhada do pipeline global
+      this.log('❌ [GLOBAL CATCH] Pipeline falhou!', 'error');
+      if (error instanceof Error && error.stack) {
+        this.log(`STACK TRACE: ${error.stack}`, 'error');
+      }
       result.errors.push(error instanceof Error ? error.message : String(error));
       result.endTime = new Date();
       result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
-      
       this.log(`❌ Pipeline falhou: ${error}`, 'error');
       await this.generateErrorReport(result, error);
     }

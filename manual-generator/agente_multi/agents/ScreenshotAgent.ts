@@ -1,5 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { MinIOService } from '../services/MinIOService.js';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { MinIOService } from '../services/MinIOService';
 import { Browser, Page, chromium } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';

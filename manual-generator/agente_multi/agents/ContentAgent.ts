@@ -1,6 +1,7 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { MinIOService } from '../services/MinIOService.js';
-import { GeminiKeyManager } from '../services/GeminiKeyManager.js';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { MinIOService } from '../services/MinIOService';
+import { GeminiKeyManager } from '../services/GeminiKeyManager';
+import { LLMManager } from '../services/LLMManager.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -71,11 +72,13 @@ export interface UserFAQItem {
 
 export class ContentAgent extends BaseAgent {
   private keyManager: GeminiKeyManager;
+  private llmManager: LLMManager;
   private minioService: MinIOService;
   private currentContent: UserManualContent | null = null;
   private contentCacheFile: string;
+  private prompt: string;
 
-  constructor() {
+  constructor(prompt: string) {
     const config: AgentConfig = {
       name: 'ContentAgent',
       version: '1.0.0',
@@ -90,8 +93,9 @@ export class ContentAgent extends BaseAgent {
     };
 
     super(config);
-    
-    this.keyManager = new GeminiKeyManager();
+    this.prompt = prompt;
+  this.keyManager = new GeminiKeyManager();
+  this.llmManager = new LLMManager(this.keyManager);
     this.minioService = new MinIOService();
     this.contentCacheFile = path.join(process.cwd(), 'output', 'content-draft.md');
   }
@@ -240,14 +244,22 @@ export class ContentAgent extends BaseAgent {
   }
 
   private async generateMetadata(analysis: any): Promise<UserManualContent['metadata']> {
+    // Proteção extra e log
+    if (!analysis) {
+      this.log('AVISO: analysis está undefined em generateMetadata', 'warn');
+    }
+    if (typeof analysis?.totalElements !== 'number') {
+      this.log('AVISO: analysis.totalElements não é um número em generateMetadata', 'warn');
+      this.log(`DEBUG: analysis: ${JSON.stringify(analysis)}`);
+    }
     const prompt = `
 Baseado nesta análise de aplicação web, gere metadados para um manual do usuário:
 
 ANÁLISE:
-- Total de Páginas: ${analysis.totalPages}
-- Total de Elementos: ${analysis.totalElements}
-- Resumo: ${analysis.summary}
-- Complexidade: ${analysis.technicalInsights.complexity}
+- Total de Páginas: ${analysis?.totalPages ?? 'N/A'}
+- Total de Elementos: ${typeof analysis?.totalElements === 'number' ? analysis.totalElements : 0}
+- Resumo: ${analysis?.summary ?? 'N/A'}
+- Complexidade: ${analysis?.technicalInsights?.complexity ?? 'N/A'}
 
 Gere metadados apropriados em formato JSON:
 - title: Título atraente do manual
@@ -260,10 +272,8 @@ Foque em linguagem clara e acessível para usuários finais.
 `;
 
     try {
-      const response = await this.keyManager.handleApiCall(async (model) => {
-        return await model.generateContent(prompt);
-      });
-      const aiMetadata = this.parseAIResponse(response.response.text());
+  const response = await this.llmManager.generateContent(prompt);
+  const aiMetadata = this.parseAIResponse(response.response.text());
       
       return {
         title: aiMetadata.title || 'Manual do Usuário',
@@ -309,10 +319,8 @@ Use linguagem simples e acolhedora. Responda em JSON.
 `;
 
     try {
-      const response = await this.keyManager.handleApiCall(async (model) => {
-        return await model.generateContent(prompt);
-      });
-      const aiIntro = this.parseAIResponse(response.response.text());
+  const response = await this.llmManager.generateContent(prompt);
+  const aiIntro = this.parseAIResponse(response.response.text());
       
       return {
         overview: aiIntro.overview || 'Esta aplicação web oferece diversas funcionalidades para melhorar sua experiência digital.',
@@ -436,10 +444,8 @@ Foque em linguagem clara e instruções práticas.
 `;
 
     try {
-      const response = await this.keyManager.handleApiCall(async (model) => {
-        return await model.generateContent(prompt);
-      });
-      const aiSection = this.parseAIResponse(response.response.text());
+  const response = await this.llmManager.generateContent(prompt);
+  const aiSection = this.parseAIResponse(response.response.text());
       
       const sectionId = pageAnalysis.url.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
       
@@ -478,10 +484,8 @@ Inclua title, description, steps detalhados, tips e troubleshooting.
 `;
 
     try {
-      const response = await this.keyManager.handleApiCall(async (model) => {
-        return await model.generateContent(prompt);
-      });
-      const aiSection = this.parseAIResponse(response.response.text());
+  const response = await this.llmManager.generateContent(prompt);
+  const aiSection = this.parseAIResponse(response.response.text());
       
       return {
         id: 'main_workflows',

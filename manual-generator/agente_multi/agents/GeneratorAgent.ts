@@ -1,5 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { MinIOService } from '../services/MinIOService.js';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { MinIOService } from '../services/MinIOService';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
@@ -7,7 +7,7 @@ import { execSync } from 'child_process';
 export interface DocumentFormats {
   markdown: string;
   html: string;
-  pdf?: string;
+  pdf?: Buffer;
 }
 
 export interface GeneratedDocuments {
@@ -35,7 +35,9 @@ export class GeneratorAgent extends BaseAgent {
   private outputDir: string;
   private currentDocuments: GeneratedDocuments | null = null;
 
-  constructor() {
+  private prompt: string;
+
+  constructor(prompt: string) {
     const config: AgentConfig = {
       name: 'GeneratorAgent',
       version: '1.0.0',
@@ -50,6 +52,7 @@ export class GeneratorAgent extends BaseAgent {
     };
 
     super(config);
+    this.prompt = prompt;
     this.minioService = new MinIOService();
     this.outputDir = path.join(process.cwd(), 'output', 'final_documents');
   }
@@ -57,7 +60,8 @@ export class GeneratorAgent extends BaseAgent {
   async initialize(): Promise<void> {
     await this.minioService.initialize();
     await this.ensureOutputDirectory();
-    this.log('GeneratorAgent inicializado para geração de documentos');
+  this.log('GeneratorAgent inicializado para geração de documentos');
+  await this.logToFile('GeneratorAgent inicializado para geração de documentos', 'init');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -94,7 +98,8 @@ export class GeneratorAgent extends BaseAgent {
     const startTime = Date.now();
     const { userContent, crawlAnalysis, sessionData, authContext, rawData } = task.data;
     
-    this.log('Iniciando geração de documentos finais');
+  this.log('Iniciando geração de documentos finais');
+  await this.logToFile('Iniciando geração de documentos finais', 'start');
 
     try {
       // Gerar documentos em todos os formatos
@@ -121,7 +126,8 @@ export class GeneratorAgent extends BaseAgent {
       };
 
     } catch (error) {
-      this.log(`Erro na geração de documentos: ${error}`, 'error');
+  this.log(`Erro na geração de documentos: ${error}`, 'error');
+  await this.logToFile(`Erro na geração de documentos: ${error}`, 'error');
       throw error;
     }
   }
@@ -183,7 +189,8 @@ export class GeneratorAgent extends BaseAgent {
   }
 
   private async generateAllFormats(userContent: any, crawlAnalysis: any): Promise<GeneratedDocuments> {
-    this.log('Gerando documentos em todos os formatos (MD, HTML, PDF)');
+  this.log('Gerando documentos em todos os formatos (MD, HTML, PDF)');
+  await this.logToFile('Gerando documentos em todos os formatos (MD, HTML, PDF)', 'formats');
 
     // Gerar Markdown
     const markdownContent = await this.generateMarkdown(userContent);
@@ -197,13 +204,14 @@ export class GeneratorAgent extends BaseAgent {
 
     // Gerar PDF (se possível)
     let pdfPath: string | undefined;
-    let pdfContent: string | undefined;
+    let pdfContent: Buffer | undefined;
     try {
       pdfContent = await this.generatePDF(userContent);
       pdfPath = path.join(this.outputDir, `manual_usuario_${Date.now()}.pdf`);
-      await fs.writeFile(pdfPath, pdfContent, 'binary');
+      await fs.writeFile(pdfPath, pdfContent);
     } catch (error) {
-      this.log(`PDF não pôde ser gerado: ${error}`, 'warn');
+  this.log(`PDF não pôde ser gerado: ${error}`, 'warn');
+  await this.logToFile(`PDF não pôde ser gerado: ${error}`, 'warn');
     }
 
     // Upload para MinIO
@@ -239,7 +247,8 @@ export class GeneratorAgent extends BaseAgent {
       }
     };
 
-    this.log(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`);
+  this.log(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`);
+  await this.logToFile(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`, 'done');
     return documents;
   }
 
@@ -673,7 +682,7 @@ Esta seção contém soluções para os problemas mais comuns:
     return html;
   }
 
-  private async generatePDF(userContent: any): Promise<string> {
+  private async generatePDF(userContent: any): Promise<Buffer> {
     // Para geração de PDF, tentaremos usar puppeteer se disponível
     // Caso contrário, retornaremos uma mensagem explicativa
     
@@ -700,7 +709,7 @@ Esta seção contém soluções para os problemas mais comuns:
         });
         
         await browser.close();
-        return Buffer.from(pdfBuffer).toString('base64');
+        return Buffer.from(pdfBuffer);
       } else {
         throw new Error('Puppeteer não disponível para geração de PDF');
       }
@@ -713,7 +722,8 @@ Esta seção contém soluções para os problemas mais comuns:
 
   private async updateDocuments(updates: any, format?: string): Promise<any> {
     // Implementação futura para atualização de documentos
-    this.log('Funcionalidade de atualização de documentos não implementada ainda');
+  this.log('Funcionalidade de atualização de documentos não implementada ainda');
+  await this.logToFile('Funcionalidade de atualização de documentos não implementada ainda', 'warn');
     return null;
   }
 
@@ -725,7 +735,8 @@ Esta seção contém soluções para os problemas mais comuns:
     try {
       await fs.mkdir(this.outputDir, { recursive: true });
     } catch (error) {
-      this.log(`Erro ao criar diretório de saída: ${error}`, 'warn');
+  this.log(`Erro ao criar diretório de saída: ${error}`, 'warn');
+  await this.logToFile(`Erro ao criar diretório de saída: ${error}`, 'warn');
     }
   }
 
@@ -835,6 +846,7 @@ ${documents.formats.pdf ? '**PDF:**\n- Layout profissional\n- Pronto para impres
 
   async cleanup(): Promise<void> {
     this.currentDocuments = null;
-    this.log('GeneratorAgent finalizado - documentos gerados com sucesso');
+  this.log('GeneratorAgent finalizado - documentos gerados com sucesso');
+  await this.logToFile('GeneratorAgent finalizado - documentos gerados com sucesso', 'done');
   }
 }

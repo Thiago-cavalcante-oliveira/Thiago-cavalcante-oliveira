@@ -1,12 +1,14 @@
 import 'dotenv/config';
-import { AgnoSCore } from './core/AgnoSCore.js';
-import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
-import { LoginAgent } from './agents/LoginAgent.js';
-import { CrawlerAgent } from './agents/CrawlerAgent.js';
-import { AnalysisAgent } from './agents/AnalysisAgent.js';
-import { ContentAgent } from './agents/ContentAgent.js';
-import { GeneratorAgent } from './agents/GeneratorAgent.js';
-import { ScreenshotAgent } from './agents/ScreenshotAgent.js';
+import { AgnoSCore } from './core/AgnoSCore';
+import { OrchestratorAgent } from './agents/OrchestratorAgent';
+import { LoginAgent } from './agents/LoginAgent';
+import { CrawlerAgent } from './agents/CrawlerAgent';
+import { AnalysisAgent } from './agents/AnalysisAgent';
+import { ContentAgent } from './agents/ContentAgent';
+import { GeneratorAgent } from './agents/GeneratorAgent';
+import { ScreenshotAgent } from './agents/ScreenshotAgent';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 async function main() {
   console.log('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais...');
@@ -15,13 +17,18 @@ async function main() {
     // Criar o core do sistema
     const core = new AgnoSCore();
 
+    // Carregar prompts externos
+    const analysisPrompt = readFileSync(join(__dirname, 'prompts/analysis.prompt.txt'), 'utf-8');
+    const contentPrompt = readFileSync(join(__dirname, 'prompts/content.prompt.txt'), 'utf-8');
+    const generatorPrompt = readFileSync(join(__dirname, 'prompts/generator.prompt.txt'), 'utf-8');
+
     // Criar e registrar agentes
     const orchestratorAgent = new OrchestratorAgent();
     const loginAgent = new LoginAgent();
     const crawlerAgent = new CrawlerAgent();
-    const analysisAgent = new AnalysisAgent();
-    const contentAgent = new ContentAgent();
-    const generatorAgent = new GeneratorAgent();
+    const analysisAgent = new AnalysisAgent(analysisPrompt);
+    const contentAgent = new ContentAgent(contentPrompt);
+    const generatorAgent = new GeneratorAgent(generatorPrompt);
     const screenshotAgent = new ScreenshotAgent();
 
     // Registrar todos os agentes
