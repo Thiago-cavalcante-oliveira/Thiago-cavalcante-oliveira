@@ -67,7 +67,7 @@ export class OrchestratorAgent extends BaseAgent {
   private page: Page | null = null;
   private currentExecution: OrchestrationResult | null = null;
 
-  protected log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
+  protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
     const timestamp = new Date().toISOString();
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
     console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
@@ -128,8 +128,10 @@ export class OrchestratorAgent extends BaseAgent {
   }
 
   private async initializeAgents(): Promise<void> {
-    const baseDir = new URL('.', import.meta.url).pathname;
-    const promptsDir = new URL('../prompts', import.meta.url).pathname;
+    const path = await import('path');
+    
+    // Use relative paths from current working directory
+    const promptsDir = path.resolve('./prompts');
 
     // Load prompts
     const analysisPrompt = await this.loadPrompt(`${promptsDir}/analysis.prompt.txt`);
@@ -143,11 +145,12 @@ export class OrchestratorAgent extends BaseAgent {
     this.agents.set('GeneratorAgent', new GeneratorAgent(generatorPrompt));
 
     // Inicializar todos os agentes
-    for (const [name, agent] of this.agents.entries()) {
+    const agentEntries = Array.from(this.agents.entries());
+    for (const [name, agent] of agentEntries) {
       try {
         await agent.initialize();
         this.log(`Agente ${name} inicializado com sucesso`);
-      } catch (error) {
+      } catch (error: any) {
         this.log(`Erro ao inicializar ${name}: ${error}`, 'error');
       }
     }
@@ -260,7 +263,7 @@ export class OrchestratorAgent extends BaseAgent {
     this.currentExecution = result;
 
     try {
-      this.log('DEBUG: Início do pipeline, config:', 'info');
+      this.log('Início do pipeline', 'info');
       this.log(JSON.stringify(config, null, 2));
       let sessionData = null;
       let authContext = null;
@@ -336,8 +339,7 @@ export class OrchestratorAgent extends BaseAgent {
           throw new Error('Crawler result missing data');
         }
 
-        // Log para debug
-        this.log(`DEBUG: Dados do crawler: ${JSON.stringify(crawlerResult.data, null, 2)}`);
+        
 
         // Garantir robustez ao acessar stats
         let totalElements = 0;
@@ -346,7 +348,7 @@ export class OrchestratorAgent extends BaseAgent {
             totalElements = crawlerResult.data.stats.totalElements;
           } else {
             this.log('AVISO: stats ou totalElements ausente em crawlerResult.data', 'warn');
-            this.log(`DEBUG: crawlerResult.data.stats: ${JSON.stringify(crawlerResult.data.stats)}`);
+
           }
         } else {
           this.log('AVISO: crawlerResult.data não é um objeto esperado', 'warn');
@@ -376,7 +378,7 @@ export class OrchestratorAgent extends BaseAgent {
 
       // FASE 3: Análise com IA
   this.log('🧠 FASE 3: Executando AnalysisAgent');
-  this.log('DEBUG: Antes de executar AnalysisAgent, result.statistics:', 'info');
+  this.log('Executando análise dos dados coletados', 'info');
   this.log(JSON.stringify(result.statistics));
       
       // Garantir que temos os dados mínimos necessários

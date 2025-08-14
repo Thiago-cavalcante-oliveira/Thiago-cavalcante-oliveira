@@ -1,5 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult, type AgentCapability } from '../core/AgnoSCore.js';
-import { MinIOService } from '../services/MinIOService.js';
+import { BaseAgent, AgentConfig, TaskData, TaskResult, type AgentCapability } from '../core/AgnoSCore';
+import { MinIOService } from '../services/MinIOService';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';

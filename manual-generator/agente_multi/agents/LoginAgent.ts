@@ -2,6 +2,8 @@ import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore'
 import { Page } from 'playwright';
 import { MinIOService } from '../services/MinIOService';
 import { AuthDetectionResult } from './interfaces/AuthTypes';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 export interface LoginCredentials {
   username: string;
@@ -21,6 +23,18 @@ export class LoginAgent extends BaseAgent {
   private page: Page | null = null;
   private minioService: MinIOService;
   private sessionData: any = null;
+  private logDir: string;
+  private logFile: string;
+
+  private async logToFile(message: string, stage: string = 'login'): Promise<void> {
+    try {
+      await fs.mkdir(this.logDir, { recursive: true });
+      const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
+      await fs.appendFile(this.logFile, logMsg, 'utf-8');
+    } catch (error) {
+      console.error(`Erro ao salvar log: ${error}`);
+    }
+  }
 
   constructor() {
     const config: AgentConfig = {
@@ -37,11 +51,14 @@ export class LoginAgent extends BaseAgent {
 
     super(config);
     this.minioService = new MinIOService();
+    this.logDir = path.join(process.cwd(), 'output', 'logs');
+    this.logFile = path.join(this.logDir, 'login-agent.log');
   }
 
   async initialize(): Promise<void> {
     await this.minioService.initialize();
     this.log('LoginAgent inicializado e pronto para autenticação');
+    await this.logToFile('LoginAgent inicializado e pronto para autenticação', 'init');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -75,20 +92,37 @@ export class LoginAgent extends BaseAgent {
   }
 
   private async handleAuthentication(task: TaskData): Promise<TaskResult> {
+    const startTime = Date.now();
     const { credentials, page } = task.data;
     this.page = page;
     if (!this.page) throw new Error('Página não fornecida para autenticação');
     this.log(`Iniciando autenticação dinâmica para: ${credentials.loginUrl || 'página atual'}`);
     const stepLog: any[] = [];
+    const screenshots: Record<string, string | null> = {};
+    
     try {
       // 1. Navegar para página de login se especificada
       if (credentials.loginUrl) {
-        await this.page.goto(credentials.loginUrl, { waitUntil: 'domcontentloaded' });
-        await this.page.waitForTimeout(2000);
-        stepLog.push({ action: 'goto', url: credentials.loginUrl, screenshot: await this.captureLoginPage() });
+        await this.page.goto(credentials.loginUrl, { waitUntil: 'networkidle' });
+        await this.page.waitForTimeout(1000); // Aguardo adicional para estabilização
+        stepLog.push({ action: 'goto', url: credentials.loginUrl });
       }
+      
+      // Detectar redirecionamentos ou modais
+      await this.handleRedirectsAndModals();
+      
+      // Capturar tela de login completa
+      screenshots['tela_login'] = await this.captureLoginPage();
+      stepLog.push({ action: 'screenshot', type: 'login_page', url: screenshots['tela_login'] });
 
-      // 2. Busca ativa de campos de login (inclui campos dinâmicos)
+      // 2. Detectar e capturar elementos de login individuais
+      await this.detectAndCaptureLoginElements(screenshots);
+      
+      // 3. Detectar logins alternativos
+      const alternativeLogins = await this.detectAlternativeLogins();
+      stepLog.push({ action: 'detect_alt_logins', count: alternativeLogins.length, logins: alternativeLogins });
+      
+      // 4. Busca ativa de campos de login (inclui campos dinâmicos)
       let usernameField = await this.page.$('input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"]');
       let passwordField = await this.page.$('input[type="password"]');
       if (!usernameField || !passwordField) {
@@ -135,26 +169,25 @@ export class LoginAgent extends BaseAgent {
         await passwordField.press('Enter');
         stepLog.push({ action: 'press_enter', screenshot: await this.captureLoginPage() });
       }
-      await this.page.waitForTimeout(4000);
+      await this.page.waitForLoadState('networkidle');
 
-      // 5. Chamar CrawlerAgent para mapear elementos pós-login (opcional, pode ser expandido)
-      this.sendTask('CrawlerAgent', 'crawl_login_flow', {
-        url: await this.page.url(),
-        stepLog
-      }, 'normal');
-
-      // 6. Verificar sucesso do login
+      // 5. Verificar sucesso do login
       const authSuccess = await this.verifyAuthenticationSuccess();
-      stepLog.push({ action: 'verify_success', success: authSuccess, screenshot: await this.capturePostLoginPage() });
+      screenshots['tela_pos_login'] = await this.capturePostLoginPage();
+      stepLog.push({ action: 'verify_success', success: authSuccess, screenshot: screenshots['tela_pos_login'] });
 
       if (authSuccess) {
         this.sessionData = await this.captureSessionData();
+        stepLog.push({ action: 'capture_session', sessionId: this.sessionData?.sessionId });
+        
         // Notificar próximo agente (CrawlerAgent) para crawling autenticado
         this.sendTask('CrawlerAgent', 'start_authenticated_crawl', {
           sessionData: this.sessionData,
           loginSteps: stepLog,
-          credentials: { username: credentials.username, loginUrl: credentials.loginUrl }
+          credentials: { username: credentials.username, loginUrl: credentials.loginUrl },
+          screenshots
         }, 'high');
+        
         return {
           id: task.id,
           taskId: task.id,
@@ -163,10 +196,13 @@ export class LoginAgent extends BaseAgent {
             authenticated: true,
             sessionId: this.sessionData.sessionId,
             userContext: this.sessionData.userContext,
-            loginSteps: stepLog
+            loginSteps: stepLog,
+            screenshots,
+            authType: 'basic',
+            alternativeLogins
           },
           timestamp: new Date(),
-          processingTime: 0
+          processingTime: Date.now() - startTime
         };
       } else {
         return {
@@ -174,14 +210,30 @@ export class LoginAgent extends BaseAgent {
           taskId: task.id,
           success: false,
           error: 'Falha na autenticação - verifique as credenciais',
-          data: { loginSteps: stepLog },
+          data: { loginSteps: stepLog, screenshots },
           timestamp: new Date(),
-          processingTime: 0
+          processingTime: Date.now() - startTime
         };
       }
     } catch (error) {
       this.log(`Erro na autenticação dinâmica: ${error}`, 'error');
-      throw error;
+      
+      // Capturar screenshot de erro se possível
+      try {
+        screenshots['tela_erro'] = await this.captureLoginPage();
+      } catch (screenshotError) {
+        this.log(`Erro ao capturar screenshot de erro: ${screenshotError}`, 'warn');
+      }
+      
+      return {
+        id: task.id,
+        taskId: task.id,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        data: { loginSteps: stepLog, screenshots },
+        timestamp: new Date(),
+        processingTime: Date.now() - startTime
+      };
     }
   }
 
@@ -225,6 +277,122 @@ export class LoginAgent extends BaseAgent {
 
     } catch (error) {
       throw error;
+    }
+  }
+
+  private async handleRedirectsAndModals(): Promise<void> {
+    if (!this.page) return;
+    
+    try {
+      // Aguardar possíveis redirecionamentos
+      await this.page.waitForTimeout(2000);
+      
+      // Verificar e fechar modais/popups que podem interferir
+      const modalSelectors = [
+        '[class*="modal"]',
+        '[class*="popup"]',
+        '[class*="overlay"]',
+        '.cookie-banner',
+        '[data-testid="cookie-banner"]'
+      ];
+      
+      for (const selector of modalSelectors) {
+        const modal = await this.page.$(selector);
+        if (modal) {
+          const closeButton = await modal.$('button[class*="close"], .close, [aria-label="close"], [aria-label="Close"]');
+          if (closeButton) {
+            await closeButton.click();
+            await this.page.waitForTimeout(500);
+          }
+        }
+      }
+    } catch (error) {
+      this.log(`Erro ao lidar com redirecionamentos/modais: ${error}`, 'warn');
+    }
+  }
+
+  private async detectAndCaptureLoginElements(screenshots: Record<string, string | null>): Promise<void> {
+    if (!this.page) return;
+    
+    try {
+      // Capturar elementos individuais de login
+      const usernameField = await this.page.$('input[type="email"], input[type="text"], input[name*="user"], input[name*="login"]');
+      const passwordField = await this.page.$('input[type="password"]');
+      
+      if (usernameField) {
+        await usernameField.scrollIntoViewIfNeeded();
+        screenshots['campo_usuario'] = await this.captureElementScreenshot(usernameField, 'campo_usuario');
+      }
+      
+      if (passwordField) {
+        await passwordField.scrollIntoViewIfNeeded();
+        screenshots['campo_senha'] = await this.captureElementScreenshot(passwordField, 'campo_senha');
+      }
+      
+      // Capturar botão de submit se existir
+      const submitButton = await this.page.$('button[type="submit"], input[type="submit"], button[class*="login"]');
+      if (submitButton) {
+        await submitButton.scrollIntoViewIfNeeded();
+        screenshots['botao_login'] = await this.captureElementScreenshot(submitButton, 'botao_login');
+      }
+    } catch (error) {
+      this.log(`Erro ao capturar elementos de login: ${error}`, 'warn');
+    }
+  }
+
+  private async detectAlternativeLogins(): Promise<Array<{type: string, selector: string, text: string}>> {
+    if (!this.page) return [];
+    
+    try {
+      const altLogins = await this.page.evaluate(() => {
+        const alternatives: Array<{type: string, selector: string, text: string}> = [];
+        
+        // Detectar logins sociais
+        const socialSelectors = [
+          { type: 'Google', patterns: ['.google', '[data-provider="google"]', '[class*="google-login"]'] },
+          { type: 'Facebook', patterns: ['.facebook', '[data-provider="facebook"]', '[class*="facebook-login"]'] },
+          { type: 'GitHub', patterns: ['.github', '[data-provider="github"]', '[class*="github-login"]'] },
+          { type: 'Microsoft', patterns: ['.microsoft', '[data-provider="microsoft"]', '[class*="microsoft-login"]'] }
+        ];
+        
+        socialSelectors.forEach(social => {
+          social.patterns.forEach(pattern => {
+            const element = document.querySelector(pattern);
+            if (element) {
+              alternatives.push({
+                type: social.type,
+                selector: pattern,
+                text: element.textContent?.trim() || ''
+              });
+            }
+          });
+        });
+        
+        return alternatives;
+      });
+      
+      return altLogins;
+    } catch (error) {
+      this.log(`Erro ao detectar logins alternativos: ${error}`, 'warn');
+      return [];
+    }
+  }
+
+  private async captureElementScreenshot(element: any, name: string): Promise<string | null> {
+    try {
+      const filename = `${name}_${Date.now()}.png`;
+      const localPath = `output/screenshots/${filename}`;
+      
+      await element.screenshot({ path: localPath, type: 'png' });
+      
+      // Upload para MinIO
+      const minioUrl = await this.minioService.uploadScreenshot(localPath, filename);
+      
+      this.log(`Screenshot do elemento ${name} capturado: ${filename}`);
+      return minioUrl || localPath;
+    } catch (error) {
+      this.log(`Erro ao capturar screenshot do elemento ${name}: ${error}`, 'warn');
+      return null;
     }
   }
 
@@ -592,9 +760,26 @@ export class LoginAgent extends BaseAgent {
 `;
       
       if (taskResult.data.screenshots) {
-        taskResult.data.screenshots.forEach((screenshot: string, index: number) => {
-          report += `${index + 1}. ![Screenshot ${index + 1}](${screenshot})\n`;
+        Object.entries(taskResult.data.screenshots).forEach(([key, url]) => {
+          if (url) {
+            report += `### ${key.replace('_', ' ').toUpperCase()}
+![${key}](${url})
+
+`;
+          }
         });
+      }
+
+      if (taskResult.data.loginSteps) {
+        report += `## Passos da Autenticação
+
+`;
+        taskResult.data.loginSteps.forEach((step: any, index: number) => {
+          report += `${index + 1}. **${step.action}**: ${JSON.stringify(step, null, 2)}
+`;
+        });
+        report += `
+`;
       }
 
       report += `
@@ -610,7 +795,23 @@ export class LoginAgent extends BaseAgent {
 
 **Erro:** ${taskResult.error}
 
-## Ações Recomendadas
+`;
+      
+      if (taskResult.data?.screenshots) {
+        report += `## Screenshots de Diagnóstico
+
+`;
+        Object.entries(taskResult.data.screenshots).forEach(([key, url]) => {
+          if (url) {
+            report += `### ${key.replace('_', ' ').toUpperCase()}
+![${key}](${url})
+
+`;
+          }
+        });
+      }
+      
+      report += `## Ações Recomendadas
 
 - Verificar credenciais fornecidas
 - Verificar se a URL de login está correta
@@ -628,6 +829,10 @@ export class LoginAgent extends BaseAgent {
 
   setPage(page: Page): void {
     this.page = page;
+  }
+
+  getSessionData(): any {
+    return this.sessionData;
   }
 
   async cleanup(): Promise<void> {

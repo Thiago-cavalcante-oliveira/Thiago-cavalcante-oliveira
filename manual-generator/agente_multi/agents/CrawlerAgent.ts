@@ -1,6 +1,7 @@
 import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
 import { Page, Browser } from 'playwright';
 import { MinIOService } from '../services/MinIOService';
+import { LLMManager } from '../services/LLMManager';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import {
@@ -9,7 +10,7 @@ import {
   ElementGroup,
   CrawlResult,
   RelatedElement
-} from './interfaces/CrawlerTypes.js';
+} from './interfaces/CrawlerTypes';
 
 export interface PageData {
   url: string;
@@ -23,16 +24,292 @@ export interface PageData {
   };
 }
 
+export interface InteractionResult {
+  element: {
+    type: string;
+    text: string;
+    selector: string;
+    location: string;
+  };
+  functionality: {
+    action: string;
+    expectedResult: string;
+    triggersWhat: string;
+    destinationUrl: string | null;
+    opensModal: boolean;
+    changesPageContent: boolean;
+  };
+  interactionResults: {
+    wasClicked: boolean;
+    visualChanges: string[];
+    newElementsAppeared: string[];
+    navigationOccurred: boolean;
+    screenshotBefore: string;
+    screenshotAfter: string;
+  };
+}
+
+export interface ProxyConfig {
+  proxy: {
+    enabled: boolean;
+    host: string;
+    port: string;
+    username: string;
+    password: string;
+    protocol: string;
+  };
+  authentication: {
+    autoDetect: boolean;
+    timeout: number;
+    retryAttempts: number;
+  };
+  selectors: {
+    usernameField: string;
+    passwordField: string;
+    submitButton: string;
+    authDialog: string;
+    authForm: string;
+  };
+}
+
+export interface ProxyAuthResult {
+  detected: boolean;
+  authenticated: boolean;
+  error?: string;
+}
+
 export class CrawlerAgent extends BaseAgent {
   private page: Page | null = null;
   private browser: Browser | null = null;
   private minioService: MinIOService;
+  private llmManager: LLMManager;
+  private screenshots: string[] = [];
+  private proxyConfig: ProxyConfig | null = null;
   private visitedPages: Set<string> = new Set();
   private allPageData: PageData[] = [];
+  private discoveredPages: Array<{
+    url: string;
+    title: string;
+    accessMethod: string;
+    functionality: string;
+  }> = [];
+  private logDir: string;
+  private logFile: string;
+  private retryAttempts: number = 3;
+  private retryDelay: number = 2000;
+
+  private async logToFile(message: string, stage: string = 'crawler'): Promise<void> {
+    try {
+      await fs.mkdir(this.logDir, { recursive: true });
+      const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
+      await fs.appendFile(this.logFile, logMsg, 'utf-8');
+    } catch (error) {
+      console.error(`Erro ao salvar log: ${error}`);
+    }
+  }
+
+  private async retryWithFallback<T>(operation: () => Promise<T>, operationName: string): Promise<T | null> {
+    for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+      try {
+        await this.logToFile(`Tentativa ${attempt}/${this.retryAttempts} para ${operationName}`);
+        const result = await operation();
+        await this.logToFile(`${operationName} executado com sucesso na tentativa ${attempt}`);
+        return result;
+      } catch (error) {
+        await this.logToFile(`Erro na tentativa ${attempt}/${this.retryAttempts} para ${operationName}: ${error}`, 'error');
+        if (attempt < this.retryAttempts) {
+          await this.logToFile(`Aguardando ${this.retryDelay}ms antes da próxima tentativa`);
+          await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+        }
+      }
+    }
+    await this.logToFile(`Todas as tentativas falharam para ${operationName}`, 'error');
+    return null;
+  }
+
+  private createFailedInteractionResult(element: any, screenshotBefore: string): InteractionResult {
+    return {
+      element: {
+        type: element.type,
+        text: element.text,
+        selector: element.selector,
+        location: 'main-content'
+      },
+      functionality: {
+        action: `attempted click on ${element.type}`,
+        expectedResult: 'failed to interact',
+        triggersWhat: 'error',
+        destinationUrl: element.href,
+        opensModal: false,
+        changesPageContent: false
+      },
+      interactionResults: {
+        wasClicked: false,
+        visualChanges: [],
+        newElementsAppeared: [],
+        navigationOccurred: false,
+        screenshotBefore: screenshotBefore,
+        screenshotAfter: ''
+      }
+    };
+  }
 
   setPage(page: Page | null): void {
     this.page = page;
     this.log('CrawlerAgent: página definida');
+  }
+
+  private async loadProxyConfig(): Promise<void> {
+    try {
+      const configPath = path.join(__dirname, '..', 'proxy-config.json');
+      const configData = await fs.readFile(configPath, 'utf-8');
+      this.proxyConfig = JSON.parse(configData) as ProxyConfig;
+      console.log('📋 Configuração de proxy carregada');
+    } catch (error) {
+      console.warn('⚠️ Arquivo de configuração de proxy não encontrado, usando configuração padrão');
+      this.proxyConfig = null;
+    }
+  }
+
+  private async detectProxyAuth(): Promise<boolean> {
+    if (!this.page || !this.proxyConfig?.authentication.autoDetect) {
+      return false;
+    }
+
+    try {
+      // Verificar se há diálogos de autenticação visíveis
+      const authDialog = await this.page.$(this.proxyConfig.selectors.authDialog);
+      if (authDialog) {
+        console.log('🔐 Diálogo de autenticação de proxy detectado');
+        return true;
+      }
+
+      // Verificar se há formulários de autenticação
+      const authForm = await this.page.$(this.proxyConfig.selectors.authForm);
+      if (authForm) {
+        console.log('🔐 Formulário de autenticação de proxy detectado');
+        return true;
+      }
+
+      // Verificar se há campos de usuário e senha visíveis
+      const usernameField = await this.page.$(this.proxyConfig.selectors.usernameField);
+      const passwordField = await this.page.$(this.proxyConfig.selectors.passwordField);
+      
+      if (usernameField && passwordField) {
+        const usernameVisible = await usernameField.isVisible();
+        const passwordVisible = await passwordField.isVisible();
+        
+        if (usernameVisible && passwordVisible) {
+          console.log('🔐 Campos de autenticação de proxy detectados');
+          return true;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.warn('⚠️ Erro ao detectar autenticação de proxy:', error);
+      return false;
+    }
+  }
+
+  private async handleProxyAuth(): Promise<ProxyAuthResult> {
+    if (!this.page || !this.proxyConfig) {
+      return { detected: false, authenticated: false, error: 'Configuração de proxy não disponível' };
+    }
+
+    const { proxy, authentication, selectors } = this.proxyConfig;
+
+    if (!proxy.enabled || !proxy.username || !proxy.password) {
+      return { detected: false, authenticated: false, error: 'Credenciais de proxy não configuradas' };
+    }
+
+    try {
+      console.log('🔐 Iniciando autenticação de proxy...');
+
+      // Aguardar um pouco para garantir que os elementos estejam carregados
+      await this.page.waitForTimeout(2000);
+
+      // Tentar preencher campo de usuário
+      const usernameField = await this.page.$(selectors.usernameField);
+      if (usernameField) {
+        await usernameField.fill(proxy.username);
+        console.log('✅ Campo de usuário preenchido');
+      } else {
+        console.warn('⚠️ Campo de usuário não encontrado');
+      }
+
+      // Tentar preencher campo de senha
+      const passwordField = await this.page.$(selectors.passwordField);
+      if (passwordField) {
+        await passwordField.fill(proxy.password);
+        console.log('✅ Campo de senha preenchido');
+      } else {
+        console.warn('⚠️ Campo de senha não encontrado');
+      }
+
+      // Tentar clicar no botão de submit
+      const submitButton = await this.page.$(selectors.submitButton);
+      if (submitButton) {
+        await submitButton.click();
+        console.log('✅ Botão de autenticação clicado');
+        
+        // Aguardar processamento da autenticação
+        await this.page.waitForTimeout(authentication.timeout);
+        
+        // Verificar se ainda há campos de autenticação (indicando falha)
+        const stillNeedsAuth = await this.detectProxyAuth();
+        
+        if (!stillNeedsAuth) {
+          console.log('✅ Autenticação de proxy bem-sucedida');
+          return { detected: true, authenticated: true };
+        } else {
+          console.warn('❌ Autenticação de proxy falhou');
+          return { detected: true, authenticated: false, error: 'Credenciais inválidas' };
+        }
+      } else {
+        console.warn('⚠️ Botão de submit não encontrado');
+        return { detected: true, authenticated: false, error: 'Botão de submit não encontrado' };
+      }
+    } catch (error) {
+       console.error('❌ Erro durante autenticação de proxy:', error);
+       return { detected: true, authenticated: false, error: String(error) };
+     }
+  }
+
+  private async checkAndHandleProxyAuth(): Promise<void> {
+    if (!this.proxyConfig?.authentication.autoDetect) {
+      return;
+    }
+
+    const maxRetries = this.proxyConfig.authentication.retryAttempts;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      const needsAuth = await this.detectProxyAuth();
+      
+      if (!needsAuth) {
+        break;
+      }
+
+      console.log(`🔄 Tentativa de autenticação de proxy ${retryCount + 1}/${maxRetries}`);
+      const authResult = await this.handleProxyAuth();
+      
+      if (authResult.authenticated) {
+        console.log('✅ Autenticação de proxy concluída com sucesso');
+        break;
+      }
+
+      retryCount++;
+      
+      if (retryCount < maxRetries) {
+        console.log(`⏳ Aguardando antes da próxima tentativa...`);
+        await this.page?.waitForTimeout(2000);
+      }
+    }
+
+    if (retryCount >= maxRetries) {
+      console.warn('⚠️ Máximo de tentativas de autenticação de proxy atingido');
+    }
   }
 
   setBrowser(browser: Browser | null): void {
@@ -40,34 +317,83 @@ export class CrawlerAgent extends BaseAgent {
     this.log('CrawlerAgent: browser definido');
   }
 
-
-
-  constructor() {
+  constructor(minioService?: MinIOService, llmManager?: LLMManager) {
     const config: AgentConfig = {
       name: 'CrawlerAgent',
-      version: '1.1.0',
-      description: 'Agente especializado em navegação web e detecção de elementos interativos e estáticos',
+      version: '2.0.0',
+      description: 'Agente especializado em navegação web interativa e análise completa de funcionalidades',
       capabilities: [
-        { name: 'web_crawling', description: 'Navegação web inteligente', version: '1.0.0' },
-        { name: 'element_detection', description: 'Detecção de elementos', version: '1.1.0' },
-        { name: 'interaction_analysis', description: 'Análise de interações', version: '1.0.0' }
+        { name: 'interactive_crawling', description: 'Navegação web com interações reais', version: '2.0.0' },
+        { name: 'visual_interaction', description: 'Cliques e interações visuais', version: '2.0.0' },
+        { name: 'functionality_mapping', description: 'Mapeamento completo de funcionalidades', version: '2.0.0' },
+        { name: 'workflow_analysis', description: 'Análise de workflows completos', version: '2.0.0' }
       ]
     };
 
     super(config);
-    this.minioService = new MinIOService();
+    this.minioService = minioService || new MinIOService();
+     this.llmManager = llmManager || new LLMManager('gemini');
+     this.logDir = path.join(process.cwd(), 'output', 'logs');
+     this.logFile = path.join(this.logDir, 'crawler-agent.log');
+     this.loadProxyConfig();
+  }
+
+  private async captureScreenshot(filename: string): Promise<string> {
+    if (!this.page) return '';
+    
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const screenshotPath = `/tmp/screenshot-${filename}-${timestamp}.png`;
+      
+      await this.page.screenshot({ 
+        path: screenshotPath, 
+        fullPage: true 
+      });
+      
+      // Upload para MinIO
+      const buffer = await fs.readFile(screenshotPath);
+      const minioPath = `screenshots/${filename}-${timestamp}.png`;
+      await this.minioService.uploadFile(minioPath, buffer.toString('base64'));
+      
+      // Limpar arquivo temporário
+      await fs.unlink(screenshotPath).catch(() => {});
+      
+      this.screenshots.push(minioPath);
+      return minioPath;
+    } catch (error) {
+      this.log(`Erro ao capturar screenshot: ${error}`, 'error');
+      return '';
+    }
   }
 
   async initialize(): Promise<void> {
     await this.minioService.initialize();
-    this.log('CrawlerAgent inicializado e pronto para navegação');
+    this.log('CrawlerAgent inicializado e pronto para navegação interativa');
+    await this.logToFile('CrawlerAgent inicializado e pronto para navegação interativa', 'init');
   }
 
-  private async detectAllElements(): Promise<ElementGroup[]> {
-    if (!this.page) return [];
+  private async detectAndInteractWithElements(): Promise<InteractionResult[]> {
+    if (!this.page) {
+      await this.logToFile('Página não disponível para detecção de elementos', 'error');
+      return [];
+    }
 
     try {
-      const elements = await this.page.evaluate(() => {
+      await this.logToFile('Iniciando detecção e interação com elementos');
+      
+      // Primeiro, capturar screenshot inicial
+      const initialScreenshot = await this.retryWithFallback(
+        () => this.captureScreenshot('initial-page-state'),
+        'captura de screenshot inicial'
+      );
+      
+      if (!initialScreenshot) {
+        await this.logToFile('Falha ao capturar screenshot inicial, continuando sem screenshot', 'warning');
+      }
+      
+      // Detectar todos os elementos interativos com retry
+      const elementData = await this.retryWithFallback(
+        () => this.page!.evaluate(() => {
         function isElementVisible(element: Element): boolean {
           const rect = element.getBoundingClientRect();
           if (rect.width <= 0 || rect.height <= 0) return false;
@@ -77,18 +403,6 @@ export class CrawlerAgent extends BaseAgent {
           if (parseFloat(style.opacity) < 0.1) return false;
           
           return true;
-        }
-
-        function getInteractivityLevel(element: Element, isStatic: boolean): 'static' | 'interactive' | 'dynamic' {
-          if (isStatic) return 'static';
-          
-          const isDynamic = element.hasAttribute('data-action') ||
-                          element.hasAttribute('data-toggle') ||
-                          element.hasAttribute('[ng-click]') ||
-                          element.hasAttribute('[(ngModel)]') ||
-                          element.getAttribute('class')?.includes('dynamic');
-          
-          return isDynamic ? 'dynamic' : 'interactive';
         }
 
         function generateSelector(element: Element): string {
@@ -113,283 +427,213 @@ export class CrawlerAgent extends BaseAgent {
           return tagName;
         }
 
-        function getWorkflowContext(element: Element): string {
-          const form = element.closest('form');
-          if (form) {
-            const formId = form.id || 'form';
-            const formAction = form.getAttribute('action') || 'submit';
-            return `${formId}-${formAction}`;
-          }
-          
-          const modal = element.closest('[role="dialog"], .modal, .popup');
-          if (modal) {
-            return `modal-${modal.id || 'interaction'}`;
-          }
-          
-          return 'standalone';
-        }
-
-        function determineLocation(element: Element): string {
-          const rect = element.getBoundingClientRect();
-          const viewportHeight = window.innerHeight;
-          const viewportWidth = window.innerWidth;
-
-          if (rect.top < viewportHeight / 3) return 'header';
-          if (rect.top > viewportHeight * 2/3) return 'footer';
-          if (rect.left < viewportWidth / 4) return 'left-sidebar';
-          if (rect.left > viewportWidth * 3/4) return 'right-sidebar';
-          return 'main-content';
-        }
-
-        function findRelatedElements(element: Element): RelatedElement[] {
-          const relatedElements: RelatedElement[] = [];
-          
-          // Para inputs, procurar labels e mensagens de validação
-          if (element.tagName.toLowerCase() === 'input') {
-            const inputId = element.getAttribute('id');
-            if (inputId) {
-              const label = document.querySelector(`label[for="${inputId}"]`);
-              if (label) {
-                relatedElements.push({
-                  type: 'label',
-                  relationship: 'describes',
-                  dependent: true,
-                  selector: `label[for="${inputId}"]`
-                });
-              }
-            }
-            
-            const validationMessage = element.getAttribute('aria-errormessage');
-            if (validationMessage) {
-              const messageElement = document.getElementById(validationMessage);
-              if (messageElement) {
-                relatedElements.push({
-                  type: 'validation',
-                  relationship: 'validates',
-                  dependent: true,
-                  selector: `#${validationMessage}`
-                });
-              }
-            }
-          }
-
-          // Para botões de submit, relacionar com o formulário
-          if (element.getAttribute('type') === 'submit') {
-            const form = element.closest('form');
-            if (form) {
-              const inputs = form.querySelectorAll('input:not([type="submit"]), select, textarea');
-              inputs.forEach((input) => {
-                relatedElements.push({
-                  type: input.tagName.toLowerCase(),
-                  relationship: 'submits',
-                  dependent: false,
-                  selector: generateSelector(input)
-                });
-              });
-            }
-          }
-
-          // Para elementos estáticos, identificar elementos aninhados ou relacionados
-          if (!element.hasAttribute('type')) {
-            const nestedElements = element.querySelectorAll('img, strong, em, code, pre');
-            nestedElements.forEach((nested) => {
-              relatedElements.push({
-                type: nested.tagName.toLowerCase(),
-                relationship: 'contains',
-                dependent: true,
-                selector: generateSelector(nested)
-              });
-            });
-          }
-
-          return relatedElements;
-        }
-
-        const elementSelectors = [
-          // Elementos de formulário e entrada de dados (Interativos)
-          { 
-            selector: 'input[type="text"], input[type="email"], input[type="password"]', 
-            type: 'input', 
-            interactionType: 'input' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          { 
-            selector: 'button[type="submit"], input[type="submit"]', 
-            type: 'submit',
-            interactionType: 'submit' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          { 
-            selector: 'textarea', 
-            type: 'textarea',
-            interactionType: 'input' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          { 
-            selector: 'select', 
-            type: 'select',
-            interactionType: 'select' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          
-          // Elementos de interação (Interativos)
-          { 
-            selector: 'button:not([type="submit"])', 
-            type: 'button',
-            interactionType: 'click' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          { 
-            selector: '[role="button"], [onclick]', 
-            type: 'actionable',
-            interactionType: 'click' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          { 
-            selector: 'a[href]:not([href^="javascript:"]):not([href^="mailto:"])', 
-            type: 'link',
-            interactionType: 'navigate' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-          
-          // Elementos de controle (Interativos)
-          { 
-            selector: 'input[type="checkbox"]', 
-            type: 'checkbox',
-            interactionType: 'toggle' as const,
-            isStatic: false,
-            importance: 'secondary' as const
-          },
-          { 
-            selector: 'input[type="radio"]', 
-            type: 'radio',
-            interactionType: 'select' as const,
-            isStatic: false,
-            importance: 'secondary' as const
-          },
-          
-          // Elementos dinâmicos
-          { 
-            selector: '[data-action], [data-toggle], [data-target]', 
-            type: 'dynamic',
-            interactionType: 'click' as const,
-            isStatic: false,
-            importance: 'primary' as const
-          },
-
-          // Elementos estáticos de conteúdo
-          { 
-            selector: 'h1, h2, h3, h4, h5, h6', 
-            type: 'heading',
-            contentType: 'heading' as const,
-            isStatic: true,
-            importance: 'primary' as const
-          },
-          { 
-            selector: 'p, article, section > div', 
-            type: 'text',
-            contentType: 'text' as const,
-            isStatic: true,
-            importance: 'secondary' as const
-          },
-          { 
-            selector: 'img[alt]:not([role="button"])', 
-            type: 'image',
-            contentType: 'image' as const,
-            isStatic: true,
-            importance: 'secondary' as const
-          },
-          { 
-            selector: 'label:not([for]), span[aria-label]', 
-            type: 'description',
-            contentType: 'description' as const,
-            isStatic: true,
-            importance: 'secondary' as const
-          }
+        // Encontrar todos os elementos interativos
+        const interactiveSelectors = [
+          'button', 'a[href]', 'input[type="button"]', 'input[type="submit"]',
+          '[onclick]', '[role="button"]', '.btn', '.button', '[data-action]',
+          'select', 'input[type="checkbox"]', 'input[type="radio"]',
+          '[tabindex]', '.clickable', '.menu-item', '.nav-link'
         ];
 
-        const groups: ElementGroup[] = [];
-
-        // Processar cada tipo de elemento
-        elementSelectors.forEach(({ selector, type, interactionType, contentType, isStatic, importance }) => {
-          const elements = document.querySelectorAll(selector);
-          
-          elements.forEach((element) => {
-            if (!isElementVisible(element)) return;
-
-            // Extrair propósito e conteúdo do elemento
-            const purpose = element.getAttribute('aria-label') ||
-                          element.getAttribute('title') ||
-                          element.getAttribute('name') ||
-                          element.getAttribute('placeholder') ||
-                          element.textContent?.trim() ||
-                          type;
-
-            // Identificar elementos relacionados
-            const relatedElements = findRelatedElements(element);
-            
-            // Criar grupo de elementos
-            let primary: InteractiveElement | StaticElement;
-            
-            if (isStatic) {
-              primary = {
-                type,
-                purpose: purpose?.substring(0, 100) || type,
+        const elements: any[] = [];
+        
+        interactiveSelectors.forEach(selector => {
+          const foundElements = document.querySelectorAll(selector);
+          foundElements.forEach((element, index) => {
+            if (isElementVisible(element)) {
+              const rect = element.getBoundingClientRect();
+              elements.push({
+                type: element.tagName.toLowerCase(),
+                text: element.textContent?.trim() || '',
                 selector: generateSelector(element),
-                content: element.textContent?.trim() || element.getAttribute('alt') || '',
-                contentType: contentType!,
-                isStatic: true
-              };
-            } else {
-              primary = {
-                type,
-                purpose: purpose?.substring(0, 100) || type,
-                selector: generateSelector(element),
-                action: interactionType! || 'click', // Default to click if not specified
-                required: element.hasAttribute('required'),
-                interactionType: interactionType!,
-                isStatic: false
-              };
+                href: (element as HTMLAnchorElement).href || null,
+                onclick: element.getAttribute('onclick') || null,
+                dataAction: element.getAttribute('data-action') || null,
+                position: {
+                  x: rect.left + rect.width / 2,
+                  y: rect.top + rect.height / 2
+                },
+                index: index
+              });
             }
-
-            const elementGroup: ElementGroup = {
-              primary,
-              related: relatedElements,
-              context: {
-                workflow: getWorkflowContext(element),
-                location: determineLocation(element),
-                importance: importance,
-                interactivityLevel: getInteractivityLevel(element, isStatic)
-              }
-            };
-
-            groups.push(elementGroup);
           });
         });
 
-        return groups;
+        return elements;
+        }),
+        'detecção de elementos interativos'
+      );
+      
+      if (!elementData) {
+        await this.logToFile('Falha na detecção de elementos, retornando lista vazia', 'error');
+        return [];
+      }
+      
+      await this.logToFile(`Detectados ${elementData.length} elementos interativos`);
+
+      // Agora interagir com cada elemento
+      const interactionResults: InteractionResult[] = [];
+      const maxElements = Math.min(elementData.length, 10);
+      
+      await this.logToFile(`Iniciando interação com ${maxElements} elementos`);
+      
+      for (let i = 0; i < maxElements; i++) {
+        const element = elementData[i];
+        
+        await this.logToFile(`Processando elemento ${i + 1}/${maxElements}: ${element.type} - "${element.text}"`);
+        
+        try {
+          // Capturar screenshot antes da interação com retry
+          const screenshotBefore = await this.retryWithFallback(
+            () => this.captureScreenshot(`before-interaction-${i}`),
+            `screenshot antes da interação ${i}`
+          ) || '';
+          
+          // Tentar clicar no elemento com retry
+          const clickResult = await this.retryWithFallback(
+            async () => {
+              await this.page!.click(element.selector, { timeout: 5000 });
+              await this.page!.waitForTimeout(2000);
+              return true;
+            },
+            `clique no elemento ${i}: ${element.text}`
+          );
+          
+          if (!clickResult) {
+            await this.logToFile(`Falha ao clicar no elemento ${i}, registrando como falha`, 'warning');
+            interactionResults.push(this.createFailedInteractionResult(element, screenshotBefore));
+            continue;
+          }
+          
+          // Capturar screenshot depois da interação
+          const screenshotAfter = await this.retryWithFallback(
+            () => this.captureScreenshot(`after-interaction-${i}`),
+            `screenshot após interação ${i}`
+          ) || '';
+          
+          // Verificar se houve navegação
+          const currentUrl = this.page.url();
+          
+          // Verificar se apareceram novos elementos
+          const newElements = await this.retryWithFallback(
+            () => this.page!.evaluate(() => {
+              const modals = document.querySelectorAll('.modal, [role="dialog"], .popup');
+              const dropdowns = document.querySelectorAll('.dropdown-menu, .menu-open');
+              return {
+                modals: modals.length,
+                dropdowns: dropdowns.length
+              };
+            }),
+            `verificação de novos elementos ${i}`
+          ) || { modals: 0, dropdowns: 0 };
+          
+          const interactionResult = {
+            element: {
+              type: element.type,
+              text: element.text,
+              selector: element.selector,
+              location: 'main-content'
+            },
+            functionality: {
+              action: `click on ${element.type}`,
+              expectedResult: element.href ? `navigate to ${element.href}` : 'trigger action',
+              triggersWhat: element.onclick || element.dataAction || 'unknown',
+              destinationUrl: element.href,
+              opensModal: newElements.modals > 0,
+              changesPageContent: true
+            },
+            interactionResults: {
+              wasClicked: true,
+              visualChanges: ['element clicked', 'possible state change'],
+              newElementsAppeared: newElements.modals > 0 ? ['modal'] : [],
+              navigationOccurred: currentUrl !== this.page.url(),
+              screenshotBefore: screenshotBefore,
+              screenshotAfter: screenshotAfter
+            }
+          };
+          
+          interactionResults.push(interactionResult);
+          
+          await this.logToFile(`Interação ${i + 1} bem-sucedida: ${element.text || element.type}`);
+          
+        } catch (error) {
+          await this.logToFile(`Erro ao interagir com elemento ${i}: ${error}`, 'error');
+          
+          interactionResults.push({
+            element: {
+              type: element.type,
+              text: element.text,
+              selector: element.selector,
+              location: 'main-content'
+            },
+            functionality: {
+              action: `attempted click on ${element.type}`,
+              expectedResult: 'failed to interact',
+              triggersWhat: 'error',
+              destinationUrl: element.href,
+              opensModal: false,
+              changesPageContent: false
+            },
+            interactionResults: {
+              wasClicked: false,
+              visualChanges: [],
+              newElementsAppeared: [],
+              navigationOccurred: false,
+              screenshotBefore: '',
+              screenshotAfter: ''
+            }
+          });
+        }
+      }
+      
+      return interactionResults;
+      
+    } catch (error) {
+      this.log(`Erro na detecção e interação com elementos: ${error}`, 'error');
+      return [];
+    }
+  }
+
+  private async analyzePageObjective(): Promise<{
+    centralPurpose: string;
+    mainFunctionalities: string[];
+    userGoals: string[];
+  }> {
+    if (!this.page) {
+      return {
+        centralPurpose: 'Unknown',
+        mainFunctionalities: [],
+        userGoals: []
+      };
+    }
+
+    try {
+      const pageAnalysis = await this.page.evaluate(() => {
+        const title = document.title;
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3')).map(h => h.textContent?.trim()).filter(Boolean);
+        const buttons = Array.from(document.querySelectorAll('button, .btn')).map(b => b.textContent?.trim()).filter(Boolean);
+        const links = Array.from(document.querySelectorAll('a[href]')).map(a => a.textContent?.trim()).filter(Boolean);
+        
+        return {
+          title,
+          headings,
+          buttons,
+          links
+        };
       });
 
-      // Calcular estatísticas
-      const stats = {
-        staticElements: elements.filter(g => (g.primary as any).isStatic).length,
-        interactiveElements: elements.filter(g => !(g.primary as any).isStatic).length,
-        totalElements: elements.length
+      return {
+        centralPurpose: pageAnalysis.title || 'Web Application',
+        mainFunctionalities: [...pageAnalysis.buttons.slice(0, 5), ...pageAnalysis.links.slice(0, 5)].filter((func): func is string => func !== undefined),
+        userGoals: pageAnalysis.headings.slice(0, 3).filter((goal): goal is string => goal !== undefined)
       };
-
-      this.log(`Elementos detectados: ${stats.totalElements} (${stats.staticElements} estáticos, ${stats.interactiveElements} interativos)`);
-      return elements;
-
     } catch (error) {
-      this.log(`Erro ao detectar elementos: ${error}`, 'error');
-      return [];
+      this.log(`Erro ao analisar objetivo da página: ${error}`, 'error');
+      return {
+        centralPurpose: 'Unknown',
+        mainFunctionalities: [],
+        userGoals: []
+      };
     }
   }
 
@@ -399,36 +643,13 @@ export class CrawlerAgent extends BaseAgent {
     try {
       switch (task.type) {
         case 'start_crawl':
-          const result = await this.processPage(task.data.url);
-          console.log("CrawlerAgent result:", JSON.stringify(result, null, 2));
-          // Sempre retorna crawlResults como array para compatibilidade com AnalysisAgent
-          return {
-            id: task.id,
-            taskId: task.id,
-            success: true,
-            data: {
-              crawlResults: [result],
-              pagesProcessed: 1,
-              totalElements: result.stats.totalElements,
-              staticElements: result.stats.staticElements,
-              interactiveElements: result.stats.interactiveElements
-            },
-            timestamp: new Date(),
-            processingTime: Date.now() - startTime
-          };
         case 'start_authenticated_crawl':
-          const authResult = await this.processPage(task.data.url);
+          const result = await this.processPageWithInteractions(task.data.url);
           return {
             id: task.id,
             taskId: task.id,
             success: true,
-            data: {
-              crawlResults: authResult,
-              pagesProcessed: 1,
-              totalElements: authResult.elements.length,
-              sessionData: task.data.sessionData,
-              authContext: task.data.authContext
-            },
+            data: result,
             timestamp: new Date(),
             processingTime: Date.now() - startTime
           };
@@ -449,45 +670,60 @@ export class CrawlerAgent extends BaseAgent {
     }
   }
 
-  private async processPage(url: string): Promise<CrawlResult> {
+  private async processPageWithInteractions(url: string): Promise<any> {
     if (!this.page) throw new Error('Página não disponível');
 
+    const screenshots: Record<string, string | null> = {};
+    const startTime = Date.now();
+
     try {
-      // Navegar para a página
+      // Navegar para a página com networkidle
       await this.page.goto(url, { 
-        waitUntil: 'domcontentloaded',
+        waitUntil: 'networkidle',
         timeout: 30000 
       });
 
-      // Aguardar estabilização
-      await this.page.waitForTimeout(3000);
+      // Verificar e lidar com autenticação de proxy
+      await this.checkAndHandleProxyAuth();
+
+      // Lidar com redirecionamentos e modais
+       await this.handleRedirectsAndModals();
+
+       // Capturar screenshot da página inicial
+       screenshots['pagina_inicial'] = await this.captureScreenshot('pagina_inicial');
+
+      // Aguardar estabilização adicional
+      await this.page.waitForTimeout(2000);
 
       // Capturar título
       const title = await this.page.title();
       
-      // Detectar elementos
-      const elements = await this.detectAllElements();
+      // Analisar objetivo da página
+      const pageObjective = await this.analyzePageObjective();
+      
+      // Detectar e interagir com elementos
+      const interactiveElements = await this.detectAndInteractWithElements();
 
-      // Calcular estatísticas
-      const stats = {
-        staticElements: elements.filter(g => (g.primary as StaticElement).isStatic).length,
-        interactiveElements: elements.filter(g => !(g.primary as StaticElement).isStatic).length,
-        totalElements: elements.length
-      };
+      // Criar workflows baseados nas interações
+      const workflows = this.createWorkflowsFromInteractions(interactiveElements);
 
-      // Agrupar elementos por workflow
-      const workflows = this.groupElementsByWorkflow(elements);
+      // Identificar funcionalidades ocultas
+      const hiddenFunctionalities = await this.discoverHiddenFunctionalities();
 
       return {
-        url,
-        title,
-        elements,
+        pageObjective,
+        interactiveElements,
+        discoveredPages: this.discoveredPages,
         workflows,
-        stats,
-        metadata: {
-          timestamp: new Date(),
-          loadTime: 0,
-          elementCount: elements.length
+        hiddenFunctionalities,
+        screenshots,
+        statistics: {
+          totalElementsTested: interactiveElements.length,
+          successfulInteractions: interactiveElements.filter(e => e.interactionResults.wasClicked).length,
+          pagesDiscovered: this.discoveredPages.length,
+          workflowsIdentified: workflows.length,
+          hiddenFeaturesFound: hiddenFunctionalities.length,
+          processingTime: Date.now() - startTime
         }
       };
 
@@ -497,128 +733,212 @@ export class CrawlerAgent extends BaseAgent {
     }
   }
 
-  private groupElementsByWorkflow(elements: ElementGroup[]): Array<{
+  private createWorkflowsFromInteractions(interactions: InteractionResult[]): Array<{
     name: string;
-    steps: string[];
-    elements: string[];
+    description: string;
+    steps: Array<{
+      stepNumber: number;
+      action: string;
+      element: string;
+      expectedOutcome: string;
+    }>;
+    completionCriteria: string;
   }> {
-    const workflowMap = new Map<string, {
-      elements: string[];
-      steps: Set<string>;
-    }>();
+    const workflows: Array<{
+      name: string;
+      description: string;
+      steps: Array<{
+        stepNumber: number;
+        action: string;
+        element: string;
+        expectedOutcome: string;
+      }>;
+      completionCriteria: string;
+    }> = [];
+    
+    // Agrupar interações por tipo de funcionalidade
+    const loginElements = interactions.filter(i => 
+      i.element.text.toLowerCase().includes('login') || 
+      i.element.text.toLowerCase().includes('entrar')
+    );
+    
+    const navigationElements = interactions.filter(i => 
+      i.functionality.destinationUrl && 
+      i.interactionResults.navigationOccurred
+    );
+    
+    if (loginElements.length > 0) {
+      workflows.push({
+        name: 'Login Workflow',
+        description: 'Processo de autenticação do usuário',
+        steps: loginElements.map((element, index) => ({
+          stepNumber: index + 1,
+          action: element.functionality.action,
+          element: element.element.text || element.element.selector,
+          expectedOutcome: element.functionality.expectedResult
+        })),
+        completionCriteria: 'Usuário autenticado com sucesso'
+      });
+    }
+    
+    if (navigationElements.length > 0) {
+      workflows.push({
+        name: 'Navigation Workflow',
+        description: 'Navegação entre páginas da aplicação',
+        steps: navigationElements.map((element, index) => ({
+          stepNumber: index + 1,
+          action: element.functionality.action,
+          element: element.element.text || element.element.selector,
+          expectedOutcome: element.functionality.expectedResult
+        })),
+        completionCriteria: 'Navegação bem-sucedida'
+      });
+    }
+    
+    return workflows;
+  }
 
-    elements.forEach(group => {
-      const workflow = group.context.workflow;
-      if (!workflowMap.has(workflow)) {
-        workflowMap.set(workflow, {
-          elements: [],
-          steps: new Set()
+  private async discoverHiddenFunctionalities(): Promise<Array<{
+    type: string;
+    triggerElement: string;
+    description: string;
+    accessMethod: string;
+  }>> {
+    if (!this.page) return [];
+    
+    try {
+      const hiddenFeatures = await this.page.evaluate(() => {
+        const features: Array<{
+          type: string;
+          triggerElement: string;
+          description: string;
+          accessMethod: string;
+        }> = [];
+        
+        // Procurar por elementos com data attributes
+        const dataElements = document.querySelectorAll('[data-toggle], [data-action], [data-target]');
+        dataElements.forEach(element => {
+          features.push({
+            type: 'data-driven-functionality',
+            triggerElement: element.tagName.toLowerCase(),
+            description: `Element with data attributes: ${element.getAttribute('data-toggle') || element.getAttribute('data-action') || element.getAttribute('data-target')}`,
+            accessMethod: 'click or hover'
+          });
         });
+        
+        // Procurar por elementos com eventos JavaScript
+        const jsElements = document.querySelectorAll('[onclick], [onmouseover], [onchange]');
+        jsElements.forEach(element => {
+          features.push({
+            type: 'javascript-functionality',
+            triggerElement: element.tagName.toLowerCase(),
+            description: 'Element with JavaScript event handlers',
+            accessMethod: 'user interaction'
+          });
+        });
+        
+        return features;
+      });
+      
+      return hiddenFeatures;
+    } catch (error) {
+      this.log(`Erro ao descobrir funcionalidades ocultas: ${error}`, 'error');
+      return [];
+    }
+  }
+
+  private async handleRedirectsAndModals(): Promise<void> {
+    if (!this.page) return;
+    
+    try {
+      // Aguardar possíveis redirecionamentos
+      await this.page.waitForTimeout(2000);
+      
+      // Verificar e fechar modais/popups que podem interferir
+      const modalSelectors = [
+        '[class*="modal"]',
+        '[class*="popup"]',
+        '[class*="overlay"]',
+        '.cookie-banner',
+        '[data-testid="cookie-banner"]',
+        '.alert',
+        '.notification'
+      ];
+      
+      for (const selector of modalSelectors) {
+        const modal = await this.page.$(selector);
+        if (modal) {
+          const closeButton = await modal.$('button[class*="close"], .close, [aria-label="close"], [aria-label="Close"], .btn-close');
+          if (closeButton) {
+            await closeButton.click();
+            await this.page.waitForTimeout(500);
+          }
+        }
       }
-
-      const current = workflowMap.get(workflow)!;
-      current.elements.push(group.primary.selector);
-
-      if (!('isStatic' in group.primary) || !group.primary.isStatic) {
-        const interactive = group.primary as InteractiveElement;
-        current.steps.add(`${interactive.action} ${interactive.type}`);
-      }
-    });
-
-    return Array.from(workflowMap.entries()).map(([name, data]) => ({
-      name,
-      steps: Array.from(data.steps),
-      elements: data.elements
-    }));
+    } catch (error) {
+      this.log(`Erro ao lidar com redirecionamentos/modais: ${error}`, 'warn');
+    }
   }
 
   async cleanup(): Promise<void> {
     this.visitedPages.clear();
     this.allPageData = [];
-    this.page = null;
-    this.browser = null;
-    this.log('CrawlerAgent finalizado e recursos liberados');
+    this.discoveredPages = [];
+    this.log('CrawlerAgent: limpeza concluída');
   }
 
   async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
-    const timestamp = new Date().toISOString();
+    const data = taskResult.data;
     
-    let report = `# Relatório do CrawlerAgent
-
-**Task ID:** ${taskResult.taskId}
-**Timestamp:** ${timestamp}
-**Status:** ${taskResult.success ? '✅ Sucesso' : '❌ Falha'}
-**Tempo de Processamento:** ${taskResult.processingTime}ms
-
-`;
-
-    if (taskResult.success && taskResult.data) {
-      // Suporte a dois formatos: CrawlResult (com .stats) e stats simples
-      const data: any = taskResult.data;
-      let totalElements, staticElements, interactiveElements, url, title, workflows, elements;
-      if (data.stats && data.elements && data.workflows) {
-        // Formato CrawlResult
-        totalElements = data.stats.totalElements;
-        staticElements = data.stats.staticElements;
-        interactiveElements = data.stats.interactiveElements;
-        url = data.url;
-        title = data.title;
-        workflows = data.workflows;
-        elements = data.elements;
-      } else {
-        // Formato simples
-        totalElements = data.totalElements;
-        staticElements = data.staticElements;
-        interactiveElements = data.interactiveElements;
-        url = data.url || '-';
-        title = data.title || '-';
-        workflows = [];
-        elements = [];
-      }
-
-      report += `## Análise da Página
-
-- **URL:** ${url}
-- **Título:** ${title}
-- **Elementos Totais:** ${totalElements}
-  - Elementos Estáticos: ${staticElements}
-  - Elementos Interativos: ${interactiveElements}
-
-## Workflows Detectados
-
-${workflows && workflows.length > 0 ? workflows.map((wf: any, idx: number) => `
-### ${idx + 1}. ${wf.name}
-
-- **Passos:** ${wf.steps.join(' → ')}
-- **Elementos:** ${wf.elements.length}
-`).join('\n') : 'Nenhum workflow detectado.'}
-
-## Elementos por Tipo
-
-${elements && elements.length > 0 ? JSON.stringify(elements.reduce((acc: any, el: any) => {
-  const type = el.primary.type;
-  if (!acc[type]) acc[type] = 0;
-  acc[type]++;
-  return acc;
-}, {}), null, 2) : 'Sem elementos detalhados.'}
-
----
-*Relatório gerado em: ${new Date().toLocaleString()}*
-`;
-    } else {
-      report += `## Erro no Processamento
-
-**Erro:** ${taskResult.error}
-
-## Ações Recomendadas
-
-- Verificar conectividade de rede
-- Verificar se a página está acessível
-- Verificar permissões de acesso
-- Tentar novamente em alguns minutos
-`;
+    let report = `# Relatório de Crawling Interativo\n\n`;
+    report += `**Data:** ${new Date().toLocaleString()}\n`;
+    report += `**Tempo de Processamento:** ${taskResult.processingTime}ms\n\n`;
+    
+    if (data.pageObjective) {
+      report += `## Objetivo Central da Página\n`;
+      report += `**Propósito:** ${data.pageObjective.centralPurpose}\n\n`;
+      report += `**Funcionalidades Principais:**\n`;
+      data.pageObjective.mainFunctionalities.forEach((func: string) => {
+        report += `- ${func}\n`;
+      });
+      report += `\n`;
     }
-
+    
+    if (data.interactiveElements && data.interactiveElements.length > 0) {
+      report += `## Elementos Interativos Testados\n\n`;
+      data.interactiveElements.forEach((element: any, index: number) => {
+        report += `### ${index + 1}. ${element.element.text || element.element.type}\n`;
+        report += `- **Ação:** ${element.functionality.action}\n`;
+        report += `- **Resultado Esperado:** ${element.functionality.expectedResult}\n`;
+        report += `- **Foi Clicado:** ${element.interactionResults.wasClicked ? 'Sim' : 'Não'}\n`;
+        if (element.functionality.destinationUrl) {
+          report += `- **URL de Destino:** ${element.functionality.destinationUrl}\n`;
+        }
+        report += `\n`;
+      });
+    }
+    
+    if (data.workflows && data.workflows.length > 0) {
+      report += `## Workflows Identificados\n\n`;
+      data.workflows.forEach((workflow: any) => {
+        report += `### ${workflow.name}\n`;
+        report += `${workflow.description}\n\n`;
+        workflow.steps.forEach((step: any) => {
+          report += `${step.stepNumber}. ${step.action} - ${step.expectedOutcome}\n`;
+        });
+        report += `\n`;
+      });
+    }
+    
+    if (data.statistics) {
+      report += `## Estatísticas\n\n`;
+      report += `- **Elementos Testados:** ${data.statistics.totalElementsTested}\n`;
+      report += `- **Interações Bem-sucedidas:** ${data.statistics.successfulInteractions}\n`;
+      report += `- **Páginas Descobertas:** ${data.statistics.pagesDiscovered}\n`;
+      report += `- **Workflows Identificados:** ${data.statistics.workflowsIdentified}\n`;
+      report += `- **Funcionalidades Ocultas:** ${data.statistics.hiddenFeaturesFound}\n`;
+    }
+    
     return report;
   }
 }

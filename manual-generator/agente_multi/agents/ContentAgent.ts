@@ -1,7 +1,7 @@
 import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
 import { MinIOService } from '../services/MinIOService';
 import { GeminiKeyManager } from '../services/GeminiKeyManager';
-import { LLMManager } from '../services/LLMManager.js';
+import { LLMManager } from '../services/LLMManager';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -77,6 +77,40 @@ export class ContentAgent extends BaseAgent {
   private currentContent: UserManualContent | null = null;
   private contentCacheFile: string;
   private prompt: string;
+  private logDir: string;
+  private logFile: string;
+  private retryAttempts: number = 5;
+  private retryDelay: number = 3000;
+
+  private async logToFile(message: string, stage: string = 'content'): Promise<void> {
+    try {
+      await fs.mkdir(this.logDir, { recursive: true });
+      const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
+      await fs.appendFile(this.logFile, logMsg, 'utf-8');
+    } catch (error) {
+      console.error(`Erro ao salvar log: ${error}`);
+    }
+  }
+
+  private async retryAICall<T>(operation: () => Promise<T>, operationName: string): Promise<T | null> {
+    for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+      try {
+        await this.logToFile(`Tentativa ${attempt}/${this.retryAttempts} para ${operationName}`);
+        const result = await operation();
+        await this.logToFile(`${operationName} executado com sucesso na tentativa ${attempt}`);
+        return result;
+      } catch (error) {
+        await this.logToFile(`Erro na tentativa ${attempt}/${this.retryAttempts} para ${operationName}: ${error}`, 'error');
+        if (attempt < this.retryAttempts) {
+          const delay = this.retryDelay * attempt; // Backoff exponencial
+          await this.logToFile(`Aguardando ${delay}ms antes da próxima tentativa`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+    await this.logToFile(`Todas as tentativas falharam para ${operationName}, usando fallback`, 'error');
+    return null;
+  }
 
   constructor(prompt: string) {
     const config: AgentConfig = {
@@ -94,16 +128,19 @@ export class ContentAgent extends BaseAgent {
 
     super(config);
     this.prompt = prompt;
-  this.keyManager = new GeminiKeyManager();
-  this.llmManager = new LLMManager(this.keyManager);
+    this.keyManager = new GeminiKeyManager();
+    this.llmManager = new LLMManager(this.keyManager);
     this.minioService = new MinIOService();
     this.contentCacheFile = path.join(process.cwd(), 'output', 'content-draft.md');
+    this.logDir = path.join(process.cwd(), 'output', 'logs');
+    this.logFile = path.join(this.logDir, 'content-agent.log');
   }
 
   async initialize(): Promise<void> {
     await this.minioService.initialize();
     await this.keyManager.loadStatus();
     this.log('ContentAgent inicializado para criação de conteúdo user-friendly');
+    await this.logToFile('ContentAgent inicializado para criação de conteúdo user-friendly', 'init');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -244,13 +281,15 @@ export class ContentAgent extends BaseAgent {
   }
 
   private async generateMetadata(analysis: any): Promise<UserManualContent['metadata']> {
+    await this.logToFile('Iniciando geração de metadados', 'metadata');
+    
     // Proteção extra e log
     if (!analysis) {
       this.log('AVISO: analysis está undefined em generateMetadata', 'warn');
     }
     if (typeof analysis?.totalElements !== 'number') {
       this.log('AVISO: analysis.totalElements não é um número em generateMetadata', 'warn');
-      this.log(`DEBUG: analysis: ${JSON.stringify(analysis)}`);
+      
     }
     const prompt = `
 Baseado nesta análise de aplicação web, gere metadados para um manual do usuário:
@@ -271,33 +310,43 @@ Gere metadados apropriados em formato JSON:
 Foque em linguagem clara e acessível para usuários finais.
 `;
 
-    try {
-  const response = await this.llmManager.generateContent(prompt);
-  const aiMetadata = this.parseAIResponse(response.response.text());
-      
-      return {
-        title: aiMetadata.title || 'Manual do Usuário',
-        subtitle: aiMetadata.subtitle || 'Guia completo de utilização',
-        version: aiMetadata.version || '1.0.0',
-        dateCreated: new Date().toLocaleDateString('pt-BR'),
-        targetAudience: aiMetadata.targetAudience || 'Usuários finais',
-        estimatedReadTime: aiMetadata.estimatedReadTime || '15-20 minutos'
-      };
-
-    } catch (error) {
-      this.log(`Erro na geração de metadados: ${error}`, 'warn');
-      return {
-        title: 'Manual do Usuário - Aplicação Web',
-        subtitle: 'Guia completo para utilização da aplicação',
-        version: '1.0.0',
-        dateCreated: new Date().toLocaleDateString('pt-BR'),
-        targetAudience: 'Usuários finais da aplicação web',
-        estimatedReadTime: '15-20 minutos'
-      };
+    const result = await this.retryAICall(
+      () => this.llmManager.generateContent(prompt),
+      'generateMetadata'
+    );
+    
+    if (result) {
+      try {
+        const aiMetadata = this.parseAIResponse(result.response.text());
+        await this.logToFile('Metadados gerados com sucesso via IA', 'metadata');
+        return {
+          title: aiMetadata.title || 'Manual do Usuário',
+          subtitle: aiMetadata.subtitle || 'Guia completo de utilização',
+          version: aiMetadata.version || '1.0.0',
+          dateCreated: new Date().toLocaleDateString('pt-BR'),
+          targetAudience: aiMetadata.targetAudience || 'Usuários finais',
+          estimatedReadTime: aiMetadata.estimatedReadTime || '15-20 minutos'
+        };
+      } catch (parseError) {
+        await this.logToFile(`Erro ao parsear resposta da IA: ${parseError}`, 'error');
+      }
     }
+    
+    // Fallback
+    await this.logToFile('Usando metadados de fallback', 'metadata');
+    return {
+      title: 'Manual do Usuário - Aplicação Web',
+      subtitle: 'Guia completo para utilização da aplicação',
+      version: '1.0.0',
+      dateCreated: new Date().toLocaleDateString('pt-BR'),
+      targetAudience: 'Usuários finais da aplicação web',
+      estimatedReadTime: '15-20 minutos'
+    };
   }
 
   private async generateIntroduction(analysis: any, authContext: any): Promise<UserManualContent['introduction']> {
+    await this.logToFile('Iniciando geração de introdução', 'introduction');
+    
     const prompt = `
 Crie uma introdução amigável para um manual do usuário baseado nesta análise:
 
@@ -318,24 +367,32 @@ Crie uma introdução que inclua:
 Use linguagem simples e acolhedora. Responda em JSON.
 `;
 
-    try {
-  const response = await this.llmManager.generateContent(prompt);
-  const aiIntro = this.parseAIResponse(response.response.text());
-      
-      return {
-        overview: aiIntro.overview || 'Esta aplicação web oferece diversas funcionalidades para melhorar sua experiência digital.',
-        requirements: aiIntro.requirements || ['Navegador web atualizado', 'Conexão com internet', 'Dados de acesso (se necessário)'],
-        howToUseManual: aiIntro.howToUseManual || 'Este manual está organizado em seções que cobrem desde o acesso inicial até as funcionalidades avançadas. Cada seção inclui instruções passo a passo com capturas de tela.'
-      };
-
-    } catch (error) {
-      this.log(`Erro na geração da introdução: ${error}`, 'warn');
-      return {
-        overview: 'Esta aplicação web foi projetada para oferecer uma experiência intuitiva e eficiente. Este manual irá guiá-lo através de todas as funcionalidades disponíveis.',
-        requirements: ['Navegador web moderno (Chrome, Firefox, Safari, Edge)', 'Conexão estável com a internet', 'Credenciais de acesso quando aplicável'],
-        howToUseManual: 'Este manual está dividido em seções temáticas. Cada seção contém instruções detalhadas, screenshots e dicas úteis. Você pode navegar diretamente para a seção de seu interesse ou seguir sequencialmente.'
-      };
+    const result = await this.retryAICall(
+      () => this.llmManager.generateContent(prompt),
+      'generateIntroduction'
+    );
+    
+    if (result) {
+      try {
+        const aiIntro = this.parseAIResponse(result.response.text());
+        await this.logToFile('Introdução gerada com sucesso via IA', 'introduction');
+        return {
+          overview: aiIntro.overview || 'Esta aplicação web oferece diversas funcionalidades para melhorar sua experiência digital.',
+          requirements: aiIntro.requirements || ['Navegador web atualizado', 'Conexão com internet', 'Dados de acesso (se necessário)'],
+          howToUseManual: aiIntro.howToUseManual || 'Este manual está organizado em seções que cobrem desde o acesso inicial até as funcionalidades avançadas. Cada seção inclui instruções passo a passo com capturas de tela.'
+        };
+      } catch (parseError) {
+        await this.logToFile(`Erro ao parsear resposta da IA: ${parseError}`, 'error');
+      }
     }
+    
+    // Fallback
+    await this.logToFile('Usando introdução de fallback', 'introduction');
+    return {
+      overview: 'Esta aplicação web foi projetada para oferecer uma experiência intuitiva e eficiente. Este manual irá guiá-lo através de todas as funcionalidades disponíveis.',
+      requirements: ['Navegador web moderno (Chrome, Firefox, Safari, Edge)', 'Conexão estável com a internet', 'Credenciais de acesso quando aplicável'],
+      howToUseManual: 'Este manual está dividido em seções temáticas. Cada seção contém instruções detalhadas, screenshots e dicas úteis. Você pode navegar diretamente para a seção de seu interesse ou seguir sequencialmente.'
+    };
   }
 
   private async generateUserGuideSections(analysis: any, rawData: any[]): Promise<UserGuideSection[]> {
