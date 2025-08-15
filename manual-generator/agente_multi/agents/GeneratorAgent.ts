@@ -1,5 +1,7 @@
 import { BaseAgent, AgentConfig, TaskData, TaskResult, type AgentCapability } from '../core/AgnoSCore';
 import { MinIOService } from '../services/MinIOService';
+import { logger } from '../utils/logger';
+import { retry } from '../utils/retry';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
@@ -111,7 +113,17 @@ export class GeneratorAgent extends BaseAgent {
 
   private async handleDocumentGeneration(task: TaskData): Promise<TaskResult> {
     const startTime = Date.now();
-    const { userContent, crawlAnalysis, sessionData, authContext, rawData } = task.data;
+    // Suporte para diferentes estruturas de dados
+    const userContent = task.data.userContent || task.data.content;
+    const { crawlAnalysis, sessionData, authContext, rawData } = task.data;
+    
+    // Validação de entrada
+    if (!userContent) {
+      const errorMsg = 'userContent não pode ser undefined';
+      this.log(errorMsg, 'error');
+      await this.logToFile(errorMsg, 'error');
+      throw new Error(errorMsg);
+    }
     
   this.log('Iniciando geração de documentos finais');
   await this.logToFile('Iniciando geração de documentos finais', 'start');
@@ -268,11 +280,28 @@ export class GeneratorAgent extends BaseAgent {
   }
 
   private async generateMarkdown(userContent: any): Promise<string> {
-    const metadata = userContent.metadata;
-    const introduction = userContent.introduction;
+    // Validação de entrada
+    if (!userContent) {
+      await this.logToFile('Erro: userContent está undefined em generateMarkdown', 'error');
+      throw new Error('userContent não pode ser undefined');
+    }
+    
+    const metadata = userContent.metadata || {
+      title: 'Manual do Usuário',
+      subtitle: 'Guia de utilização',
+      version: '1.0.0',
+      dateCreated: new Date().toLocaleDateString('pt-BR'),
+      targetAudience: 'Usuários finais',
+      estimatedReadTime: '15-20 minutos'
+    };
+    const introduction = userContent.introduction || {
+      overview: 'Este manual fornece instruções para utilização da aplicação.',
+      requirements: ['Acesso à internet', 'Navegador web atualizado'],
+      howToUseManual: 'Siga os passos descritos em cada seção.'
+    };
     const sections = userContent.sections || [];
-    const appendices = userContent.appendices;
-    const summary = userContent.summary;
+    const appendices = userContent.appendices || {};
+    const summary = userContent.summary || 'Manual concluído com sucesso.';
 
     let markdown = `# ${metadata.title}
 
@@ -292,9 +321,11 @@ ${metadata.subtitle}
 `;
 
     // Gerar índice
-    sections.forEach((section: any, index: number) => {
-      markdown += `${index + 1}. [${section.title}](#${section.id})\n`;
-    });
+    if (sections && Array.isArray(sections)) {
+      sections.forEach((section: any, index: number) => {
+        markdown += `${index + 1}. [${section.title}](#${section.id})\n`;
+      });
+    }
 
     markdown += `
 ${sections.length + 1}. [Troubleshooting](#troubleshooting)
@@ -314,9 +345,11 @@ ${introduction.overview}
 
 `;
 
-    introduction.requirements.forEach((req: string) => {
-      markdown += `- ${req}\n`;
-    });
+    if (introduction.requirements && Array.isArray(introduction.requirements)) {
+      introduction.requirements.forEach((req: string) => {
+        markdown += `- ${req}\n`;
+      });
+    }
 
     markdown += `
 ### Como Usar Este Manual
@@ -328,8 +361,9 @@ ${introduction.howToUseManual}
 `;
 
     // Gerar seções principais
-    sections.forEach((section: any, index: number) => {
-      markdown += `## ${index + 1}. ${section.title} {#${section.id}}
+    if (sections && Array.isArray(sections)) {
+      sections.forEach((section: any, index: number) => {
+        markdown += `## ${index + 1}. ${section.title} {#${section.id}}
 
 ${section.description}
 
@@ -337,50 +371,53 @@ ${section.description}
 
 `;
 
-      section.steps.forEach((step: any) => {
-        markdown += `#### ${step.stepNumber}. ${step.action}
+        if (section.steps && Array.isArray(section.steps)) {
+          section.steps.forEach((step: any) => {
+            markdown += `#### ${step.stepNumber}. ${step.action}
 
 ${step.description}
 
 **Resultado Esperado:** ${step.expectedResult}
 
 `;
-        
-        if (step.screenshot) {
-          markdown += `![Screenshot do Passo ${step.stepNumber}](${step.screenshot})\n\n`;
+            
+            if (step.screenshot) {
+              markdown += `![Screenshot do Passo ${step.stepNumber}](${step.screenshot})\n\n`;
+            }
+
+            if (step.notes && Array.isArray(step.notes) && step.notes.length > 0) {
+              markdown += `**Observações:**\n`;
+              step.notes.forEach((note: string) => {
+                markdown += `- ${note}\n`;
+              });
+              markdown += '\n';
+            }
+          });
         }
 
-        if (step.notes && step.notes.length > 0) {
-          markdown += `**Observações:**\n`;
-          step.notes.forEach((note: string) => {
-            markdown += `- ${note}\n`;
+        if (section.tips && Array.isArray(section.tips) && section.tips.length > 0) {
+          markdown += `### 💡 Dicas Úteis
+
+`;
+          section.tips.forEach((tip: string) => {
+            markdown += `- ${tip}\n`;
           });
           markdown += '\n';
         }
+
+        if (section.troubleshooting && Array.isArray(section.troubleshooting) && section.troubleshooting.length > 0) {
+          markdown += `### ⚠️ Problemas Comuns
+
+`;
+          section.troubleshooting.forEach((issue: string) => {
+            markdown += `- ${issue}\n`;
+          });
+          markdown += '\n';
+        }
+
+        markdown += '---\n\n';
       });
-
-      if (section.tips && section.tips.length > 0) {
-        markdown += `### 💡 Dicas Úteis
-
-`;
-        section.tips.forEach((tip: string) => {
-          markdown += `- ${tip}\n`;
-        });
-        markdown += '\n';
-      }
-
-      if (section.troubleshooting && section.troubleshooting.length > 0) {
-        markdown += `### ⚠️ Problemas Comuns
-
-`;
-        section.troubleshooting.forEach((issue: string) => {
-          markdown += `- ${issue}\n`;
-        });
-        markdown += '\n';
-      }
-
-      markdown += '---\n\n';
-    });
+    }
 
     // Gerar apêndices
     markdown += `## 🔧 Troubleshooting {#troubleshooting}
@@ -482,6 +519,12 @@ Esta seção contém soluções para os problemas mais comuns:
 
   private async generateHTML(userContent: any): Promise<string> {
     const markdownContent = await this.generateMarkdown(userContent);
+    
+    // Validação de entrada
+    if (!userContent || !userContent.metadata) {
+      await this.logToFile('Erro: userContent ou metadata está undefined em generateHTML', 'error');
+      throw new Error('userContent e metadata são obrigatórios');
+    }
     
     // Template HTML base
     const htmlTemplate = `<!DOCTYPE html>

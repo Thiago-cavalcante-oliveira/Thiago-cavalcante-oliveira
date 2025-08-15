@@ -432,7 +432,12 @@ export class CrawlerAgent extends BaseAgent {
           'button', 'a[href]', 'input[type="button"]', 'input[type="submit"]',
           '[onclick]', '[role="button"]', '.btn', '.button', '[data-action]',
           'select', 'input[type="checkbox"]', 'input[type="radio"]',
-          '[tabindex]', '.clickable', '.menu-item', '.nav-link'
+          'input[type="text"]', 'input[type="email"]', 'input[type="password"]',
+          'input[name*="user"]', 'input[name*="login"]', 'input[name*="email"]',
+          'input[name*="pass"]', 'input[id*="user"]', 'input[id*="login"]',
+          'input[id*="email"]', 'input[id*="pass"]', 'textarea', 'form',
+          '[tabindex]', '.clickable', '.menu-item', '.nav-link', '.form-control',
+          '.input-field', '[data-testid]', '[aria-label]'
         ];
 
         const elements: any[] = [];
@@ -449,6 +454,13 @@ export class CrawlerAgent extends BaseAgent {
                 href: (element as HTMLAnchorElement).href || null,
                 onclick: element.getAttribute('onclick') || null,
                 dataAction: element.getAttribute('data-action') || null,
+                name: element.getAttribute('name') || null,
+                id: element.getAttribute('id') || null,
+                placeholder: element.getAttribute('placeholder') || null,
+                ariaLabel: element.getAttribute('aria-label') || null,
+                className: element.className || null,
+                inputType: (element as HTMLInputElement).type || null,
+                value: (element as HTMLInputElement).value || null,
                 position: {
                   x: rect.left + rect.width / 2,
                   y: rect.top + rect.height / 2
@@ -670,13 +682,56 @@ export class CrawlerAgent extends BaseAgent {
     }
   }
 
-  private async processPageWithInteractions(url: string): Promise<any> {
-    if (!this.page) throw new Error('Página não disponível');
-
-    const screenshots: Record<string, string | null> = {};
+  async crawlPage(url: string): Promise<any> {
     const startTime = Date.now();
+    this.log(`Iniciando crawling recursivo da página: ${url}`);
 
     try {
+      if (!this.page) {
+        throw new Error('Página do Playwright não inicializada');
+      }
+
+      // Processar a página com interações recursivas (profundidade máxima 3)
+      const visitedPages = new Set<string>();
+      const result = await this.processPageWithInteractions(url, 3, 0, visitedPages);
+      
+      const processingTime = Date.now() - startTime;
+      result.statistics.processingTime = processingTime;
+      
+      this.log(`Crawling recursivo concluído em ${processingTime}ms`);
+      this.log(`Elementos interativos encontrados: ${result.interactiveElements.length}`);
+      this.log(`Páginas descobertas: ${result.discoveredPages.length}`);
+      this.log(`Workflows identificados: ${result.workflows.length}`);
+      this.log(`Páginas visitadas: ${visitedPages.size}`);
+      
+      return result;
+    } catch (error) {
+      this.log(`Erro durante o crawling: ${error}`, 'error');
+      throw error;
+    }
+  }
+
+  private async processPageWithInteractions(url: string, maxDepth: number = 3, currentDepth: number = 0): Promise<any> {
+    if (!this.page) throw new Error('Página não disponível');
+    if (currentDepth >= maxDepth) {
+      this.log(`Profundidade máxima atingida (${maxDepth}) para ${url}`);
+      return this.createEmptyResult();
+    }
+    if (this.visitedPages.has(url)) {
+      this.log(`Página já visitada: ${url}`);
+      return this.createEmptyResult();
+    }
+
+    this.visitedPages.add(url);
+    const screenshots: Record<string, string | null> = {};
+    const startTime = Date.now();
+    const allInteractiveElements: any[] = [];
+    const allWorkflows: any[] = [];
+    const allHiddenFunctionalities: any[] = [];
+
+    try {
+      this.log(`Processando página (profundidade ${currentDepth}): ${url}`);
+      
       // Navegar para a página com networkidle
       await this.page.goto(url, { 
         waitUntil: 'networkidle',
@@ -687,10 +742,10 @@ export class CrawlerAgent extends BaseAgent {
       await this.checkAndHandleProxyAuth();
 
       // Lidar com redirecionamentos e modais
-       await this.handleRedirectsAndModals();
+      await this.handleRedirectsAndModals();
 
-       // Capturar screenshot da página inicial
-       screenshots['pagina_inicial'] = await this.captureScreenshot('pagina_inicial');
+      // Capturar screenshot da página inicial
+      screenshots[`pagina_${currentDepth}_inicial`] = await this.captureScreenshot(`pagina_${currentDepth}_inicial`);
 
       // Aguardar estabilização adicional
       await this.page.waitForTimeout(2000);
@@ -701,29 +756,79 @@ export class CrawlerAgent extends BaseAgent {
       // Analisar objetivo da página
       const pageObjective = await this.analyzePageObjective();
       
-      // Detectar e interagir com elementos
+      // Detectar e interagir com elementos da página atual
       const interactiveElements = await this.detectAndInteractWithElements();
+      allInteractiveElements.push(...interactiveElements);
+
+      // Descobrir links para outras páginas
+      const navigationLinks = await this.discoverNavigationLinks();
+      
+      // Adicionar páginas descobertas à lista
+      navigationLinks.forEach(link => {
+        if (!this.discoveredPages.find(p => p.url === link.url)) {
+          this.discoveredPages.push({
+            url: link.url,
+            title: link.text || 'Página sem título',
+            accessMethod: 'navigation_link',
+            functionality: link.functionality || 'Funcionalidade não identificada'
+          });
+        }
+      });
 
       // Criar workflows baseados nas interações
       const workflows = this.createWorkflowsFromInteractions(interactiveElements);
+      allWorkflows.push(...workflows);
 
       // Identificar funcionalidades ocultas
       const hiddenFunctionalities = await this.discoverHiddenFunctionalities();
+      allHiddenFunctionalities.push(...hiddenFunctionalities);
+
+      // Navegar recursivamente para páginas descobertas (limitado a 5 páginas por nível)
+      const linksToExplore = navigationLinks.slice(0, 5);
+      for (const link of linksToExplore) {
+        if (!this.visitedPages.has(link.url) && this.isValidSaebUrl(link.url)) {
+          try {
+            this.log(`Explorando link descoberto: ${link.url}`);
+            const subPageResult = await this.processPageWithInteractions(link.url, maxDepth, currentDepth + 1);
+            
+            // Agregar resultados das subpáginas
+            if (subPageResult.interactiveElements) {
+              allInteractiveElements.push(...subPageResult.interactiveElements);
+            }
+            if (subPageResult.workflows) {
+              allWorkflows.push(...subPageResult.workflows);
+            }
+            if (subPageResult.hiddenFunctionalities) {
+              allHiddenFunctionalities.push(...subPageResult.hiddenFunctionalities);
+            }
+            
+            // Voltar para a página original
+            await this.page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+            await this.page.waitForTimeout(1000);
+            
+          } catch (error) {
+            this.log(`Erro ao explorar ${link.url}: ${error}`, 'warn');
+            // Continuar com outras páginas mesmo se uma falhar
+          }
+        }
+      }
 
       return {
         pageObjective,
-        interactiveElements,
+        interactiveElements: allInteractiveElements,
         discoveredPages: this.discoveredPages,
-        workflows,
-        hiddenFunctionalities,
+        workflows: allWorkflows,
+        hiddenFunctionalities: allHiddenFunctionalities,
         screenshots,
         statistics: {
-          totalElementsTested: interactiveElements.length,
-          successfulInteractions: interactiveElements.filter(e => e.interactionResults.wasClicked).length,
+          totalElementsTested: allInteractiveElements.length,
+          successfulInteractions: allInteractiveElements.filter(e => e.interactionResults?.wasClicked).length,
           pagesDiscovered: this.discoveredPages.length,
-          workflowsIdentified: workflows.length,
-          hiddenFeaturesFound: hiddenFunctionalities.length,
-          processingTime: Date.now() - startTime
+          workflowsIdentified: allWorkflows.length,
+          hiddenFeaturesFound: allHiddenFunctionalities.length,
+          processingTime: Date.now() - startTime,
+          currentDepth,
+          visitedPagesCount: this.visitedPages.size
         }
       };
 
@@ -845,6 +950,135 @@ export class CrawlerAgent extends BaseAgent {
       this.log(`Erro ao descobrir funcionalidades ocultas: ${error}`, 'error');
       return [];
     }
+  }
+
+  private async discoverNavigationLinks(): Promise<Array<{
+    url: string;
+    text: string;
+    functionality: string;
+  }>> {
+    if (!this.page) return [];
+
+    try {
+      const links = await this.page.evaluate(() => {
+        const navigationLinks: Array<{
+          url: string;
+          text: string;
+          functionality: string;
+        }> = [];
+
+        // Buscar links de navegação específicos do SAEB
+        const linkSelectors = [
+          'a[href]',
+          'button[onclick*="location"]',
+          '[data-href]',
+          '.menu-item a',
+          '.nav-link',
+          '.sidebar a',
+          '.navigation a',
+          '[role="menuitem"]',
+          '.btn[href]'
+        ];
+
+        linkSelectors.forEach(selector => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(element => {
+            let url = '';
+            let text = element.textContent?.trim() || '';
+            
+            if (element.tagName.toLowerCase() === 'a') {
+              url = (element as HTMLAnchorElement).href;
+            } else if (element.hasAttribute('data-href')) {
+              url = element.getAttribute('data-href') || '';
+            } else if (element.hasAttribute('onclick')) {
+              const onclick = element.getAttribute('onclick') || '';
+              const urlMatch = onclick.match(/location[\s]*=[\s]*['"]([^'"]+)['"]/); 
+              if (urlMatch) {
+                url = urlMatch[1];
+              }
+            }
+
+            if (url && text && url !== '#' && url !== 'javascript:void(0)') {
+              // Determinar funcionalidade baseada no texto e contexto
+              let functionality = 'Navegação geral';
+              const lowerText = text.toLowerCase();
+              
+              if (lowerText.includes('prova') || lowerText.includes('gerador')) {
+                functionality = 'Geração de provas';
+              } else if (lowerText.includes('relatório') || lowerText.includes('report')) {
+                functionality = 'Relatórios e análises';
+              } else if (lowerText.includes('usuário') || lowerText.includes('perfil')) {
+                functionality = 'Gerenciamento de usuários';
+              } else if (lowerText.includes('configuração') || lowerText.includes('config')) {
+                functionality = 'Configurações do sistema';
+              } else if (lowerText.includes('dashboard') || lowerText.includes('início')) {
+                functionality = 'Dashboard principal';
+              } else if (lowerText.includes('logout') || lowerText.includes('sair')) {
+                functionality = 'Logout do sistema';
+              }
+
+              navigationLinks.push({
+                url: url,
+                text: text,
+                functionality: functionality
+              });
+            }
+          });
+        });
+
+        return navigationLinks;
+      });
+
+      // Filtrar links únicos
+      const uniqueLinks = links.filter((link, index, self) => 
+        index === self.findIndex(l => l.url === link.url)
+      );
+
+      this.log(`Descobertos ${uniqueLinks.length} links de navegação`);
+      return uniqueLinks;
+
+    } catch (error) {
+      this.log(`Erro ao descobrir links de navegação: ${error}`, 'error');
+      return [];
+    }
+  }
+
+  private isValidSaebUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      // Verificar se é uma URL do domínio SAEB
+      return urlObj.hostname.includes('saeb') || 
+             urlObj.hostname.includes('pmfi.pr.gov.br') ||
+             url.includes('/saeb') ||
+             // Permitir URLs relativas
+             !url.startsWith('http');
+    } catch {
+      // Se não conseguir fazer parse da URL, assumir que é relativa e válida
+      return !url.startsWith('http') && !url.startsWith('mailto:') && !url.startsWith('tel:');
+    }
+  }
+
+  private createEmptyResult(): any {
+    return {
+      pageObjective: {
+        centralPurpose: '',
+        mainFunctionalities: [],
+        userGoals: []
+      },
+      interactiveElements: [],
+      discoveredPages: [],
+      workflows: [],
+      hiddenFunctionalities: [],
+      screenshots: {},
+      statistics: {
+        totalElementsTested: 0,
+        successfulInteractions: 0,
+        pagesDiscovered: 0,
+        workflowsIdentified: 0,
+        hiddenFeaturesFound: 0,
+        processingTime: 0
+      }
+    };
   }
 
   private async handleRedirectsAndModals(): Promise<void> {

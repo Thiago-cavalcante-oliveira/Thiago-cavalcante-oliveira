@@ -11,19 +11,21 @@
     "dev": "tsx --watch main.ts"
   },
   "dependencies": {
-    "playwright": "^1.40.0",
     "@google/generative-ai": "^0.2.0",
-    "minio": "^7.1.0",
     "dotenv": "^16.3.0",
-    "puppeteer": "^21.0.0",
     "groq-sdk": "^0.3.0",
+    "marked": "^9.0.0",
+    "minio": "^7.1.0",
     "pdf-lib": "^1.17.1",
-    "marked": "^9.0.0"
+    "pino": "^9.9.0",
+    "playwright": "^1.40.0",
+    "puppeteer": "^21.0.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
   },
   "keywords": [
     "automation",

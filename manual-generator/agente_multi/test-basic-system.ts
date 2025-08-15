@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { AgnoSCore } from './core/AgnoSCore';
 
 async function testBasicSystem() {
@@ -20,13 +23,13 @@ async function testBasicSystem() {
     console.log('\n2️⃣ Testando importação de agentes...');
     
     try {
-      const { OrchestratorAgent } = await import('./agents/OrchestratorAgent.js');
-      const { CrawlerAgent } = await import('./agents/CrawlerAgent.js');
-      const { AnalysisAgent } = await import('./agents/AnalysisAgent.js');
-      const { ContentAgent } = await import('./agents/ContentAgent.js');
-      const { GeneratorAgent } = await import('./agents/GeneratorAgent.js');
-      const { ScreenshotAgent } = await import('./agents/ScreenshotAgent.js');
-      const { LoginAgent } = await import('./agents/LoginAgent.js');
+      const { OrchestratorAgent } = await import('./agents/OrchestratorAgent');
+const { CrawlerAgent } = await import('./agents/CrawlerAgent');
+const { AnalysisAgent } = await import('./agents/AnalysisAgent');
+const { ContentAgent } = await import('./agents/ContentAgent');
+const { GeneratorAgent } = await import('./agents/GeneratorAgent');
+const { ScreenshotAgent } = await import('./agents/ScreenshotAgent');
+const { LoginAgent } = await import('./agents/LoginAgent');
       
       console.log('✅ Todos os agentes importados com sucesso');
       

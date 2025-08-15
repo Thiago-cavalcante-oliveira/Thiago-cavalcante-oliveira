@@ -7,6 +7,8 @@ import { ContentAgent } from './ContentAgent';
 import { GeneratorAgent } from './GeneratorAgent';
 import { Browser, Page, chromium } from 'playwright';
 import { ElementGroup } from './interfaces/CrawlerTypes';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 export interface OrchestrationConfig {
   maxRetries: number;
@@ -73,6 +75,40 @@ export class OrchestratorAgent extends BaseAgent {
     console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
   }
 
+  private async saveAgentLog(agentName: string, type: 'input' | 'output' | 'ai_response', data: any): Promise<void> {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const logDir = path.join(process.cwd(), 'output', 'agent_logs');
+      await fs.mkdir(logDir, { recursive: true });
+      
+      const filename = `${agentName}_${type}_${timestamp}.md`;
+      const filepath = path.join(logDir, filename);
+      
+      let content = `# ${agentName} - ${type.toUpperCase()}\n\n`;
+      content += `**Timestamp:** ${new Date().toISOString()}\n\n`;
+      
+      if (type === 'input') {
+        content += `## Dados de Entrada\n\n`;
+        content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
+      } else if (type === 'output') {
+        content += `## Dados de Saída\n\n`;
+        content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
+      } else if (type === 'ai_response') {
+        content += `## Resposta da IA\n\n`;
+        if (typeof data === 'string') {
+          content += data;
+        } else {
+          content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
+        }
+      }
+      
+      await fs.writeFile(filepath, content, 'utf-8');
+      this.log(`📝 Log salvo: ${filename}`);
+    } catch (error) {
+      this.log(`❌ Erro ao salvar log: ${error}`, 'error');
+    }
+  }
+
   private readonly agentConfig: AgentConfig;
 
   constructor() {
@@ -100,7 +136,7 @@ export class OrchestratorAgent extends BaseAgent {
     
     // Inicializar browser
     this.browser = await chromium.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -307,8 +343,50 @@ export class OrchestratorAgent extends BaseAgent {
 
       // FASE 2: Crawling e Captura
       this.log('🕷️ FASE 2: Executando CrawlerAgent');
+      
+      // Capturar URL atual após login (se houve login)
+      let crawlUrl = config.targetUrl;
+      if (this.page && (config.credentials || config.authConfig)) {
+        try {
+          // Aguardar um pouco para garantir que a navegação pós-login foi concluída
+          await this.page.waitForTimeout(2000);
+          crawlUrl = this.page.url();
+          this.log(`📍 URL atual após login: ${crawlUrl}`);
+          
+          // Se ainda estiver na página de login, tentar navegar para dashboard
+          if (crawlUrl.includes('signin') || crawlUrl.includes('login')) {
+            this.log('⚠️ Ainda na página de login, tentando navegar para dashboard...');
+            try {
+              // Tentar encontrar e clicar em links de dashboard/home
+              const dashboardSelectors = [
+                'a[href*="dashboard"]',
+                'a[href*="home"]',
+                'a[href*="inicio"]',
+                '.nav-link[href*="dashboard"]',
+                '.menu-item[href*="dashboard"]'
+              ];
+              
+              for (const selector of dashboardSelectors) {
+                const element = await this.page.$(selector);
+                if (element) {
+                  await element.click();
+                  await this.page.waitForTimeout(3000);
+                  crawlUrl = this.page.url();
+                  this.log(`📍 Navegado para: ${crawlUrl}`);
+                  break;
+                }
+              }
+            } catch (navError) {
+              this.log(`⚠️ Erro ao navegar para dashboard: ${navError}`, 'warn');
+            }
+          }
+        } catch (error) {
+          this.log(`⚠️ Erro ao capturar URL pós-login: ${error}`, 'warn');
+        }
+      }
+      
       const crawlerResult = await this.executeAgentTask('CrawlerAgent', 'start_crawl', {
-        url: config.targetUrl,
+        url: crawlUrl,
         sessionData: sessionData,
         authContext: authContext,
         enableScreenshots: config.enableScreenshots,
@@ -505,8 +583,23 @@ export class OrchestratorAgent extends BaseAgent {
 
     this.log(`🔄 Executando ${agentName}.${taskType}`);
     
+    // Salvar dados de entrada
+    await this.saveAgentLog(agentName, 'input', {
+      taskType,
+      data,
+      timestamp: new Date().toISOString()
+    });
+    
     try {
       const result = await agent.processTask(taskData);
+      
+      // Salvar dados de saída
+      await this.saveAgentLog(agentName, 'output', {
+        success: result.success,
+        data: result.data,
+        error: result.error,
+        timestamp: new Date().toISOString()
+      });
       
       if (result.success) {
         this.log(`✅ ${agentName} concluído com sucesso`);
