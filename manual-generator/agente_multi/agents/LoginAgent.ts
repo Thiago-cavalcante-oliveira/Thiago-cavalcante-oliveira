@@ -51,8 +51,9 @@ export class LoginAgent extends BaseAgent {
 
     super(config);
     this.minioService = new MinIOService();
-    this.logDir = path.join(process.cwd(), 'output', 'logs');
-    this.logFile = path.join(this.logDir, 'login-agent.log');
+    this.logDir = path.join(process.cwd(), 'output', 'agent_logs');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    this.logFile = path.join(this.logDir, `LoginAgent_output_${timestamp}.md`);
   }
 
   async initialize(): Promise<void> {
@@ -93,136 +94,79 @@ export class LoginAgent extends BaseAgent {
 
   private async handleAuthentication(task: TaskData): Promise<TaskResult> {
     const startTime = Date.now();
-    const { credentials, page } = task.data;
-    this.page = page;
+    const { url, credentials, authType, customSteps, page } = task.data;
+    
+    // Verificar se a página foi fornecida
+    if (page) {
+      this.page = page;
+    }
+    
     if (!this.page) throw new Error('Página não fornecida para autenticação');
-    this.log(`Iniciando autenticação dinâmica para: ${credentials.loginUrl || 'página atual'}`);
+    if (!credentials || !credentials.username || !credentials.password) {
+      throw new Error('Credenciais inválidas ou incompletas');
+    }
+    
+    const loginUrl = url || credentials.loginUrl;
+    this.log(`🔐 Iniciando autenticação genérica para: ${loginUrl}`);
+    this.log(`📋 Tipo de autenticação: ${authType || 'basic'}`);
+    
     const stepLog: any[] = [];
     const screenshots: Record<string, string | null> = {};
     
     try {
-      // 1. Navegar para página de login se especificada
-      if (credentials.loginUrl) {
-        await this.page.goto(credentials.loginUrl, { waitUntil: 'networkidle' });
-        await this.page.waitForTimeout(1000); // Aguardo adicional para estabilização
-        stepLog.push({ action: 'goto', url: credentials.loginUrl });
-      }
-      
-      // Detectar redirecionamentos ou modais
-      await this.handleRedirectsAndModals();
-      
-      // Capturar tela de login completa
-      screenshots['tela_login'] = await this.captureLoginPage();
-      stepLog.push({ action: 'screenshot', type: 'login_page', url: screenshots['tela_login'] });
-
-      // 2. Detectar e capturar elementos de login individuais
-      await this.detectAndCaptureLoginElements(screenshots);
-      
-      // 3. Detectar logins alternativos
-      const alternativeLogins = await this.detectAlternativeLogins();
-      stepLog.push({ action: 'detect_alt_logins', count: alternativeLogins.length, logins: alternativeLogins });
-      
-      // 4. Busca ativa de campos de login (inclui campos dinâmicos)
-      let usernameField = await this.page.$('input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"]');
-      let passwordField = await this.page.$('input[type="password"]');
-      if (!usernameField || !passwordField) {
-        // Tenta clicar em botões que podem exibir campos
-        const possibleButtons = await this.page.$$('button, a');
-        for (const btn of possibleButtons) {
-          const text = (await btn.innerText()).toLowerCase();
-          if (text.includes('entrar') || text.includes('login') || text.includes('acessar')) {
-            await btn.click();
-            await this.page.waitForTimeout(1000);
-            usernameField = await this.page.$('input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"]');
-            passwordField = await this.page.$('input[type="password"]');
-            if (usernameField && passwordField) break;
-          }
-        }
-      }
-      stepLog.push({ action: 'detect_fields', found: !!usernameField && !!passwordField, screenshot: await this.captureLoginPage() });
-      if (!usernameField || !passwordField) throw new Error('Campos de login não encontrados');
-
-      // 3. Preencher credenciais
-      await usernameField.fill(credentials.username);
-      await this.page.waitForTimeout(500);
-      await passwordField.fill(credentials.password);
-      await this.page.waitForTimeout(500);
-      stepLog.push({ action: 'fill_credentials', screenshot: await this.captureLoginPage() });
-
-      // 4. Submeter formulário (tenta botão, depois Enter)
-      let submitButton = await this.page.$('button[type="submit"], input[type="submit"], button[class*="login"], button[class*="submit"], button[class*="signin"]');
-      if (!submitButton) {
-        // Busca botão visível com texto de login
-        const buttons = await this.page.$$('button, input[type="button"]');
-        for (const btn of buttons) {
-          const text = (await btn.innerText?.() || '').toLowerCase();
-          if (text.includes('entrar') || text.includes('login') || text.includes('acessar')) {
-            submitButton = btn;
-            break;
-          }
-        }
-      }
-      if (submitButton) {
-        await submitButton.click();
-        stepLog.push({ action: 'click_submit', screenshot: await this.captureLoginPage() });
+      // FASE 1: Navegação e preparação (se URL fornecida)
+      if (loginUrl && this.page.url() !== loginUrl) {
+        await this.navigateToLoginPage(loginUrl, stepLog);
       } else {
-        await passwordField.press('Enter');
-        stepLog.push({ action: 'press_enter', screenshot: await this.captureLoginPage() });
+        // Garantir que a página atual esteja completamente carregada
+        await this.ensurePageFullyLoaded();
       }
-      await this.page.waitForLoadState('networkidle');
-
-      // 5. Verificar sucesso do login
-      const authSuccess = await this.verifyAuthenticationSuccess();
-      screenshots['tela_pos_login'] = await this.capturePostLoginPage();
-      stepLog.push({ action: 'verify_success', success: authSuccess, screenshot: screenshots['tela_pos_login'] });
-
-      if (authSuccess) {
-        this.sessionData = await this.captureSessionData();
-        stepLog.push({ action: 'capture_session', sessionId: this.sessionData?.sessionId });
-        
-        // Notificar próximo agente (CrawlerAgent) para crawling autenticado
-        this.sendTask('CrawlerAgent', 'start_authenticated_crawl', {
-          sessionData: this.sessionData,
+      
+      // FASE 2: Análise da página e detecção de elementos
+      const pageAnalysis = await this.analyzeLoginPage(screenshots, stepLog);
+      
+      // FASE 3: Execução da autenticação
+      const authResult = await this.executeAuthentication(credentials, pageAnalysis, customSteps, stepLog, screenshots);
+      
+      // FASE 4: Verificação de sucesso
+      const success = await this.verifyAuthenticationSuccess();
+      
+      if (!success) {
+        throw new Error('Autenticação falhou - verificação de sucesso negativa');
+      }
+      
+      // FASE 5: Captura de dados de sessão
+      const sessionData = await this.captureSessionData();
+      screenshots['post_login_page'] = await this.capturePostLoginPage();
+      
+      this.log('✅ Autenticação concluída com sucesso');
+      
+      return {
+        id: task.id,
+        taskId: task.id,
+        success: true,
+        data: {
+          authenticated: true,
+          authType: authType || 'basic',
+          sessionData,
+          sessionId: sessionData?.sessionId,
+          userContext: sessionData?.userInfo,
           loginSteps: stepLog,
-          credentials: { username: credentials.username, loginUrl: credentials.loginUrl },
-          screenshots
-        }, 'high');
-        
-        return {
-          id: task.id,
-          taskId: task.id,
-          success: true,
-          data: {
-            authenticated: true,
-            sessionId: this.sessionData.sessionId,
-            userContext: this.sessionData.userContext,
-            loginSteps: stepLog,
-            screenshots,
-            authType: 'basic',
-            alternativeLogins
-          },
-          timestamp: new Date(),
-          processingTime: Date.now() - startTime
-        };
-      } else {
-        return {
-          id: task.id,
-          taskId: task.id,
-          success: false,
-          error: 'Falha na autenticação - verifique as credenciais',
-          data: { loginSteps: stepLog, screenshots },
-          timestamp: new Date(),
-          processingTime: Date.now() - startTime
-        };
-      }
-    } catch (error) {
-      this.log(`Erro na autenticação dinâmica: ${error}`, 'error');
+          screenshots,
+          pageAnalysis
+        },
+        timestamp: new Date(),
+        processingTime: Date.now() - startTime
+      };
       
-      // Capturar screenshot de erro se possível
+    } catch (error) {
+      this.log(`❌ Erro na autenticação: ${error}`, 'error');
+      
+      // Capturar screenshot de erro para diagnóstico
       try {
-        screenshots['tela_erro'] = await this.captureLoginPage();
+        screenshots['error_page'] = await this.captureLoginPage();
       } catch (screenshotError) {
-        this.log(`Erro ao capturar screenshot de erro: ${screenshotError}`, 'warn');
+        this.log(`⚠️ Erro ao capturar screenshot de erro: ${screenshotError}`, 'warn');
       }
       
       return {
@@ -230,11 +174,357 @@ export class LoginAgent extends BaseAgent {
         taskId: task.id,
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        data: { loginSteps: stepLog, screenshots },
+        data: {
+          authenticated: false,
+          loginSteps: stepLog,
+          screenshots,
+          errorDetails: error
+        },
         timestamp: new Date(),
         processingTime: Date.now() - startTime
       };
     }
+  }
+
+  /**
+   * Navega para a página de login
+   */
+  private async navigateToLoginPage(loginUrl: string, stepLog: any[]): Promise<void> {
+    if (!this.page) throw new Error('Página não disponível');
+    
+    this.log(`🌐 Navegando para: ${loginUrl}`);
+    
+    try {
+      // Navegar para a página com aguarda completa
+      await this.page.goto(loginUrl, { 
+        waitUntil: 'domcontentloaded',
+        timeout: 30000
+      });
+      
+      // Aguardar que todos os recursos sejam carregados
+      await this.page.waitForLoadState('networkidle', { timeout: 15000 });
+      
+      // Aguardar que o DOM esteja completamente renderizado
+      await this.page.waitForFunction(() => {
+        return document.readyState === 'complete' && 
+               document.body && 
+               document.body.children.length > 0;
+      }, { timeout: 10000 });
+      
+      // Aguardar um pouco para carregamento de SPAs
+      await this.page.waitForTimeout(3000);
+      
+      // Tentar detectar e clicar em botões de login que revelam formulários
+      await this.handleInitialLoginButtons();
+      
+      // Aguardar elementos básicos de formulário aparecerem
+      try {
+        await this.page.waitForSelector('input, form, button', { timeout: 10000 });
+        this.log('✅ Elementos de formulário detectados');
+      } catch (e) {
+        this.log('⚠️ Nenhum elemento de formulário detectado imediatamente', 'warn');
+      }
+      
+      // Tratar redirecionamentos e modais
+      await this.handleRedirectsAndModals();
+      
+      stepLog.push({ 
+        action: 'navigate', 
+        url: loginUrl, 
+        finalUrl: this.page.url(),
+        timestamp: new Date().toISOString()
+      });
+      
+      this.log(`✅ Navegação concluída: ${this.page.url()}`);
+      
+    } catch (error) {
+      this.log(`❌ Erro na navegação: ${error}`, 'error');
+      throw new Error(`Falha ao navegar para página de login: ${error}`);
+    }
+  }
+
+  /**
+   * Garante que a página esteja completamente carregada para qualquer aplicação web
+   */
+  private async ensurePageFullyLoaded(): Promise<void> {
+    if (!this.page) throw new Error('Página não disponível');
+    
+    try {
+      this.log('⏳ Aguardando carregamento completo da página...');
+      
+      // Aguardar que todos os recursos de rede sejam carregados
+      await this.page.waitForLoadState('networkidle', { timeout: 15000 });
+      
+      // Aguardar que o DOM esteja completamente renderizado
+      await this.page.waitForFunction(() => {
+        return document.readyState === 'complete' && 
+               document.body && 
+               document.body.children.length > 0;
+      }, { timeout: 10000 });
+      
+      // Aguardar elementos básicos de formulário aparecerem (genérico para qualquer app)
+      try {
+        await this.page.waitForSelector('input, form, button, [type="submit"], [role="button"]', { timeout: 5000 });
+      } catch (e) {
+        this.log('⚠️ Nenhum elemento de formulário detectado imediatamente - pode ser SPA', 'warn');
+      }
+      
+      // Aguardar estabilização adicional para SPAs e aplicações dinâmicas
+      await this.page.waitForTimeout(1500);
+      
+      this.log('✅ Página completamente carregada e estabilizada');
+      
+    } catch (error) {
+      this.log(`⚠️ Aviso no carregamento da página: ${error}`, 'warn');
+      // Não falhar - apenas logar o aviso para manter compatibilidade genérica
+    }
+  }
+
+  /**
+   * Analisa a página de login e detecta elementos
+   */
+  private async analyzeLoginPage(screenshots: Record<string, string | null>, stepLog: any[]): Promise<any> {
+    if (!this.page) throw new Error('Página não disponível');
+    
+    this.log('🔍 Analisando página de login...');
+    
+    try {
+      // Capturar screenshot inicial
+      screenshots['login_page'] = await this.captureLoginPage();
+      
+      // Garantir que botões iniciais de login sejam clicados antes da detecção
+      await this.handleInitialLoginButtons();
+      
+      // Detectar métodos de autenticação disponíveis
+      const authMethods = await this.detectAuthMethods();
+      
+      // Detectar e capturar elementos individuais
+      await this.detectAndCaptureLoginElements(screenshots);
+      
+      // Detectar logins alternativos
+      const alternativeLogins = await this.detectAlternativeLogins();
+      
+      const analysis = {
+        authMethods,
+        alternativeLogins,
+        hasStandardLogin: authMethods.standardAuth.available,
+        hasOAuthOptions: authMethods.oauthProviders.length > 0,
+        pageUrl: this.page.url(),
+        pageTitle: await this.page.title()
+      };
+      
+      stepLog.push({ 
+        action: 'analyze_page', 
+        analysis,
+        timestamp: new Date().toISOString()
+      });
+      
+      this.log(`📊 Análise concluída: ${analysis.hasStandardLogin ? 'Login padrão' : 'Sem login padrão'}, ${analysis.alternativeLogins.length} opções alternativas`);
+      
+      return analysis;
+      
+    } catch (error) {
+      this.log(`❌ Erro na análise da página: ${error}`, 'error');
+      throw new Error(`Falha ao analisar página de login: ${error}`);
+    }
+  }
+
+  /**
+   * Executa o processo de autenticação
+   */
+  private async executeAuthentication(
+    credentials: any, 
+    pageAnalysis: any, 
+    customSteps: any[] | undefined, 
+    stepLog: any[], 
+    screenshots: Record<string, string | null>
+  ): Promise<boolean> {
+    if (!this.page) throw new Error('Página não disponível');
+    
+    this.log('⚡ Executando processo de autenticação...');
+    
+    try {
+      // Se há passos customizados, executá-los
+      if (customSteps && customSteps.length > 0) {
+        this.log('🔧 Executando passos customizados de autenticação');
+        return await this.performCustomAuth(credentials);
+      }
+      
+      // Caso contrário, usar detecção automática
+      if (pageAnalysis.hasStandardLogin) {
+        this.log('🔑 Executando autenticação padrão');
+        return await this.executeStandardAuthentication(credentials, stepLog, screenshots);
+      }
+      
+      // Se há opções OAuth, tentar usar a primeira disponível
+      if (pageAnalysis.hasOAuthOptions && pageAnalysis.alternativeLogins.length > 0) {
+        this.log('🔗 Tentando autenticação OAuth');
+        // OAuth genérico não implementado - usar autenticação customizada se necessário
+        throw new Error('Autenticação OAuth detectada mas não implementada. Use customSteps para OAuth específico.');
+      }
+      
+      throw new Error('Nenhum método de autenticação compatível encontrado');
+      
+    } catch (error) {
+      this.log(`❌ Erro na execução da autenticação: ${error}`, 'error');
+      throw error;
+    }
+  }
+
+  /**
+   * Executa autenticação padrão (campos de usuário e senha)
+   */
+  private async executeStandardAuthentication(
+    credentials: any, 
+    stepLog: any[], 
+    screenshots: Record<string, string | null>
+  ): Promise<boolean> {
+    if (!this.page) throw new Error('Página não disponível');
+    
+    try {
+      // Buscar campos de login com seletores mais abrangentes
+      const usernameField = await this.findUsernameField();
+      const passwordField = await this.findPasswordField();
+      
+      if (!usernameField || !passwordField) {
+        throw new Error('Campos de usuário ou senha não encontrados');
+      }
+      
+      this.log('📝 Preenchendo credenciais...');
+      await this.logToFile('📝 Preenchendo credenciais...');
+      
+      // Preencher campo de usuário
+      await usernameField.evaluate((el: HTMLElement) => el.scrollIntoView());
+      await usernameField.click();
+      await usernameField.fill(''); // Limpar campo
+      await usernameField.type(credentials.username, { delay: 100 });
+      await this.page.waitForTimeout(500);
+      await this.logToFile(`✅ Campo de usuário preenchido: ${credentials.username}`);
+      
+      // Preencher campo de senha
+      await passwordField.evaluate((el: HTMLElement) => el.scrollIntoView());
+      await passwordField.click();
+      await passwordField.fill(''); // Limpar campo
+      await passwordField.type(credentials.password, { delay: 100 });
+      await this.page.waitForTimeout(500);
+      await this.logToFile('✅ Campo de senha preenchido');
+      
+      stepLog.push({ 
+        action: 'fill_credentials', 
+        username: credentials.username,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Capturar screenshot antes do submit
+      screenshots['before_submit'] = await this.captureLoginPage();
+      
+      // Submeter formulário
+      const submitButton = await this.page.$('button[type="submit"], input[type="submit"], button[class*="login"], button[class*="submit"], button[class*="signin"]');
+      if (submitButton) {
+        await this.logToFile('🎯 Clicando no botão de submit');
+        await submitButton.click();
+        stepLog.push({ action: 'click_submit', timestamp: new Date().toISOString() });
+      } else {
+        await this.logToFile('⌨️ Pressionando Enter para submeter');
+        await passwordField.press('Enter');
+        stepLog.push({ action: 'press_enter', timestamp: new Date().toISOString() });
+      }
+      await this.page.waitForLoadState('networkidle');
+      await this.logToFile('✅ Formulário submetido, aguardando resposta...');
+      
+      return true;
+      
+    } catch (error) {
+      this.log(`❌ Erro na autenticação padrão: ${error}`, 'error');
+      await this.logToFile(`❌ Erro na autenticação padrão: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Encontra campo de usuário/email
+   */
+  private async findUsernameField(): Promise<any> {
+    if (!this.page) return null;
+    
+    // Buscar usando seletores diretos primeiro
+    const selectors = [
+      'input[type="email"]',
+      'input[name*="user"]',
+      'input[name*="email"]',
+      'input[name*="login"]',
+      'input[id*="user"]',
+      'input[id*="email"]',
+      'input[id*="login"]',
+      'input[placeholder*="user"]',
+      'input[placeholder*="email"]',
+      'input[placeholder*="login"]',
+      'input[class*="user"]',
+      'input[class*="email"]',
+      'input[class*="login"]',
+      'input[type="text"]'
+    ];
+    
+    for (const selector of selectors) {
+      const field = await this.page.$(selector);
+      if (field) {
+        const isVisible = await field.isVisible();
+        if (isVisible) {
+          return field;
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Encontra campo de senha
+   */
+  private async findPasswordField(): Promise<any> {
+    if (!this.page) return null;
+    
+    // Buscar usando seletores diretos
+    const selectors = [
+      'input[type="password"]',
+      'input[name*="password"]',
+      'input[name*="senha"]',
+      'input[name*="pass"]',
+      'input[id*="password"]',
+      'input[id*="senha"]',
+      'input[id*="pass"]',
+      'input[placeholder*="password"]',
+      'input[placeholder*="senha"]',
+      'input[placeholder*="pass"]',
+      'input[class*="password"]',
+      'input[class*="senha"]',
+      'input[class*="pass"]'
+    ];
+    
+    for (const selector of selectors) {
+      const field = await this.page.$(selector);
+      if (field) {
+        const isVisible = await field.isVisible();
+        if (isVisible) {
+          return field;
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Encontra campo por placeholder
+   */
+  private async findFieldByPlaceholder(placeholders: string[]): Promise<any> {
+    if (!this.page) return null;
+    
+    for (const placeholder of placeholders) {
+      const field = await this.page.$(`input[placeholder*="${placeholder}"], input[aria-label*="${placeholder}"]`);
+      if (field) return field;
+    }
+    return null;
   }
 
   private async handleSessionCheck(task: TaskData): Promise<TaskResult> {
@@ -280,6 +570,63 @@ export class LoginAgent extends BaseAgent {
     }
   }
 
+  /**
+    * Detecta e clica em botões iniciais de login que podem revelar formulários
+    */
+   private async handleInitialLoginButtons(): Promise<void> {
+     if (!this.page) return;
+     
+     try {
+       await this.logToFile('🔍 Procurando por botões de login iniciais...');
+       
+       // Seletores para botões que podem revelar formulários de login
+       const loginButtonSelectors = [
+         'button:has-text("Fazer Login")',
+         'button:has-text("Login")',
+         'button:has-text("Entrar")',
+         'button:has-text("Sign In")',
+         'a:has-text("Fazer Login")',
+         'a:has-text("Login")',
+         'a:has-text("Entrar")',
+         'a:has-text("Sign In")',
+         '[data-testid*="login"]',
+         '[class*="login-button"]',
+         '[class*="signin-button"]',
+         '[id*="login-btn"]',
+         '[id*="signin-btn"]'
+       ];
+       
+       for (const selector of loginButtonSelectors) {
+         try {
+           const button = await this.page.$(selector);
+           if (button) {
+             const isVisible = await button.isVisible();
+             if (isVisible) {
+               await this.logToFile(`🎯 Encontrado botão de login: ${selector}`);
+               await button.click();
+               await this.page.waitForTimeout(3000);
+               
+               // Verificar se formulário apareceu após o clique
+               const formAppeared = await this.page.$('input[type="password"], input[name*="password"]');
+               if (formAppeared) {
+                 await this.logToFile('✅ Formulário de login revelado após clique');
+                 return;
+               }
+             }
+           }
+         } catch (e) {
+           // Continuar tentando outros seletores
+           continue;
+         }
+       }
+       
+       await this.logToFile('ℹ️ Nenhum botão inicial de login encontrado ou necessário');
+       
+     } catch (error) {
+       await this.logToFile(`⚠️ Erro ao procurar botões iniciais: ${error}`);
+     }
+   }
+
   private async handleRedirectsAndModals(): Promise<void> {
     if (!this.page) return;
     
@@ -320,19 +667,19 @@ export class LoginAgent extends BaseAgent {
       const passwordField = await this.page.$('input[type="password"]');
       
       if (usernameField) {
-        await usernameField.scrollIntoViewIfNeeded();
+        await usernameField.evaluate((el: HTMLElement) => el.scrollIntoView());
         screenshots['campo_usuario'] = await this.captureElementScreenshot(usernameField, 'campo_usuario');
       }
       
       if (passwordField) {
-        await passwordField.scrollIntoViewIfNeeded();
+        await passwordField.evaluate((el: HTMLElement) => el.scrollIntoView());
         screenshots['campo_senha'] = await this.captureElementScreenshot(passwordField, 'campo_senha');
       }
       
       // Capturar botão de submit se existir
       const submitButton = await this.page.$('button[type="submit"], input[type="submit"], button[class*="login"]');
       if (submitButton) {
-        await submitButton.scrollIntoViewIfNeeded();
+        await submitButton.evaluate((el: HTMLElement) => el.scrollIntoView());
         screenshots['botao_login'] = await this.captureElementScreenshot(submitButton, 'botao_login');
       }
     } catch (error) {
@@ -399,6 +746,16 @@ export class LoginAgent extends BaseAgent {
   private async detectAuthMethods(): Promise<AuthDetectionResult> {
     if (!this.page) throw new Error('Página não disponível');
 
+    await this.logToFile('🔍 Iniciando detecção de métodos de autenticação...');
+
+    // Capturar logs do console do browser
+    const consoleLogs: string[] = [];
+    this.page.on('console', msg => {
+      if (msg.type() === 'log') {
+        consoleLogs.push(msg.text());
+      }
+    });
+
     const authMethods = await this.page.evaluate(() => {
       // Detectar autenticação padrão
       const standardAuth = {
@@ -409,21 +766,63 @@ export class LoginAgent extends BaseAgent {
         }
       };
 
-      const form = document.querySelector('form');
-      if (form) {
-        const inputs = form.querySelectorAll('input');
-        inputs.forEach(input => {
-          const name = input.name || input.id || input.placeholder;
-          if (name) {
-            if (input.hasAttribute('required')) {
-              standardAuth.fields.required.push(name);
-            } else {
-              standardAuth.fields.optional.push(name);
-            }
+      // Buscar formulários de login de forma mais abrangente
+      const forms = document.querySelectorAll('form, [role="form"], .login-form, .signin-form, .auth-form');
+      console.log(`📋 Encontrados ${forms.length} formulários`);
+      
+      let hasUsernameField = false;
+      let hasPasswordField = false;
+      
+      // Se não encontrar formulários, buscar inputs diretamente
+      const allInputs = forms.length > 0 ? 
+        Array.from(forms).flatMap(form => Array.from(form.querySelectorAll('input'))) :
+        Array.from(document.querySelectorAll('input'));
+      
+      console.log(`📝 Encontrados ${allInputs.length} inputs ${forms.length > 0 ? 'dentro dos formulários' : 'diretamente na página'}`);
+
+      allInputs.forEach((input, index) => {
+        const inputElement = input as HTMLInputElement;
+        const name = inputElement.name || inputElement.id || inputElement.placeholder || '';
+        const type = inputElement.type?.toLowerCase() || '';
+        const className = inputElement.className?.toLowerCase() || '';
+        const placeholder = inputElement.placeholder?.toLowerCase() || '';
+        
+        console.log(`Input ${index + 1}: type="${type}", name="${name}", placeholder="${placeholder}", class="${className}"`);
+        
+        // Detectar campos de usuário/email com seletores mais específicos
+        if (type === 'email' || type === 'text' || 
+            name.toLowerCase().includes('user') || name.toLowerCase().includes('email') ||
+            name.toLowerCase().includes('login') || placeholder.includes('email') ||
+            placeholder.includes('user') || placeholder.includes('login') ||
+            className.includes('user') || className.includes('email') ||
+            className.includes('login') || name === 'username' || inputElement.id === 'username') {
+          hasUsernameField = true;
+          console.log(`👤 Campo de usuário detectado: name="${name}", id="${inputElement.id}", type="${type}"`);
+          if (inputElement.hasAttribute('required') || inputElement.required) {
+            standardAuth.fields.required.push(name || 'username');
+          } else {
+            standardAuth.fields.optional.push(name || 'username');
           }
-        });
-        standardAuth.available = standardAuth.fields.required.length > 0;
-      }
+        }
+        
+        // Detectar campos de senha com seletores mais específicos
+        if (type === 'password' || 
+            name.toLowerCase().includes('pass') || placeholder.includes('pass') ||
+            className.includes('pass') || name === 'password' || inputElement.id === 'password') {
+          hasPasswordField = true;
+          console.log(`🔒 Campo de senha detectado: name="${name}", id="${inputElement.id}", type="${type}"`);
+          if (inputElement.hasAttribute('required') || inputElement.required) {
+            standardAuth.fields.required.push(name || 'password');
+          } else {
+            standardAuth.fields.optional.push(name || 'password');
+          }
+        }
+      });
+      
+      console.log(`Resultado da detecção: hasUsernameField=${hasUsernameField}, hasPasswordField=${hasPasswordField}`);
+      
+      // Considerar disponível se tiver pelo menos um campo de usuário e um de senha
+      standardAuth.available = hasUsernameField && hasPasswordField;
 
       // Detectar provedores OAuth
       const oauthProviders = [] as Array<{ name: string; buttonSelector: string; location: string }>;
@@ -487,6 +886,17 @@ export class LoginAgent extends BaseAgent {
         additionalFeatures
       };
     });
+
+    // Registrar logs do console do browser
+    for (const log of consoleLogs) {
+      await this.logToFile(`[BROWSER] ${log}`);
+    }
+
+    // Log dos resultados da detecção
+    await this.logToFile(`👤 Campo de usuário encontrado: ${authMethods.standardAuth.available ? 'SIM' : 'NÃO'}`);
+    await this.logToFile(`🔒 Campo de senha encontrado: ${authMethods.standardAuth.available ? 'SIM' : 'NÃO'}`);
+    await this.logToFile(`✅ Autenticação padrão disponível: ${authMethods.standardAuth.available ? 'SIM' : 'NÃO'}`);
+    await this.logToFile(`🔗 Provedores OAuth encontrados: ${authMethods.oauthProviders.length}`);
 
     return authMethods;
   }
