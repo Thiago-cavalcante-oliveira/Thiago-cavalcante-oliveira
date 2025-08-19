@@ -8,7 +8,11 @@ import { ContentAgent } from './agents/ContentAgent';
 import { GeneratorAgent } from './agents/GeneratorAgent';
 import { ScreenshotAgent } from './agents/ScreenshotAgent';
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function main() {
   console.log('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais...');

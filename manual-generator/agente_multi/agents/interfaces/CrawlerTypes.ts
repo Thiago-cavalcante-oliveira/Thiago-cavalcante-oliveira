@@ -58,6 +58,12 @@ export interface CrawlResult {
     loadTime: number;
     elementCount: number;
   };
+  pages: Array<{
+    url: string;
+    title: string;
+    elements: ElementGroup[];
+  }>;
+  errors: string[];
 }
 
 export interface ElementContext {
