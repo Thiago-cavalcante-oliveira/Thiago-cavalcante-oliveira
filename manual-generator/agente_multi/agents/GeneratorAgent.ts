@@ -1,7 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult, type AgentCapability } from '../core/AgnoSCore';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
 import { MinIOService } from '../services/MinIOService';
-import { logger } from '../utils/logger';
-import { retry } from '../utils/retry';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
@@ -33,24 +31,11 @@ export interface GeneratedDocuments {
 }
 
 export class GeneratorAgent extends BaseAgent {
-  protected declare config: AgentConfig;
-
   private minioService: MinIOService;
   private outputDir: string;
   private currentDocuments: GeneratedDocuments | null = null;
-  private logDir: string;
-  private logFile: string;
-  private prompt: string;
 
-  private async logToFile(message: string, stage: string = 'generator'): Promise<void> {
-    try {
-      await fs.mkdir(this.logDir, { recursive: true });
-      const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
-      await fs.appendFile(this.logFile, logMsg, 'utf-8');
-    } catch (error) {
-      console.error(`Erro ao salvar log: ${error}`);
-    }
-  }
+  private prompt: string;
 
   constructor(prompt: string) {
     const config: AgentConfig = {
@@ -70,15 +55,12 @@ export class GeneratorAgent extends BaseAgent {
     this.prompt = prompt;
     this.minioService = new MinIOService();
     this.outputDir = path.join(process.cwd(), 'output', 'final_documents');
-    this.logDir = path.join(process.cwd(), 'output', 'logs');
-    this.logFile = path.join(this.logDir, 'generator-agent.log');
   }
 
   async initialize(): Promise<void> {
     await this.minioService.initialize();
     await this.ensureOutputDirectory();
-  this.log('GeneratorAgent inicializado para geração de documentos');
-  await this.logToFile('GeneratorAgent inicializado para geração de documentos', 'init');
+    this.log('GeneratorAgent inicializado para geração de documentos');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -113,20 +95,9 @@ export class GeneratorAgent extends BaseAgent {
 
   private async handleDocumentGeneration(task: TaskData): Promise<TaskResult> {
     const startTime = Date.now();
-    // Suporte para diferentes estruturas de dados
-    const userContent = task.data.userContent || task.data.content;
-    const { crawlAnalysis, sessionData, authContext, rawData } = task.data;
+    const { userContent, crawlAnalysis, sessionData, authContext, rawData } = task.data;
     
-    // Validação de entrada
-    if (!userContent) {
-      const errorMsg = 'userContent não pode ser undefined';
-      this.log(errorMsg, 'error');
-      await this.logToFile(errorMsg, 'error');
-      throw new Error(errorMsg);
-    }
-    
-  this.log('Iniciando geração de documentos finais');
-  await this.logToFile('Iniciando geração de documentos finais', 'start');
+    this.log('Iniciando geração de documentos finais');
 
     try {
       // Gerar documentos em todos os formatos
@@ -153,8 +124,7 @@ export class GeneratorAgent extends BaseAgent {
       };
 
     } catch (error) {
-  this.log(`Erro na geração de documentos: ${error}`, 'error');
-  await this.logToFile(`Erro na geração de documentos: ${error}`, 'error');
+      this.log(`Erro na geração de documentos: ${error}`, 'error');
       throw error;
     }
   }
@@ -216,8 +186,7 @@ export class GeneratorAgent extends BaseAgent {
   }
 
   private async generateAllFormats(userContent: any, crawlAnalysis: any): Promise<GeneratedDocuments> {
-  this.log('Gerando documentos em todos os formatos (MD, HTML, PDF)');
-  await this.logToFile('Gerando documentos em todos os formatos (MD, HTML, PDF)', 'formats');
+    this.log('Gerando documentos em todos os formatos (MD, HTML, PDF)');
 
     // Gerar Markdown
     const markdownContent = await this.generateMarkdown(userContent);
@@ -237,8 +206,7 @@ export class GeneratorAgent extends BaseAgent {
       pdfPath = path.join(this.outputDir, `manual_usuario_${Date.now()}.pdf`);
       await fs.writeFile(pdfPath, pdfContent);
     } catch (error) {
-  this.log(`PDF não pôde ser gerado: ${error}`, 'warn');
-  await this.logToFile(`PDF não pôde ser gerado: ${error}`, 'warn');
+      this.log(`PDF não pôde ser gerado: ${error}`, 'warn');
     }
 
     // Upload para MinIO
@@ -274,34 +242,16 @@ export class GeneratorAgent extends BaseAgent {
       }
     };
 
-  this.log(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`);
-  await this.logToFile(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`, 'done');
+    this.log(`Documentos gerados: MD (${wordCount} palavras), HTML, ${pdfPath ? 'PDF' : 'PDF falhou'}`);
     return documents;
   }
 
   private async generateMarkdown(userContent: any): Promise<string> {
-    // Validação de entrada
-    if (!userContent) {
-      await this.logToFile('Erro: userContent está undefined em generateMarkdown', 'error');
-      throw new Error('userContent não pode ser undefined');
-    }
-    
-    const metadata = userContent.metadata || {
-      title: 'Manual do Usuário',
-      subtitle: 'Guia de utilização',
-      version: '1.0.0',
-      dateCreated: new Date().toLocaleDateString('pt-BR'),
-      targetAudience: 'Usuários finais',
-      estimatedReadTime: '15-20 minutos'
-    };
-    const introduction = userContent.introduction || {
-      overview: 'Este manual fornece instruções para utilização da aplicação.',
-      requirements: ['Acesso à internet', 'Navegador web atualizado'],
-      howToUseManual: 'Siga os passos descritos em cada seção.'
-    };
+    const metadata = userContent.metadata;
+    const introduction = userContent.introduction;
     const sections = userContent.sections || [];
-    const appendices = userContent.appendices || {};
-    const summary = userContent.summary || 'Manual concluído com sucesso.';
+    const appendices = userContent.appendices;
+    const summary = userContent.summary;
 
     let markdown = `# ${metadata.title}
 
@@ -321,11 +271,9 @@ ${metadata.subtitle}
 `;
 
     // Gerar índice
-    if (sections && Array.isArray(sections)) {
-      sections.forEach((section: any, index: number) => {
-        markdown += `${index + 1}. [${section.title}](#${section.id})\n`;
-      });
-    }
+    sections.forEach((section: any, index: number) => {
+      markdown += `${index + 1}. [${section.title}](#${section.id})\n`;
+    });
 
     markdown += `
 ${sections.length + 1}. [Troubleshooting](#troubleshooting)
@@ -345,11 +293,9 @@ ${introduction.overview}
 
 `;
 
-    if (introduction.requirements && Array.isArray(introduction.requirements)) {
-      introduction.requirements.forEach((req: string) => {
-        markdown += `- ${req}\n`;
-      });
-    }
+    introduction.requirements.forEach((req: string) => {
+      markdown += `- ${req}\n`;
+    });
 
     markdown += `
 ### Como Usar Este Manual
@@ -361,9 +307,8 @@ ${introduction.howToUseManual}
 `;
 
     // Gerar seções principais
-    if (sections && Array.isArray(sections)) {
-      sections.forEach((section: any, index: number) => {
-        markdown += `## ${index + 1}. ${section.title} {#${section.id}}
+    sections.forEach((section: any, index: number) => {
+      markdown += `## ${index + 1}. ${section.title} {#${section.id}}
 
 ${section.description}
 
@@ -371,53 +316,50 @@ ${section.description}
 
 `;
 
-        if (section.steps && Array.isArray(section.steps)) {
-          section.steps.forEach((step: any) => {
-            markdown += `#### ${step.stepNumber}. ${step.action}
+      section.steps.forEach((step: any) => {
+        markdown += `#### ${step.stepNumber}. ${step.action}
 
 ${step.description}
 
 **Resultado Esperado:** ${step.expectedResult}
 
 `;
-            
-            if (step.screenshot) {
-              markdown += `![Screenshot do Passo ${step.stepNumber}](${step.screenshot})\n\n`;
-            }
-
-            if (step.notes && Array.isArray(step.notes) && step.notes.length > 0) {
-              markdown += `**Observações:**\n`;
-              step.notes.forEach((note: string) => {
-                markdown += `- ${note}\n`;
-              });
-              markdown += '\n';
-            }
-          });
+        
+        if (step.screenshot) {
+          markdown += `![Screenshot do Passo ${step.stepNumber}](${step.screenshot})\n\n`;
         }
 
-        if (section.tips && Array.isArray(section.tips) && section.tips.length > 0) {
-          markdown += `### 💡 Dicas Úteis
-
-`;
-          section.tips.forEach((tip: string) => {
-            markdown += `- ${tip}\n`;
+        if (step.notes && step.notes.length > 0) {
+          markdown += `**Observações:**\n`;
+          step.notes.forEach((note: string) => {
+            markdown += `- ${note}\n`;
           });
           markdown += '\n';
         }
-
-        if (section.troubleshooting && Array.isArray(section.troubleshooting) && section.troubleshooting.length > 0) {
-          markdown += `### ⚠️ Problemas Comuns
-
-`;
-          section.troubleshooting.forEach((issue: string) => {
-            markdown += `- ${issue}\n`;
-          });
-          markdown += '\n';
-        }
-
-        markdown += '---\n\n';
       });
-    }
+
+      if (section.tips && section.tips.length > 0) {
+        markdown += `### 💡 Dicas Úteis
+
+`;
+        section.tips.forEach((tip: string) => {
+          markdown += `- ${tip}\n`;
+        });
+        markdown += '\n';
+      }
+
+      if (section.troubleshooting && section.troubleshooting.length > 0) {
+        markdown += `### ⚠️ Problemas Comuns
+
+`;
+        section.troubleshooting.forEach((issue: string) => {
+          markdown += `- ${issue}\n`;
+        });
+        markdown += '\n';
+      }
+
+      markdown += '---\n\n';
+    });
 
     // Gerar apêndices
     markdown += `## 🔧 Troubleshooting {#troubleshooting}
@@ -519,12 +461,6 @@ Esta seção contém soluções para os problemas mais comuns:
 
   private async generateHTML(userContent: any): Promise<string> {
     const markdownContent = await this.generateMarkdown(userContent);
-    
-    // Validação de entrada
-    if (!userContent || !userContent.metadata) {
-      await this.logToFile('Erro: userContent ou metadata está undefined em generateHTML', 'error');
-      throw new Error('userContent e metadata são obrigatórios');
-    }
     
     // Template HTML base
     const htmlTemplate = `<!DOCTYPE html>
@@ -780,8 +716,7 @@ Esta seção contém soluções para os problemas mais comuns:
 
   private async updateDocuments(updates: any, format?: string): Promise<any> {
     // Implementação futura para atualização de documentos
-  this.log('Funcionalidade de atualização de documentos não implementada ainda');
-  await this.logToFile('Funcionalidade de atualização de documentos não implementada ainda', 'warn');
+    this.log('Funcionalidade de atualização de documentos não implementada ainda');
     return null;
   }
 
@@ -793,8 +728,7 @@ Esta seção contém soluções para os problemas mais comuns:
     try {
       await fs.mkdir(this.outputDir, { recursive: true });
     } catch (error) {
-  this.log(`Erro ao criar diretório de saída: ${error}`, 'warn');
-  await this.logToFile(`Erro ao criar diretório de saída: ${error}`, 'warn');
+      this.log(`Erro ao criar diretório de saída: ${error}`, 'warn');
     }
   }
 
@@ -904,7 +838,6 @@ ${documents.formats.pdf ? '**PDF:**\n- Layout profissional\n- Pronto para impres
 
   async cleanup(): Promise<void> {
     this.currentDocuments = null;
-  this.log('GeneratorAgent finalizado - documentos gerados com sucesso');
-  await this.logToFile('GeneratorAgent finalizado - documentos gerados com sucesso', 'done');
+    this.log('GeneratorAgent finalizado - documentos gerados com sucesso');
   }
 }

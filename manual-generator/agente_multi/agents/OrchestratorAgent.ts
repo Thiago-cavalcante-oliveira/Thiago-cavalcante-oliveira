@@ -7,8 +7,6 @@ import { ContentAgent } from './ContentAgent';
 import { GeneratorAgent } from './GeneratorAgent';
 import { Browser, Page, chromium } from 'playwright';
 import { ElementGroup } from './interfaces/CrawlerTypes';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 
 export interface OrchestrationConfig {
   maxRetries: number;
@@ -69,44 +67,10 @@ export class OrchestratorAgent extends BaseAgent {
   private page: Page | null = null;
   private currentExecution: OrchestrationResult | null = null;
 
-  protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
+  protected log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
     const timestamp = new Date().toISOString();
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
     console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
-  }
-
-  private async saveAgentLog(agentName: string, type: 'input' | 'output' | 'ai_response', data: any): Promise<void> {
-    try {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const logDir = path.join(process.cwd(), 'output', 'agent_logs');
-      await fs.mkdir(logDir, { recursive: true });
-      
-      const filename = `${agentName}_${type}_${timestamp}.md`;
-      const filepath = path.join(logDir, filename);
-      
-      let content = `# ${agentName} - ${type.toUpperCase()}\n\n`;
-      content += `**Timestamp:** ${new Date().toISOString()}\n\n`;
-      
-      if (type === 'input') {
-        content += `## Dados de Entrada\n\n`;
-        content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
-      } else if (type === 'output') {
-        content += `## Dados de Saída\n\n`;
-        content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
-      } else if (type === 'ai_response') {
-        content += `## Resposta da IA\n\n`;
-        if (typeof data === 'string') {
-          content += data;
-        } else {
-          content += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n`;
-        }
-      }
-      
-      await fs.writeFile(filepath, content, 'utf-8');
-      this.log(`📝 Log salvo: ${filename}`);
-    } catch (error) {
-      this.log(`❌ Erro ao salvar log: ${error}`, 'error');
-    }
   }
 
   private readonly agentConfig: AgentConfig;
@@ -136,7 +100,7 @@ export class OrchestratorAgent extends BaseAgent {
     
     // Inicializar browser
     this.browser = await chromium.launch({
-      headless: false,
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -164,10 +128,8 @@ export class OrchestratorAgent extends BaseAgent {
   }
 
   private async initializeAgents(): Promise<void> {
-    const path = await import('path');
-    
-    // Use relative paths from current working directory
-    const promptsDir = path.resolve('./prompts');
+    const baseDir = new URL('.', import.meta.url).pathname;
+    const promptsDir = new URL('../prompts', import.meta.url).pathname;
 
     // Load prompts
     const analysisPrompt = await this.loadPrompt(`${promptsDir}/analysis.prompt.txt`);
@@ -181,12 +143,11 @@ export class OrchestratorAgent extends BaseAgent {
     this.agents.set('GeneratorAgent', new GeneratorAgent(generatorPrompt));
 
     // Inicializar todos os agentes
-    const agentEntries = Array.from(this.agents.entries());
-    for (const [name, agent] of agentEntries) {
+    for (const [name, agent] of this.agents.entries()) {
       try {
         await agent.initialize();
         this.log(`Agente ${name} inicializado com sucesso`);
-      } catch (error: any) {
+      } catch (error) {
         this.log(`Erro ao inicializar ${name}: ${error}`, 'error');
       }
     }
@@ -299,67 +260,50 @@ export class OrchestratorAgent extends BaseAgent {
     this.currentExecution = result;
 
     try {
-      this.log('Início do pipeline', 'info');
+      this.log('DEBUG: Início do pipeline, config:', 'info');
       this.log(JSON.stringify(config, null, 2));
       let sessionData = null;
       let authContext = null;
 
-      // FASE 1: Detecção automática de necessidade de login e autenticação
-      const needsAuthentication = this.detectAuthenticationNeeds(config);
-      
-      if (needsAuthentication) {
-        this.log('🔐 FASE 1: Credenciais detectadas - Executando LoginAgent');
-        
-        // Preparar dados de autenticação de forma genérica
-        const authData = this.prepareAuthenticationData(config);
-        
+      // FASE 1: Login e Autenticação (apenas se necessário)
+      if (config.credentials) {
+        this.log('📋 FASE 1: Executando LoginAgent com credenciais fornecidas');
+        const loginCredentials = {
+          username: config.credentials.username,
+          password: config.credentials.password,
+          loginUrl: config.credentials.loginUrl || config.targetUrl,
+          customSteps: config.credentials.customSteps
+        };
+
+        this.log('📋 FASE 1: Executando LoginAgent');
         const loginResult = await this.executeAgentTask('LoginAgent', 'authenticate', {
-          url: authData.loginUrl,
-          credentials: authData.credentials,
-          authType: authData.authType,
-          customSteps: authData.customSteps,
+          credentials: loginCredentials,
           page: this.page
         });
 
         if (!loginResult.success) {
-          this.log(`❌ LoginAgent falhou: ${loginResult.error}`, 'error');
-          throw new Error(`Falha na autenticação: ${loginResult.error}`);
+          throw new Error(`LoginAgent falhou: ${loginResult.error}`);
         }
 
-        this.log('✅ LoginAgent executado com sucesso');
         result.agentsExecuted.push('LoginAgent');
         result.reports['LoginAgent'] = await this.agents.get('LoginAgent')!.generateMarkdownReport(loginResult);
-        
-        // Extrair dados de sessão e contexto de autenticação
         sessionData = loginResult.data?.sessionData;
         authContext = {
-          authenticated: true,
-          loginScreenshot: loginResult.data?.screenshots?.login_page,
-          postLoginScreenshot: loginResult.data?.screenshots?.post_login_page,
-          authType: authData.authType,
-          sessionId: loginResult.data?.sessionId,
-          userContext: loginResult.data?.userContext
+          loginScreenshot: loginResult.data?.loginScreenshot,
+          postLoginScreenshot: loginResult.data?.postLoginScreenshot,
+          authType: config.authConfig?.type || 'basic'
         };
-        
-        this.log(`📋 Sessão estabelecida: ${sessionData ? 'Sim' : 'Não'}`);
       } else {
         this.log('⏭️ FASE 1: Pulando LoginAgent - autenticação não necessária');
-        authContext = { authenticated: false };
       }
 
       // FASE 2: Crawling e Captura
       this.log('🕷️ FASE 2: Executando CrawlerAgent');
-      
-      // Determinar URL de crawling baseada no contexto de autenticação
-      let crawlUrl = await this.determineCrawlUrl(config, authContext);
-      this.log(`📍 URL de crawling determinada: ${crawlUrl}`);
-      
       const crawlerResult = await this.executeAgentTask('CrawlerAgent', 'start_crawl', {
-        url: crawlUrl,
+        url: config.targetUrl,
         sessionData: sessionData,
         authContext: authContext,
         enableScreenshots: config.enableScreenshots,
-        maxDepth: 3, // Navegação recursiva
         page: this.page
       });
 
@@ -387,7 +331,8 @@ export class OrchestratorAgent extends BaseAgent {
           throw new Error('Crawler result missing data');
         }
 
-        
+        // Log para debug
+        this.log(`DEBUG: Dados do crawler: ${JSON.stringify(crawlerResult.data, null, 2)}`);
 
         // Garantir robustez ao acessar stats
         let totalElements = 0;
@@ -396,7 +341,7 @@ export class OrchestratorAgent extends BaseAgent {
             totalElements = crawlerResult.data.stats.totalElements;
           } else {
             this.log('AVISO: stats ou totalElements ausente em crawlerResult.data', 'warn');
-
+            this.log(`DEBUG: crawlerResult.data.stats: ${JSON.stringify(crawlerResult.data.stats)}`);
           }
         } else {
           this.log('AVISO: crawlerResult.data não é um objeto esperado', 'warn');
@@ -426,7 +371,7 @@ export class OrchestratorAgent extends BaseAgent {
 
       // FASE 3: Análise com IA
   this.log('🧠 FASE 3: Executando AnalysisAgent');
-  this.log('Executando análise dos dados coletados', 'info');
+  this.log('DEBUG: Antes de executar AnalysisAgent, result.statistics:', 'info');
   this.log(JSON.stringify(result.statistics));
       
       // Garantir que temos os dados mínimos necessários
@@ -553,23 +498,8 @@ export class OrchestratorAgent extends BaseAgent {
 
     this.log(`🔄 Executando ${agentName}.${taskType}`);
     
-    // Salvar dados de entrada
-    await this.saveAgentLog(agentName, 'input', {
-      taskType,
-      data,
-      timestamp: new Date().toISOString()
-    });
-    
     try {
       const result = await agent.processTask(taskData);
-      
-      // Salvar dados de saída
-      await this.saveAgentLog(agentName, 'output', {
-        success: result.success,
-        data: result.data,
-        error: result.error,
-        timestamp: new Date().toISOString()
-      });
       
       if (result.success) {
         this.log(`✅ ${agentName} concluído com sucesso`);
@@ -777,162 +707,6 @@ O pipeline completo foi executado e todos os documentos foram gerados.` :
 
 Consulte o relatório final completo para detalhes.
 `;
-  }
-
-  /**
-   * Detecta se a configuração requer autenticação
-   */
-  private detectAuthenticationNeeds(config: OrchestrationConfig): boolean {
-    // Verifica se há credenciais explícitas
-    if (config.credentials && config.credentials.username && config.credentials.password) {
-      this.log('🔍 Credenciais explícitas detectadas');
-      return true;
-    }
-    
-    // Verifica se há configuração de autenticação
-    if (config.authConfig && config.authConfig.credentials) {
-      const creds = config.authConfig.credentials;
-      if (creds.username && creds.password) {
-        this.log('🔍 Configuração de autenticação detectada');
-        return true;
-      }
-    }
-    
-    this.log('🔍 Nenhuma necessidade de autenticação detectada');
-    return false;
-  }
-
-  /**
-   * Prepara dados de autenticação de forma genérica
-   */
-  private prepareAuthenticationData(config: OrchestrationConfig) {
-    let credentials, authType, loginUrl, customSteps;
-    
-    // Priorizar credenciais explícitas
-    if (config.credentials) {
-      credentials = {
-        username: config.credentials.username,
-        password: config.credentials.password
-      };
-      loginUrl = config.credentials.loginUrl || config.targetUrl;
-      customSteps = config.credentials.customSteps;
-      authType = 'basic';
-    } else if (config.authConfig?.credentials) {
-      credentials = {
-        username: config.authConfig.credentials.username || '',
-        password: config.authConfig.credentials.password || ''
-      };
-      loginUrl = config.targetUrl;
-      authType = config.authConfig.type || 'basic';
-      
-      // Gerar passos customizados básicos se não fornecidos
-      customSteps = [
-        { type: 'fill' as const, selector: 'input[type="text"], input[type="email"], input[name*="user"], input[name*="login"]', value: credentials.username },
-        { type: 'fill' as const, selector: 'input[type="password"]', value: credentials.password },
-        { type: 'click' as const, selector: 'button[type="submit"], input[type="submit"], button[class*="login"]' },
-        { type: 'wait' as const, selector: '', timeout: 3000 }
-      ];
-    }
-    
-    this.log(`🔧 Dados de autenticação preparados: ${authType} para ${loginUrl}`);
-    
-    return {
-      credentials,
-      authType,
-      loginUrl,
-      customSteps
-    };
-  }
-
-  /**
-   * Determina a URL de crawling baseada no contexto de autenticação
-   */
-  private async determineCrawlUrl(config: OrchestrationConfig, authContext: any): Promise<string> {
-    let crawlUrl = config.targetUrl;
-    
-    // Se houve autenticação bem-sucedida, usar URL atual da página
-    if (authContext?.authenticated && this.page) {
-      try {
-        // Aguardar estabilização da navegação pós-login
-        await this.page.waitForTimeout(2000);
-        const currentUrl = this.page.url();
-        
-        this.log(`📍 URL atual após autenticação: ${currentUrl}`);
-        
-        // Se ainda estiver na página de login, tentar navegar para área principal
-        if (this.isLoginPage(currentUrl)) {
-          this.log('⚠️ Ainda na página de login, tentando navegar para área principal...');
-          const mainAreaUrl = await this.navigateToMainArea();
-          if (mainAreaUrl) {
-            crawlUrl = mainAreaUrl;
-          }
-        } else {
-          crawlUrl = currentUrl;
-        }
-      } catch (error) {
-        this.log(`⚠️ Erro ao determinar URL de crawling: ${error}`, 'warn');
-      }
-    }
-    
-    return crawlUrl;
-  }
-
-  /**
-   * Verifica se a URL atual é uma página de login
-   */
-  private isLoginPage(url: string): boolean {
-    const loginIndicators = ['signin', 'login', 'auth', 'authenticate', 'logon'];
-    const lowerUrl = url.toLowerCase();
-    return loginIndicators.some(indicator => lowerUrl.includes(indicator));
-  }
-
-  /**
-   * Tenta navegar para a área principal da aplicação
-   */
-  private async navigateToMainArea(): Promise<string | null> {
-    if (!this.page) return null;
-    
-    try {
-      // Seletores comuns para área principal/dashboard
-      const mainAreaSelectors = [
-        'a[href*="dashboard"]',
-        'a[href*="home"]',
-        'a[href*="inicio"]',
-        'a[href*="main"]',
-        'a[href*="principal"]',
-        '.nav-link[href*="dashboard"]',
-        '.menu-item[href*="dashboard"]',
-        '.navbar a[href*="home"]',
-        '[data-testid*="dashboard"]',
-        '[data-testid*="home"]'
-      ];
-      
-      for (const selector of mainAreaSelectors) {
-        try {
-          const element = await this.page.$(selector);
-          if (element) {
-            this.log(`🔗 Encontrado link para área principal: ${selector}`);
-            await element.click();
-            await this.page.waitForTimeout(3000);
-            
-            const newUrl = this.page.url();
-            if (!this.isLoginPage(newUrl)) {
-              this.log(`✅ Navegado com sucesso para: ${newUrl}`);
-              return newUrl;
-            }
-          }
-        } catch (elementError) {
-          // Continuar tentando outros seletores
-          continue;
-        }
-      }
-      
-      this.log('⚠️ Nenhum link para área principal encontrado');
-      return null;
-    } catch (error) {
-      this.log(`❌ Erro ao navegar para área principal: ${error}`, 'error');
-      return null;
-    }
   }
 
   async cleanup(): Promise<void> {
