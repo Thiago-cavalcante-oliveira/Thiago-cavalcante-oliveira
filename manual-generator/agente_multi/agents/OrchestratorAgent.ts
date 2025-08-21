@@ -1,10 +1,11 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
-import { MinIOService } from '../services/MinIOService';
-import { LoginAgent } from './LoginAgent';
-import { CrawlerAgent } from './CrawlerAgent';
-import { AnalysisAgent } from './AnalysisAgent';
-import { ContentAgent } from './ContentAgent';
-import { GeneratorAgent } from './GeneratorAgent';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { MinIOService } from '../services/MinIOService.js';
+import { LoginAgent } from './LoginAgent.js';
+import { SmartLoginAgent } from './SmartLoginAgent.js';
+import { CrawlerAgent } from './CrawlerAgent.js';
+import { AnalysisAgent } from './AnalysisAgent.js';
+import { ContentAgent } from './ContentAgent.js';
+import { GeneratorAgent } from './GeneratorAgent.js';
 import { Browser, Page, chromium } from 'playwright';
 import { ElementGroup } from './interfaces/CrawlerTypes';
 
@@ -67,7 +68,7 @@ export class OrchestratorAgent extends BaseAgent {
   private page: Page | null = null;
   private currentExecution: OrchestrationResult | null = null;
 
-  protected log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
+  protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
     const timestamp = new Date().toISOString();
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
     console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
@@ -100,7 +101,7 @@ export class OrchestratorAgent extends BaseAgent {
     
     // Inicializar browser
     this.browser = await chromium.launch({
-      headless: true,
+      headless: false, // Permite visualizar o browser
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -266,13 +267,13 @@ export class OrchestratorAgent extends BaseAgent {
       let authContext = null;
 
       // FASE 1: Login e Autenticação (apenas se necessário)
-      if (config.credentials) {
+      if (config.credentials || (config.authConfig && config.authConfig.credentials && config.authConfig.credentials.username)) {
         this.log('📋 FASE 1: Executando LoginAgent com credenciais fornecidas');
         const loginCredentials = {
-          username: config.credentials.username,
-          password: config.credentials.password,
-          loginUrl: config.credentials.loginUrl || config.targetUrl,
-          customSteps: config.credentials.customSteps
+          username: config.credentials?.username || config.authConfig?.credentials?.username || '',
+          password: config.credentials?.password || config.authConfig?.credentials?.password || '',
+          loginUrl: config.credentials?.loginUrl || config.targetUrl,
+          customSteps: config.credentials?.customSteps
         };
 
         this.log('📋 FASE 1: Executando LoginAgent');
@@ -707,6 +708,204 @@ O pipeline completo foi executado e todos os documentos foram gerados.` :
 
 Consulte o relatório final completo para detalhes.
 `;
+  }
+
+  async executeLoginOnly(config: {
+    url: string;
+    credentials: { username: string; password: string };
+    outputDir: string;
+  }): Promise<{
+    success: boolean;
+    method?: string;
+    duration?: number;
+    errors?: string[];
+    screenshots?: string[];
+  }> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+    this.log('🔐 Executando teste de login com fallback automático...');
+    
+    try {
+      // Inicializar browser se necessário
+      if (!this.browser) {
+        this.browser = await chromium.launch({
+          headless: false,
+          slowMo: 1000,
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        this.page = await this.browser.newPage();
+        await this.page.setViewportSize({ width: 1280, height: 720 });
+      }
+      
+      // Navegar para a página
+      await this.page!.goto(config.url);
+      
+      // PRIMEIRA TENTATIVA: LoginAgent
+      this.log('🔄 Tentativa 1: LoginAgent...');
+      const loginResult = await this.executeAgentTask('LoginAgent', 'authenticate', {
+        credentials: {
+          username: config.credentials.username,
+          password: config.credentials.password,
+          loginUrl: config.url
+        },
+        page: this.page
+      });
+      
+      if (loginResult.success) {
+        const duration = Date.now() - startTime;
+        this.log('✅ LoginAgent teve sucesso!');
+        return {
+          success: true,
+          method: 'LoginAgent',
+          duration,
+          errors: [],
+          screenshots: []
+        };
+      }
+      
+      // LoginAgent falhou, adicionar erro
+      errors.push(`LoginAgent: ${loginResult.error || 'Falha na autenticação'}`);
+      this.log('❌ LoginAgent falhou, tentando SmartLoginAgent...');
+      
+      // SEGUNDA TENTATIVA: SmartLoginAgent
+      this.log('🔄 Tentativa 2: SmartLoginAgent...');
+      
+      // Inicializar SmartLoginAgent
+      const smartLoginAgent = new SmartLoginAgent();
+      await smartLoginAgent.initialize();
+      smartLoginAgent.setPage(this.page!);
+      
+      const smartLoginResult = await smartLoginAgent.processTask({
+         id: 'smart_login_fallback',
+         type: 'smart_login',
+         data: {
+           baseUrl: config.url,
+           credentials: {
+             username: config.credentials.username,
+             password: config.credentials.password
+           }
+         },
+         sender: 'OrchestratorAgent',
+         timestamp: new Date(),
+         priority: 'high'
+       });
+      
+      if (smartLoginResult.success) {
+        const duration = Date.now() - startTime;
+        this.log('✅ SmartLoginAgent teve sucesso!');
+        await smartLoginAgent.cleanup();
+        return {
+          success: true,
+          method: 'SmartLoginAgent',
+          duration,
+          errors: errors,
+          screenshots: []
+        };
+      }
+      
+      // SmartLoginAgent falhou, adicionar erro
+      errors.push(`SmartLoginAgent: ${smartLoginResult.error || 'Falha na autenticação inteligente'}`);
+      this.log('❌ SmartLoginAgent falhou, solicitando interação do usuário...');
+      
+      // TERCEIRA TENTATIVA: Interação do usuário
+      this.log('🔄 Tentativa 3: Solicitando interação manual do usuário...');
+      await this.requestUserInteraction();
+      
+      // Verificar se o login foi bem-sucedido após interação manual
+      const manualSuccess = await this.verifyLoginSuccess();
+      
+      const duration = Date.now() - startTime;
+      await smartLoginAgent.cleanup();
+      
+      if (manualSuccess) {
+        this.log('✅ Login completado com sucesso após interação do usuário!');
+        return {
+          success: true,
+          method: 'UserInteraction',
+          duration,
+          errors: errors,
+          screenshots: []
+        };
+      } else {
+        errors.push('UserInteraction: Usuário não completou o login no tempo esperado');
+        this.log('❌ Todas as tentativas de login falharam');
+        return {
+          success: false,
+          method: 'AllMethodsFailed',
+          duration,
+          errors: errors,
+          screenshots: []
+        };
+      }
+      
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Sistema: ${errorMessage}`);
+      this.log(`❌ Erro crítico durante login: ${errorMessage}`, 'error');
+      
+      return {
+        success: false,
+        method: 'SystemError',
+        duration,
+        errors: errors,
+        screenshots: []
+      };
+    }
+  }
+
+  private async requestUserInteraction(): Promise<void> {
+    this.log('=== INTERAÇÃO DO USUÁRIO NECESSÁRIA ===', 'warn');
+    this.log('Os agentes automáticos não conseguiram completar o login.', 'warn');
+    this.log('Por favor, complete o login manualmente no navegador.', 'warn');
+    this.log('O sistema aguardará 60 segundos para interação manual...', 'warn');
+    
+    if (this.page) {
+      // Aguardar tempo para interação manual (60 segundos)
+      await this.page.waitForTimeout(60000);
+    }
+  }
+
+  private async verifyLoginSuccess(): Promise<boolean> {
+    if (!this.page) {
+      return false;
+    }
+    
+    try {
+      // Verificar se a URL mudou (indicativo de login bem-sucedido)
+      const currentUrl = this.page.url();
+      
+      // Verificar se há elementos que indicam login bem-sucedido
+      const successIndicators = [
+        'dashboard', 'profile', 'logout', 'sair', 'perfil',
+        'welcome', 'bem-vindo', 'home', 'inicio'
+      ];
+      
+      // Verificar na URL
+      const urlIndicatesSuccess = successIndicators.some(indicator => 
+        currentUrl.toLowerCase().includes(indicator)
+      );
+      
+      if (urlIndicatesSuccess) {
+        return true;
+      }
+      
+      // Verificar no conteúdo da página
+      const pageContent = await this.page.content();
+      const contentIndicatesSuccess = successIndicators.some(indicator => 
+        pageContent.toLowerCase().includes(indicator)
+      );
+      
+      // Verificar se não há mais campos de login visíveis
+      const loginFieldsVisible = await this.page.$$('input[type="password"]');
+      const noLoginFields = loginFieldsVisible.length === 0;
+      
+      return contentIndicatesSuccess || noLoginFields;
+      
+    } catch (error) {
+      this.log(`Erro ao verificar sucesso do login: ${error}`, 'error');
+      return false;
+    }
   }
 
   async cleanup(): Promise<void> {

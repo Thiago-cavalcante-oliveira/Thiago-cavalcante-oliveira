@@ -1,5 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
-import { MinIOService } from '../services/MinIOService';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { MinIOService } from '../services/MinIOService.js';
 import { Browser, Page, chromium } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -124,7 +124,7 @@ ${data.duplicate ? '- **Status:** Duplicata detectada e otimizada' : ''}`;
   private async initializeBrowser(): Promise<void> {
     if (!this.browser) {
       this.browser = await chromium.launch({
-        headless: true,
+      headless: false, // Permite visualizar o browser
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
       });
       this.log('🌐 Browser inicializado');

@@ -1,7 +1,7 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
-import { MinIOService } from '../services/MinIOService';
-import { GeminiKeyManager } from '../services/GeminiKeyManager';
-import { LLMManager } from '../services/LLMManager';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { MinIOService } from '../services/MinIOService.js';
+import { GeminiKeyManager } from '../services/GeminiKeyManager.js';
+import { LLMManager } from '../services/LLMManager.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

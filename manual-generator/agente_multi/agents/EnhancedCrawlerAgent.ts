@@ -2,6 +2,7 @@ import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore'
 import { Page, Browser } from 'playwright';
 import { MinIOService } from '../services/MinIOService';
 import { LLMManager } from '../services/LLMManager';
+import { GeminiKeyManager } from '../services/GeminiKeyManager';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -80,7 +81,7 @@ export class EnhancedCrawlerAgent extends BaseAgent {
     });
     
     this.minioService = minioService || new MinIOService();
-    this.llmManager = llmManager || new LLMManager();
+    this.llmManager = llmManager || new LLMManager(new GeminiKeyManager());
     
     this.logDir = path.join(process.cwd(), 'output', 'agent_logs');
     this.logFile = path.join(this.logDir, 'enhanced-crawler-agent.log');
@@ -615,11 +616,15 @@ O sistema está aguardando sua interação...
     await this.logToFile('Iniciando crawling completo baseado no mapeamento');
 
     const crawlResult: CrawlResult = {
-      pages: [],
-      interactions: [],
-      workflows: [],
-      errors: []
-    };
+          url: this.page?.url() || '',
+          title: await this.page?.title() || '',
+          elements: [],
+          workflows: [],
+          stats: { staticElements: 0, interactiveElements: 0, totalElements: 0 },
+          metadata: { timestamp: new Date(), loadTime: 0, elementCount: 0 },
+          pages: [],
+          errors: []
+        };
 
     // Navegar por cada rota identificada
     for (const route of this.homePageMap.routes) {
@@ -631,19 +636,23 @@ O sistema está aguardando sua interação...
           await this.page.waitForTimeout(2000);
 
           // Mapear a nova página
-          const pageElements = await this.detectAllInteractiveElements();
+          const interactiveElements = await this.detectAllInteractiveElements();
+          const pageElements: ElementGroup[] = interactiveElements.map(element => ({
+            primary: element,
+            related: [],
+            context: {
+              workflow: 'page-interaction',
+              location: 'main-content',
+              importance: 'primary' as const,
+              interactivityLevel: 'interactive' as const
+            }
+          }));
           const pageScreenshot = await this.captureScreenshot(`page-${route.path.replace(/[^a-zA-Z0-9]/g, '-')}`);
 
           crawlResult.pages.push({
             url: this.page.url(),
             title: await this.page.title(),
-            elements: pageElements,
-            screenshots: [pageScreenshot],
-            metadata: {
-              timestamp: new Date(),
-              loadTime: 0,
-              elementCount: pageElements.length
-            }
+            elements: pageElements
           });
         }
 
@@ -727,6 +736,7 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
+    const startTime = Date.now();
     try {
       await this.logToFile(`Processando tarefa: ${task.type}`);
 
@@ -736,6 +746,8 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
           const reportPath = await this.generateDetailedReport();
           
           return {
+            id: uuidv4(),
+            taskId: task.id,
             success: true,
             data: {
               homePageMap: homeMap,
@@ -743,6 +755,8 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
               userInteractionRequired: homeMap.userInteractionRequired,
               userInstructions: homeMap.userInstructions
             },
+            timestamp: new Date(),
+            processingTime: Date.now() - startTime,
             markdownReport: homeMap.userInteractionRequired ? 
               'Mapeamento parcial concluído. Interação do usuário necessária.' :
               'Mapeamento da home page concluído com sucesso.'
@@ -754,11 +768,15 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
             const updatedReportPath = await this.generateDetailedReport();
             
             return {
+              id: uuidv4(),
+              taskId: task.id,
               success: true,
               data: {
                 homePageMap: this.homePageMap,
                 reportPath: updatedReportPath
               },
+              timestamp: new Date(),
+              processingTime: Date.now() - startTime,
               markdownReport: 'Clique do usuário processado. Mapeamento atualizado.'
             };
           }
@@ -768,8 +786,12 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
           const crawlResult = await this.executeCompleteCrawl();
           
           return {
+              id: uuidv4(),
+              taskId: task.id,
               success: true,
               data: crawlResult,
+              timestamp: new Date(),
+              processingTime: Date.now() - startTime,
               markdownReport: `Crawling completo finalizado. ${crawlResult.pages.length} páginas mapeadas.`
             };
 
@@ -780,9 +802,13 @@ O sistema aguarda interação do usuário para completar o mapeamento da navega�
     } catch (error) {
       await this.logToFile(`Erro ao processar tarefa: ${error}`, 'error');
       return {
+        id: uuidv4(),
+        taskId: task.id,
         success: false,
         data: null,
-        error: `Erro: ${error}`
+        error: `Erro: ${error}`,
+        timestamp: new Date(),
+        processingTime: Date.now() - startTime
       };
     }
   }

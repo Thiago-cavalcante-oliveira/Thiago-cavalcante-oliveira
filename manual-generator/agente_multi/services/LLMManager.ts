@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
-import { GroqKeyManager } from './GroqKeyManager';
+import { GroqKeyManager } from './GroqKeyManager.js';
 
 export class LLMManager {
   private geminiKeyManager: any;

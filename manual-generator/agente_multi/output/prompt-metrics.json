@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1755709231979-tqsgbgun8",
+    "prompt": "Analise esta página web e extraia os elementos principais",
+    "timestamp": "2025-08-20T17:00:31.979Z",
+    "tokenCount": 15,
+    "responseTime": 717,
+    "success": false,
+    "provider": "gemini",
+    "model": "demo-model",
+    "responseLength": 316,
+    "quality": 7
+  },
+  {
+    "id": "1755709232970-5zbne582i",
+    "prompt": "Gere um manual baseado nos dados coletados",
+    "timestamp": "2025-08-20T17:00:32.970Z",
+    "tokenCount": 11,
+    "responseTime": 990,
+    "success": false,
+    "provider": "gemini",
+    "model": "demo-model",
+    "responseLength": 228,
+    "quality": 6
+  },
+  {
+    "id": "1755709234325-s4ndx0ltv",
+    "prompt": "Crie um relatório de análise detalhado",
+    "timestamp": "2025-08-20T17:00:34.325Z",
+    "tokenCount": 10,
+    "responseTime": 1352,
+    "success": true,
+    "provider": "groq",
+    "model": "demo-model",
+    "responseLength": 915,
+    "quality": 6
+  },
+  {
+    "id": "1755709280677-zblse97tl",
+    "prompt": "Analise esta página web e extraia os elementos principais",
+    "timestamp": "2025-08-20T17:01:20.677Z",
+    "tokenCount": 15,
+    "responseTime": 627,
+    "success": false,
+    "provider": "gemini",
+    "model": "demo-model",
+    "responseLength": 1047,
+    "quality": 7
+  },
+  {
+    "id": "1755709281295-qwanc6cnz",
+    "prompt": "Gere um manual baseado nos dados coletados",
+    "timestamp": "2025-08-20T17:01:21.295Z",
+    "tokenCount": 11,
+    "responseTime": 616,
+    "success": true,
+    "provider": "gemini",
+    "model": "demo-model",
+    "responseLength": 1009,
+    "quality": 9
+  },
+  {
+    "id": "1755709282209-8wzzx7t7q",
+    "prompt": "Crie um relatório de análise detalhado",
+    "timestamp": "2025-08-20T17:01:22.209Z",
+    "tokenCount": 10,
+    "responseTime": 912,
+    "success": true,
+    "provider": "groq",
+    "model": "demo-model",
+    "responseLength": 1158,
+    "quality": 7
+  }
+]

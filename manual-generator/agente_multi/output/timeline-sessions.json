@@ -1,0 +1,1209 @@
+[
+  {
+    "id": "1755709280032-gc36c0st5",
+    "startTime": "2025-08-20T17:01:20.032Z",
+    "events": [
+      {
+        "id": "1755709280032-pt920oaf6",
+        "timestamp": "2025-08-20T17:01:20.032Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755709280032-gc36c0st5"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755709280032-hqn79tmd6",
+        "timestamp": "2025-08-20T17:01:20.032Z",
+        "type": "milestone",
+        "description": "Demonstração iniciada",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755709283852-5wgzue1fd",
+        "timestamp": "2025-08-20T17:01:23.852Z",
+        "type": "task_start",
+        "agent": "Demo",
+        "task": "integration",
+        "description": "Iniciando: Demonstrando integração",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "task",
+          "start",
+          "Demo"
+        ]
+      },
+      {
+        "id": "1755709283857-jk5ya8wkb",
+        "timestamp": "2025-08-20T17:01:23.857Z",
+        "type": "task_end",
+        "agent": "Demo",
+        "task": "integration",
+        "description": "Finalizado: Demonstrando integração (5ms)",
+        "metadata": {
+          "duration": 5
+        },
+        "status": "success",
+        "parentEventId": "1755709283852-5wgzue1fd",
+        "tags": [
+          "task",
+          "end",
+          "Demo"
+        ]
+      },
+      {
+        "id": "1755709283857-bm0paocey",
+        "timestamp": "2025-08-20T17:01:23.857Z",
+        "type": "milestone",
+        "description": "Gerando relatórios finais",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755709283962-vxrbjgov0",
+        "timestamp": "2025-08-20T17:01:23.962Z",
+        "type": "milestone",
+        "description": "Demonstração concluída",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755709283963-1wjftg2rv",
+        "timestamp": "2025-08-20T17:01:23.963Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755709280032-gc36c0st5",
+          "duration": 3930
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "demo": true,
+      "purpose": "Demonstração dos serviços avançados"
+    },
+    "endTime": "2025-08-20T17:01:23.962Z",
+    "summary": "Demonstração dos serviços avançados concluída com sucesso"
+  },
+  {
+    "id": "1755709598063-xhixsg8tj",
+    "startTime": "2025-08-20T17:06:38.063Z",
+    "events": [
+      {
+        "id": "1755709598063-bodjmrxry",
+        "timestamp": "2025-08-20T17:06:38.063Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755709598063-xhixsg8tj"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755709598064-ajlqgyoka",
+        "timestamp": "2025-08-20T17:06:38.064Z",
+        "type": "agent_start",
+        "agent": "OrchestratorAgent",
+        "description": "Agente OrchestratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "OrchestratorAgent"
+        ]
+      },
+      {
+        "id": "1755709598067-61u0gbq2d",
+        "timestamp": "2025-08-20T17:06:38.067Z",
+        "type": "agent_start",
+        "agent": "LoginAgent",
+        "description": "Agente LoginAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "LoginAgent"
+        ]
+      },
+      {
+        "id": "1755709598068-glex2qy6k",
+        "timestamp": "2025-08-20T17:06:38.068Z",
+        "type": "agent_start",
+        "agent": "CrawlerAgent",
+        "description": "Agente CrawlerAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "CrawlerAgent"
+        ]
+      },
+      {
+        "id": "1755709598069-lycotxo9l",
+        "timestamp": "2025-08-20T17:06:38.069Z",
+        "type": "agent_start",
+        "agent": "AnalysisAgent",
+        "description": "Agente AnalysisAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "AnalysisAgent"
+        ]
+      },
+      {
+        "id": "1755709598069-ggrlsdo6n",
+        "timestamp": "2025-08-20T17:06:38.069Z",
+        "type": "agent_start",
+        "agent": "ContentAgent",
+        "description": "Agente ContentAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ContentAgent"
+        ]
+      },
+      {
+        "id": "1755709598070-qpig4wqs6",
+        "timestamp": "2025-08-20T17:06:38.070Z",
+        "type": "agent_start",
+        "agent": "GeneratorAgent",
+        "description": "Agente GeneratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "GeneratorAgent"
+        ]
+      },
+      {
+        "id": "1755709598071-qfw9pe58r",
+        "timestamp": "2025-08-20T17:06:38.071Z",
+        "type": "agent_start",
+        "agent": "ScreenshotAgent",
+        "description": "Agente ScreenshotAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ScreenshotAgent"
+        ]
+      },
+      {
+        "id": "1755709598072-q01kzio5l",
+        "timestamp": "2025-08-20T17:06:38.072Z",
+        "type": "milestone",
+        "description": "Iniciando core do sistema",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755709600155-ds8713g12",
+        "timestamp": "2025-08-20T17:06:40.155Z",
+        "type": "milestone",
+        "description": "Sistema iniciado com sucesso",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755710624836-iz15zq34i",
+        "timestamp": "2025-08-20T17:23:44.836Z",
+        "type": "milestone",
+        "description": "Sistema sendo finalizado pelo usuário",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755710624837-z6ods5okt",
+        "timestamp": "2025-08-20T17:23:44.837Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755709598063-xhixsg8tj",
+          "duration": 1026774
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "2.0",
+      "features": [
+        "LLMRouter",
+        "PromptInspector",
+        "ArtifactStore",
+        "Timeline"
+      ]
+    },
+    "endTime": "2025-08-20T17:23:44.837Z",
+    "summary": "Sistema finalizado pelo usuário"
+  },
+  {
+    "id": "1755711357077-q5pj0j9t1",
+    "startTime": "2025-08-20T17:35:57.077Z",
+    "events": [
+      {
+        "id": "1755711357078-9vsfl0aoj",
+        "timestamp": "2025-08-20T17:35:57.078Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755711357077-q5pj0j9t1"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755711357079-nb1c44nlb",
+        "timestamp": "2025-08-20T17:35:57.079Z",
+        "type": "agent_start",
+        "agent": "OrchestratorAgent",
+        "description": "Agente OrchestratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "OrchestratorAgent"
+        ]
+      },
+      {
+        "id": "1755711357081-lgg0780y8",
+        "timestamp": "2025-08-20T17:35:57.081Z",
+        "type": "agent_start",
+        "agent": "LoginAgent",
+        "description": "Agente LoginAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "LoginAgent"
+        ]
+      },
+      {
+        "id": "1755711357081-8zc314hy5",
+        "timestamp": "2025-08-20T17:35:57.081Z",
+        "type": "agent_start",
+        "agent": "CrawlerAgent",
+        "description": "Agente CrawlerAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "CrawlerAgent"
+        ]
+      },
+      {
+        "id": "1755711357083-m1ukmzi0j",
+        "timestamp": "2025-08-20T17:35:57.083Z",
+        "type": "agent_start",
+        "agent": "AnalysisAgent",
+        "description": "Agente AnalysisAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "AnalysisAgent"
+        ]
+      },
+      {
+        "id": "1755711357084-nt24zv14q",
+        "timestamp": "2025-08-20T17:35:57.084Z",
+        "type": "agent_start",
+        "agent": "ContentAgent",
+        "description": "Agente ContentAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ContentAgent"
+        ]
+      },
+      {
+        "id": "1755711357092-bencc2749",
+        "timestamp": "2025-08-20T17:35:57.093Z",
+        "type": "agent_start",
+        "agent": "GeneratorAgent",
+        "description": "Agente GeneratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "GeneratorAgent"
+        ]
+      },
+      {
+        "id": "1755711357094-4cfiftuwm",
+        "timestamp": "2025-08-20T17:35:57.094Z",
+        "type": "agent_start",
+        "agent": "ScreenshotAgent",
+        "description": "Agente ScreenshotAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ScreenshotAgent"
+        ]
+      },
+      {
+        "id": "1755711357095-cm31d5mos",
+        "timestamp": "2025-08-20T17:35:57.095Z",
+        "type": "milestone",
+        "description": "Iniciando core do sistema",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755711357827-mzsd6h6sg",
+        "timestamp": "2025-08-20T17:35:57.827Z",
+        "type": "milestone",
+        "description": "Sistema iniciado com sucesso",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755711357829-e8qrezbih",
+        "timestamp": "2025-08-20T17:35:57.829Z",
+        "type": "milestone",
+        "description": "Iniciando geração automática de manual",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755711357906-26cwngxvx",
+        "timestamp": "2025-08-20T17:35:57.906Z",
+        "type": "error",
+        "agent": "OrchestratorAgent",
+        "description": "Erro: Erro desconhecido",
+        "metadata": {
+          "error": "Error",
+          "stack": "Error: Erro desconhecido\n    at main (file:///home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/main.js:163:69)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+          "context": {
+            "phase": "manual_generation"
+          }
+        },
+        "status": "error",
+        "tags": [
+          "error",
+          "OrchestratorAgent"
+        ]
+      },
+      {
+        "id": "1755711394630-6a3ts3uc7",
+        "timestamp": "2025-08-20T17:36:34.630Z",
+        "type": "milestone",
+        "description": "Sistema sendo finalizado pelo usuário",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755711394631-97uqu2rz1",
+        "timestamp": "2025-08-20T17:36:34.631Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755711357077-q5pj0j9t1",
+          "duration": 37554
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "2.0",
+      "features": [
+        "LLMRouter",
+        "PromptInspector",
+        "ArtifactStore",
+        "Timeline"
+      ]
+    },
+    "endTime": "2025-08-20T17:36:34.631Z",
+    "summary": "Sistema finalizado pelo usuário"
+  },
+  {
+    "id": "1755713054826-dhu61x121",
+    "startTime": "2025-08-20T18:04:14.826Z",
+    "events": [
+      {
+        "id": "1755713054826-vm3jc0jyq",
+        "timestamp": "2025-08-20T18:04:14.826Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755713054826-dhu61x121"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755713054827-21iadycge",
+        "timestamp": "2025-08-20T18:04:14.827Z",
+        "type": "agent_start",
+        "agent": "OrchestratorAgent",
+        "description": "Agente OrchestratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "OrchestratorAgent"
+        ]
+      },
+      {
+        "id": "1755713054829-6z4w9mo3i",
+        "timestamp": "2025-08-20T18:04:14.829Z",
+        "type": "agent_start",
+        "agent": "LoginAgent",
+        "description": "Agente LoginAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "LoginAgent"
+        ]
+      },
+      {
+        "id": "1755713054829-7c4sarzs6",
+        "timestamp": "2025-08-20T18:04:14.829Z",
+        "type": "agent_start",
+        "agent": "CrawlerAgent",
+        "description": "Agente CrawlerAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "CrawlerAgent"
+        ]
+      },
+      {
+        "id": "1755713054830-tc6y8f4jr",
+        "timestamp": "2025-08-20T18:04:14.830Z",
+        "type": "agent_start",
+        "agent": "AnalysisAgent",
+        "description": "Agente AnalysisAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "AnalysisAgent"
+        ]
+      },
+      {
+        "id": "1755713054831-dnvkp0upd",
+        "timestamp": "2025-08-20T18:04:14.831Z",
+        "type": "agent_start",
+        "agent": "ContentAgent",
+        "description": "Agente ContentAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ContentAgent"
+        ]
+      },
+      {
+        "id": "1755713054832-7b35v4yxd",
+        "timestamp": "2025-08-20T18:04:14.832Z",
+        "type": "agent_start",
+        "agent": "GeneratorAgent",
+        "description": "Agente GeneratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "GeneratorAgent"
+        ]
+      },
+      {
+        "id": "1755713054832-fk8urvz1e",
+        "timestamp": "2025-08-20T18:04:14.832Z",
+        "type": "agent_start",
+        "agent": "ScreenshotAgent",
+        "description": "Agente ScreenshotAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ScreenshotAgent"
+        ]
+      },
+      {
+        "id": "1755713054834-rvbx4a86g",
+        "timestamp": "2025-08-20T18:04:14.834Z",
+        "type": "milestone",
+        "description": "Iniciando core do sistema",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713056757-11mgxm744",
+        "timestamp": "2025-08-20T18:04:16.757Z",
+        "type": "milestone",
+        "description": "Sistema iniciado com sucesso",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713056759-5uc81hcr6",
+        "timestamp": "2025-08-20T18:04:16.759Z",
+        "type": "milestone",
+        "description": "Iniciando geração automática de manual",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713103369-nu2dl0wlv",
+        "timestamp": "2025-08-20T18:05:03.369Z",
+        "type": "milestone",
+        "description": "Sistema sendo finalizado pelo usuário",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713103370-pzi92gezr",
+        "timestamp": "2025-08-20T18:05:03.370Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755713054826-dhu61x121",
+          "duration": 48544
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "2.0",
+      "features": [
+        "LLMRouter",
+        "PromptInspector",
+        "ArtifactStore",
+        "Timeline"
+      ]
+    },
+    "endTime": "2025-08-20T18:05:03.370Z",
+    "summary": "Sistema finalizado pelo usuário"
+  },
+  {
+    "id": "1755713105180-h3rifkw07",
+    "startTime": "2025-08-20T18:05:05.180Z",
+    "events": [
+      {
+        "id": "1755713105180-97y5via4u",
+        "timestamp": "2025-08-20T18:05:05.180Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755713105180-h3rifkw07"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755713105181-znscawbqh",
+        "timestamp": "2025-08-20T18:05:05.181Z",
+        "type": "agent_start",
+        "agent": "OrchestratorAgent",
+        "description": "Agente OrchestratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "OrchestratorAgent"
+        ]
+      },
+      {
+        "id": "1755713105182-qsi9ne8xh",
+        "timestamp": "2025-08-20T18:05:05.182Z",
+        "type": "agent_start",
+        "agent": "LoginAgent",
+        "description": "Agente LoginAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "LoginAgent"
+        ]
+      },
+      {
+        "id": "1755713105182-e3cc0zvlx",
+        "timestamp": "2025-08-20T18:05:05.182Z",
+        "type": "agent_start",
+        "agent": "CrawlerAgent",
+        "description": "Agente CrawlerAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "CrawlerAgent"
+        ]
+      },
+      {
+        "id": "1755713105183-m2x17jpps",
+        "timestamp": "2025-08-20T18:05:05.183Z",
+        "type": "agent_start",
+        "agent": "AnalysisAgent",
+        "description": "Agente AnalysisAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "AnalysisAgent"
+        ]
+      },
+      {
+        "id": "1755713105184-tzmiycsd7",
+        "timestamp": "2025-08-20T18:05:05.184Z",
+        "type": "agent_start",
+        "agent": "ContentAgent",
+        "description": "Agente ContentAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ContentAgent"
+        ]
+      },
+      {
+        "id": "1755713105185-c6mszjc3z",
+        "timestamp": "2025-08-20T18:05:05.185Z",
+        "type": "agent_start",
+        "agent": "GeneratorAgent",
+        "description": "Agente GeneratorAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "GeneratorAgent"
+        ]
+      },
+      {
+        "id": "1755713105185-78neqk9it",
+        "timestamp": "2025-08-20T18:05:05.185Z",
+        "type": "agent_start",
+        "agent": "ScreenshotAgent",
+        "description": "Agente ScreenshotAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "ScreenshotAgent"
+        ]
+      },
+      {
+        "id": "1755713105190-mlsopclrx",
+        "timestamp": "2025-08-20T18:05:05.190Z",
+        "type": "milestone",
+        "description": "Iniciando core do sistema",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713107059-ujncn9hru",
+        "timestamp": "2025-08-20T18:05:07.059Z",
+        "type": "milestone",
+        "description": "Sistema iniciado com sucesso",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713107061-8228ucjhy",
+        "timestamp": "2025-08-20T18:05:07.061Z",
+        "type": "milestone",
+        "description": "Iniciando geração automática de manual",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713198349-cv76blelj",
+        "timestamp": "2025-08-20T18:06:38.349Z",
+        "type": "milestone",
+        "description": "Sistema sendo finalizado pelo usuário",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755713198350-90q3sex5f",
+        "timestamp": "2025-08-20T18:06:38.350Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755713105180-h3rifkw07",
+          "duration": 93170
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "2.0",
+      "features": [
+        "LLMRouter",
+        "PromptInspector",
+        "ArtifactStore",
+        "Timeline"
+      ]
+    },
+    "endTime": "2025-08-20T18:06:38.350Z",
+    "summary": "Sistema finalizado pelo usuário"
+  },
+  {
+    "id": "1755714651757-8xr9qto0x",
+    "startTime": "2025-08-20T18:30:51.757Z",
+    "events": [
+      {
+        "id": "1755714651757-2af4svpm0",
+        "timestamp": "2025-08-20T18:30:51.757Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755714651757-8xr9qto0x"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755714651758-8txd4w63v",
+        "timestamp": "2025-08-20T18:30:51.758Z",
+        "type": "agent_start",
+        "agent": "LoginAgent",
+        "description": "Agente LoginAgent iniciado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "agent",
+          "start",
+          "LoginAgent"
+        ]
+      },
+      {
+        "id": "1755714651759-57b7emno6",
+        "timestamp": "2025-08-20T18:30:51.759Z",
+        "type": "milestone",
+        "description": "Iniciando core do sistema para teste de login",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755714651883-00vihzz9x",
+        "timestamp": "2025-08-20T18:30:51.883Z",
+        "type": "milestone",
+        "description": "Sistema iniciado - pronto para teste de login",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755714653198-yg1f5vx4d",
+        "timestamp": "2025-08-20T18:30:53.198Z",
+        "type": "milestone",
+        "description": "Iniciando tarefa de autenticação",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755714672813-5wglftv0b",
+        "timestamp": "2025-08-20T18:31:12.813Z",
+        "type": "milestone",
+        "description": "Autenticação realizada com sucesso",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755714682815-sr3hawql8",
+        "timestamp": "2025-08-20T18:31:22.815Z",
+        "type": "milestone",
+        "description": "Teste de login finalizado",
+        "metadata": {},
+        "status": "info",
+        "tags": [
+          "milestone"
+        ]
+      },
+      {
+        "id": "1755714683143-irl8szamq",
+        "timestamp": "2025-08-20T18:31:23.143Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755714651757-8xr9qto0x",
+          "duration": 31386
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "2.0",
+      "features": [
+        "LoginAgent Test",
+        "LLMRouter",
+        "PromptInspector",
+        "ArtifactStore",
+        "Timeline"
+      ]
+    },
+    "endTime": "2025-08-20T18:31:23.143Z"
+  },
+  {
+    "id": "1755718815508-t9yy8ulvz",
+    "startTime": "2025-08-20T19:40:15.508Z",
+    "events": [
+      {
+        "id": "1755718815508-k2xo07qmq",
+        "timestamp": "2025-08-20T19:40:15.508Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755718815508-t9yy8ulvz"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755718815512-ya3418r46",
+        "timestamp": "2025-08-20T19:40:15.512Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755718815508-t9yy8ulvz",
+          "duration": 4
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/auth/signin",
+      "credentials": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "testType": "real-saeb-login-crawl"
+    },
+    "endTime": "2025-08-20T19:40:15.512Z",
+    "summary": "1755718815508-t9yy8ulvz"
+  },
+  {
+    "id": "1755718840722-mn1hjom8r",
+    "startTime": "2025-08-20T19:40:40.722Z",
+    "events": [
+      {
+        "id": "1755718840722-j4dgou1vz",
+        "timestamp": "2025-08-20T19:40:40.722Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755718840722-mn1hjom8r"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755718840723-inrua0evy",
+        "timestamp": "2025-08-20T19:40:40.723Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755718840722-mn1hjom8r",
+          "duration": 1
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/auth/signin",
+      "credentials": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "testType": "real-saeb-login-crawl"
+    },
+    "endTime": "2025-08-20T19:40:40.723Z",
+    "summary": "1755718840722-mn1hjom8r"
+  },
+  {
+    "id": "1755718881205-78oicv1gs",
+    "startTime": "2025-08-20T19:41:21.205Z",
+    "events": [
+      {
+        "id": "1755718881205-rxdpbwjg7",
+        "timestamp": "2025-08-20T19:41:21.205Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755718881205-78oicv1gs"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755718883587-5seztjshy",
+        "timestamp": "2025-08-20T19:41:23.587Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755718881205-78oicv1gs",
+          "duration": 2382
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/auth/signin",
+      "credentials": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "testType": "real-saeb-login-crawl"
+    },
+    "endTime": "2025-08-20T19:41:23.587Z",
+    "summary": "1755718881205-78oicv1gs"
+  },
+  {
+    "id": "1755718920791-ua5ty9cas",
+    "startTime": "2025-08-20T19:42:00.791Z",
+    "events": [
+      {
+        "id": "1755718920791-g43chggl1",
+        "timestamp": "2025-08-20T19:42:00.791Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755718920791-ua5ty9cas"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755718921851-n92w6nahb",
+        "timestamp": "2025-08-20T19:42:01.851Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755718920791-ua5ty9cas",
+          "duration": 1060
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/auth/signin",
+      "credentials": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "testType": "real-saeb-login-crawl"
+    },
+    "endTime": "2025-08-20T19:42:01.851Z",
+    "summary": "1755718920791-ua5ty9cas"
+  },
+  {
+    "id": "1755718967538-rf3ecldf7",
+    "startTime": "2025-08-20T19:42:47.538Z",
+    "events": [
+      {
+        "id": "1755718967538-5olb2whbn",
+        "timestamp": "2025-08-20T19:42:47.538Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755718967538-rf3ecldf7"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755718968971-1wbaa5dyn",
+        "timestamp": "2025-08-20T19:42:48.971Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755718967538-rf3ecldf7",
+          "duration": 1433
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/auth/signin",
+      "credentials": {
+        "username": "admin",
+        "password": "admin123"
+      },
+      "testType": "real-saeb-login-crawl"
+    },
+    "endTime": "2025-08-20T19:42:48.971Z",
+    "summary": "1755718967538-rf3ecldf7"
+  }
+]

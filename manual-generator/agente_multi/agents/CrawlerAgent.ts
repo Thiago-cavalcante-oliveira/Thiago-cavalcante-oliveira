@@ -1,7 +1,7 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
 import { Page, Browser } from 'playwright';
-import { MinIOService } from '../services/MinIOService';
-import { LLMManager } from '../services/LLMManager';
+import { MinIOService } from '../services/MinIOService.js';
+import { LLMManager } from '../services/LLMManager.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import {
@@ -692,8 +692,7 @@ export class CrawlerAgent extends BaseAgent {
       }
 
       // Processar a página com interações recursivas (profundidade máxima 3)
-      const visitedPages = new Set<string>();
-      const result = await this.processPageWithInteractions(url, 3, 0, visitedPages);
+      const result = await this.processPageWithInteractions(url, 3, 0);
       
       const processingTime = Date.now() - startTime;
       result.statistics.processingTime = processingTime;
@@ -702,7 +701,6 @@ export class CrawlerAgent extends BaseAgent {
       this.log(`Elementos interativos encontrados: ${result.interactiveElements.length}`);
       this.log(`Páginas descobertas: ${result.discoveredPages.length}`);
       this.log(`Workflows identificados: ${result.workflows.length}`);
-      this.log(`Páginas visitadas: ${visitedPages.size}`);
       
       return result;
     } catch (error) {

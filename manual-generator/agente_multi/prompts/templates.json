@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1755709283852-xn04jx0ve",
+    "name": "Análise de Página",
+    "template": "Analise a página {{url}} e extraia {{elements}}. Foque em {{focus}}.",
+    "variables": [
+      "url",
+      "elements",
+      "focus"
+    ],
+    "category": "analysis",
+    "description": "Template para análise de páginas web",
+    "examples": [
+      {
+        "input": {
+          "url": "example.com",
+          "elements": "formulários",
+          "focus": "usabilidade"
+        },
+        "expectedOutput": "Análise detalhada dos formulários com foco em usabilidade"
+      }
+    ]
+  }
+]

@@ -1,6 +1,7 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
 import { Page } from 'playwright';
-import { MinIOService } from '../services/MinIOService';
+import { MinIOService } from '../services/MinIOService.js';
+import { LoginAgent } from './LoginAgent.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -57,6 +58,8 @@ export class SmartLoginAgent extends BaseAgent {
   private steps: LoginStep[] = [];
   private maxNavigationAttempts = 5;
   private currentAttempt = 0;
+  private fallbackAgent: LoginAgent | null = null;
+  private userInteractionRequired = false;
 
   constructor() {
     const config: AgentConfig = {
@@ -79,7 +82,9 @@ export class SmartLoginAgent extends BaseAgent {
   async initialize(): Promise<void> {
     await this.minioService.initialize();
     await fs.mkdir(this.outputDir, { recursive: true });
-    this.log('SmartLoginAgent inicializado');
+    this.fallbackAgent = new LoginAgent();
+    await this.fallbackAgent.initialize();
+    this.log('SmartLoginAgent inicializado com fallback');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
@@ -128,29 +133,72 @@ export class SmartLoginAgent extends BaseAgent {
     this.log('Iniciando login inteligente...');
     
     try {
+      // Primeira tentativa: SmartLoginAgent
       const loginSuccess = await this.smartLogin(this.page, {
         baseUrl,
         credentials,
         outputDir: this.outputDir
       });
 
-      if (!loginSuccess) {
-        throw new Error('Falha no processo de login');
+      if (loginSuccess) {
+        await this.saveLoginReport();
+        return {
+          id: task.id + '_result',
+          taskId: task.id,
+          success: true,
+          data: {
+            loginCompleted: true,
+            steps: this.steps,
+            outputDir: this.outputDir,
+            totalSteps: this.steps.length,
+            finalUrl: await this.page.url(),
+            method: 'smart_login'
+          },
+          timestamp: new Date(),
+          processingTime: 0
+        };
       }
 
-      // Salvar relatório final
-      await this.saveLoginReport();
+      // Segunda tentativa: LoginAgent (fallback)
+      this.log('SmartLoginAgent falhou, tentando LoginAgent...');
+      if (this.fallbackAgent && this.page) {
+        this.fallbackAgent.setPage(this.page);
+        const fallbackResult = await this.fallbackAgent.processTask({
+          ...task,
+          sender: 'SmartLoginAgent-fallback'
+        });
+        
+        if (fallbackResult.success) {
+          this.log('LoginAgent (fallback) teve sucesso');
+          await this.saveLoginReport();
+          return {
+            ...fallbackResult,
+            data: {
+              ...fallbackResult.data,
+              method: 'fallback_login',
+              smartLoginSteps: this.steps
+            }
+          };
+        }
+      }
 
+      // Terceira tentativa: Solicitar interação do usuário
+      this.log('Ambos os agentes falharam, solicitando interação do usuário...');
+      await this.requestUserInteraction();
+      
+      await this.saveLoginReport();
       return {
         id: task.id + '_result',
         taskId: task.id,
-        success: true,
+        success: false,
         data: {
-          loginCompleted: true,
+          loginCompleted: false,
           steps: this.steps,
           outputDir: this.outputDir,
           totalSteps: this.steps.length,
-          finalUrl: await this.page.url()
+          finalUrl: await this.page.url(),
+          method: 'user_interaction_required',
+          userInteractionRequired: true
         },
         timestamp: new Date(),
         processingTime: 0
@@ -241,39 +289,78 @@ export class SmartLoginAgent extends BaseAgent {
       'fazer login', 'conectar', 'iniciar sessão', 'access', 'signin'
     ];
     
+    // Termos OAuth/SSO para ignorar
+    const oauthTerms = [
+      'google', 'facebook', 'twitter', 'linkedin', 'microsoft', 'apple',
+      'github', 'oauth', 'sso', 'single sign', 'social login'
+    ];
+    
+    // Termos de recuperação/registro para identificar
+    const recoveryTerms = [
+      'esqueci', 'forgot', 'recover', 'reset', 'recuperar', 'redefinir',
+      'cadastro', 'register', 'sign up', 'criar conta', 'nova conta'
+    ];
+    
     try {
-      // Buscar botões e links com texto relacionado a login
+      // Primeiro, identificar e documentar formulários de recuperação/registro
+      await this.identifySpecialForms(page, recoveryTerms, outputDir);
+      
+      // Buscar botões e links com texto relacionado a login (ignorando OAuth)
       for (const trigger of loginTriggers) {
         const elements = await page.$$eval(
           'button, a, [role="button"], input[type="submit"]',
-          (elements, searchText) => {
+          (elements: Element[], args: { searchText: string; oauthTerms: string[] }) => {
             return elements
-              .map((el, index) => ({
+              .map((el: Element, index: number) => ({
                 index,
                 text: el.textContent?.toLowerCase().trim() || '',
-                visible: (el as HTMLElement).offsetParent !== null
+                visible: (el as HTMLElement).offsetParent !== null,
+                isOAuth: args.oauthTerms.some((term: string) => 
+                  el.textContent?.toLowerCase().includes(term) ||
+                  el.className?.toLowerCase().includes(term) ||
+                  (el as HTMLElement).getAttribute('data-provider')?.toLowerCase().includes(term)
+                )
               }))
-              .filter(item => 
+              .filter((item: any) => 
                 item.visible && 
-                item.text.includes(searchText.toLowerCase())
+                item.text.includes(args.searchText.toLowerCase()) &&
+                !item.isOAuth // Ignorar métodos OAuth
               );
           },
-          trigger
+          { searchText: trigger, oauthTerms }
         );
         
         if (elements.length > 0) {
-          this.log(`Encontrado gatilho de login: "${trigger}"`);
+          this.log(`Encontrado gatilho de login: "${trigger}" (ignorando OAuth)`);
           
           // Clicar no primeiro elemento encontrado
           const selector = `button, a, [role="button"], input[type="submit"]`;
           const allElements = await page.$$(selector);
           
-          if (allElements[elements[0].index]) {
+          if (allElements && elements.length > 0 && allElements[elements[0].index]) {
             await this.captureStep(page, `before-click-${trigger}`, outputDir);
             await allElements[elements[0].index].click();
             await page.waitForTimeout(2000); // Aguardar navegação
             await this.captureStep(page, `after-click-${trigger}`, outputDir);
-            return true;
+            
+            // Verificar se chegamos a uma nova rota e analisar novamente
+            const newUrl = await page.url();
+            this.log(`Navegou para: ${newUrl}`);
+            
+            // Tentar detectar campos de login na nova página
+            await page.waitForTimeout(1000);
+            const formFound = await this.detectLoginForm(page);
+            
+            if (formFound) {
+              await this.captureStep(page, `login-form-found-after-navigation`, outputDir);
+              return true;
+            }
+            
+            // Se não encontrou, continuar procurando outros gatilhos
+            this.currentAttempt++;
+            if (this.currentAttempt < this.maxNavigationAttempts) {
+              return await this.findAndClickLoginTrigger(page, outputDir);
+            }
           }
         }
       }
@@ -528,9 +615,88 @@ export class SmartLoginAgent extends BaseAgent {
     return this.outputDir;
   }
 
+  private async identifySpecialForms(page: Page, recoveryTerms: string[], outputDir: string): Promise<void> {
+    try {
+      const specialForms = await page.$$eval(
+        'form, button, a, [role="button"]',
+        (elements: Element[], terms: string[]) => {
+          return elements
+            .map((el: Element, index: number) => ({
+              index,
+              text: el.textContent?.toLowerCase().trim() || '',
+              type: el.tagName.toLowerCase(),
+              action: (el as HTMLFormElement).action || '',
+              href: (el as HTMLAnchorElement).href || '',
+              className: el.className || '',
+              isSpecial: terms.some((term: string) => 
+                el.textContent?.toLowerCase().includes(term) ||
+                el.className?.toLowerCase().includes(term)
+              )
+            }))
+            .filter((item: any) => item.isSpecial);
+        },
+        recoveryTerms
+      );
+      
+      if (specialForms.length > 0) {
+        this.log(`Identificados ${specialForms.length} formulários especiais (recuperação/registro)`);
+        
+        // Documentar sem interagir
+        const specialFormsData = {
+          timestamp: new Date().toISOString(),
+          url: await page.url(),
+          forms: specialForms,
+          description: 'Formulários de recuperação de senha e registro identificados para processamento futuro'
+        };
+        
+        await fs.writeFile(
+          path.join(outputDir, 'special-forms.json'),
+          JSON.stringify(specialFormsData, null, 2),
+          'utf-8'
+        );
+        
+        await this.captureStep(page, 'special-forms-identified', outputDir);
+      }
+    } catch (error) {
+      this.log(`Erro ao identificar formulários especiais: ${error}`, 'error');
+    }
+  }
+  
+  private async requestUserInteraction(): Promise<void> {
+    this.userInteractionRequired = true;
+    this.log('=== INTERAÇÃO DO USUÁRIO NECESSÁRIA ===', 'warn');
+    this.log('Os agentes automáticos não conseguiram completar o login.', 'warn');
+    this.log('Por favor, complete o login manualmente no navegador.', 'warn');
+    this.log('O sistema aguardará 30 segundos para interação manual...', 'warn');
+    
+    if (this.page) {
+      // Capturar screenshot do estado atual
+      await this.captureStep(this.page, 'user-interaction-required', this.outputDir);
+      
+      // Aguardar tempo para interação manual
+      await this.page.waitForTimeout(30000);
+      
+      // Capturar screenshot após possível interação
+      await this.captureStep(this.page, 'after-user-interaction', this.outputDir);
+      
+      // Verificar se o login foi bem-sucedido após interação
+      const success = await this.verifyLoginSuccess(this.page);
+      if (success) {
+        this.log('Login completado com sucesso após interação do usuário!');
+      } else {
+        this.log('Login ainda não foi completado. Verifique manualmente.', 'warn');
+      }
+    }
+  }
+
   async cleanup(): Promise<void> {
     this.page = null;
     this.steps = [];
+    this.userInteractionRequired = false;
+    this.currentAttempt = 0;
+    if (this.fallbackAgent) {
+      await this.fallbackAgent.cleanup();
+    }
     this.log('SmartLoginAgent limpo');
   }
 

@@ -1,0 +1,740 @@
+{
+  "1755709231245-vnm9luor5": {
+    "id": "1755709231245-vnm9luor5",
+    "type": "document",
+    "name": "exemplo-manual.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/document/1755709231245-vnm9luor5_exemplo-manual.md",
+    "size": 53,
+    "hash": "27fb064c3069a0346787cedf6d8a34ab5ae2e060fe5131aede589228534d8572",
+    "metadata": {
+      "author": "Sistema",
+      "version": "1.0"
+    },
+    "createdAt": "2025-08-20T17:00:31.252Z",
+    "lastAccessed": "2025-08-20T17:00:31.252Z",
+    "accessCount": 0,
+    "tags": [
+      "exemplo",
+      "manual"
+    ],
+    "dependencies": []
+  },
+  "1755709231255-uo9ipjsgk": {
+    "id": "1755709231255-uo9ipjsgk",
+    "type": "data",
+    "name": "dados-crawling.json",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/data/1755709231255-uo9ipjsgk_dados-crawling.json",
+    "size": 26,
+    "hash": "b9686f2b225acaa2f4b46dc46fe6fa24c49825b84418e8872d94cc1358847852",
+    "metadata": {
+      "timestamp": "2025-08-20T17:00:31.255Z"
+    },
+    "createdAt": "2025-08-20T17:00:31.260Z",
+    "lastAccessed": "2025-08-20T17:00:31.260Z",
+    "accessCount": 0,
+    "tags": [
+      "crawling",
+      "dados"
+    ],
+    "dependencies": []
+  },
+  "1755709280034-ro1j5jh1u": {
+    "id": "1755709280034-ro1j5jh1u",
+    "type": "document",
+    "name": "exemplo-manual.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/document/1755709280034-ro1j5jh1u_exemplo-manual.md",
+    "size": 53,
+    "hash": "27fb064c3069a0346787cedf6d8a34ab5ae2e060fe5131aede589228534d8572",
+    "metadata": {
+      "author": "Sistema",
+      "version": "1.0"
+    },
+    "createdAt": "2025-08-20T17:01:20.041Z",
+    "lastAccessed": "2025-08-20T17:01:20.041Z",
+    "accessCount": 0,
+    "tags": [
+      "exemplo",
+      "manual"
+    ],
+    "dependencies": []
+  },
+  "1755709280043-qq89bkskf": {
+    "id": "1755709280043-qq89bkskf",
+    "type": "data",
+    "name": "dados-crawling.json",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/data/1755709280043-qq89bkskf_dados-crawling.json",
+    "size": 26,
+    "hash": "b9686f2b225acaa2f4b46dc46fe6fa24c49825b84418e8872d94cc1358847852",
+    "metadata": {
+      "timestamp": "2025-08-20T17:01:20.043Z"
+    },
+    "createdAt": "2025-08-20T17:01:20.044Z",
+    "lastAccessed": "2025-08-20T17:01:20.044Z",
+    "accessCount": 0,
+    "tags": [
+      "crawling",
+      "dados"
+    ],
+    "dependencies": []
+  },
+  "1755709283854-jgjpo4kun": {
+    "id": "1755709283854-jgjpo4kun",
+    "type": "data",
+    "name": "prompt-gerado.txt",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/data/1755709283854-jgjpo4kun_prompt-gerado.txt",
+    "size": 89,
+    "hash": "f60c0c9df6fe55fa68ce0c26792e96b98564203793f0c593bd66db6a6938163e",
+    "metadata": {
+      "templateId": "1755709283852-xn04jx0ve",
+      "generated": true
+    },
+    "createdAt": "2025-08-20T17:01:23.855Z",
+    "lastAccessed": "2025-08-20T17:01:23.855Z",
+    "accessCount": 0,
+    "tags": [
+      "prompt",
+      "template",
+      "gerado"
+    ],
+    "dependencies": []
+  },
+  "1755709283946-3ua0oe3nh": {
+    "id": "1755709283946-3ua0oe3nh",
+    "type": "report",
+    "name": "timeline-demo.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709283946-3ua0oe3nh_timeline-demo.md",
+    "size": 683,
+    "hash": "7b2ca11d8b9874315293a103dba74a9831f07c2a5a3ad98f44eac39429ef4ed9",
+    "metadata": {
+      "sessionId": "1755709280032-gc36c0st5"
+    },
+    "createdAt": "2025-08-20T17:01:23.949Z",
+    "lastAccessed": "2025-08-20T17:01:23.949Z",
+    "accessCount": 0,
+    "tags": [
+      "demo",
+      "timeline",
+      "relatório"
+    ],
+    "dependencies": []
+  },
+  "1755709283951-oaanrggu3": {
+    "id": "1755709283951-oaanrggu3",
+    "type": "report",
+    "name": "artifacts-demo.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709283951-oaanrggu3_artifacts-demo.md",
+    "size": 766,
+    "hash": "ad934eeb4f7da6814fae47f9a667abaccb9473aad8f0909bf131910b343b1dce",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:01:23.953Z",
+    "lastAccessed": "2025-08-20T17:01:23.953Z",
+    "accessCount": 0,
+    "tags": [
+      "demo",
+      "artifacts",
+      "relatório"
+    ],
+    "dependencies": []
+  },
+  "1755709283955-saucyyndx": {
+    "id": "1755709283955-saucyyndx",
+    "type": "report",
+    "name": "prompts-demo.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709283955-saucyyndx_prompts-demo.md",
+    "size": 460,
+    "hash": "5d82e30892b9f445bd7673538495262126a52534bba93e0f57813d6db26e5ea7",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:01:23.956Z",
+    "lastAccessed": "2025-08-20T17:01:23.956Z",
+    "accessCount": 0,
+    "tags": [
+      "demo",
+      "prompts",
+      "relatório"
+    ],
+    "dependencies": []
+  },
+  "1755709600199-6jtswntc3": {
+    "id": "1755709600199-6jtswntc3",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709600199-6jtswntc3_timeline-initialization.md",
+    "size": 1623,
+    "hash": "24fb135a122b1bd3d3b5052af1e8f5d61105d7f71eec7bef131b77d7ae8b6ec9",
+    "metadata": {
+      "sessionId": "1755709598063-xhixsg8tj"
+    },
+    "createdAt": "2025-08-20T17:06:40.204Z",
+    "lastAccessed": "2025-08-20T17:06:40.204Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755709600214-6ir2tk5z9": {
+    "id": "1755709600214-6ir2tk5z9",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709600214-6ir2tk5z9_artifacts-initialization.md",
+    "size": 760,
+    "hash": "41365df5269b020dc26309a0bccae819b2367e76ab00e1699f0f60cfcc32e1ba",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:06:40.217Z",
+    "lastAccessed": "2025-08-20T17:06:40.217Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755709600219-9n4zh4ckl": {
+    "id": "1755709600219-9n4zh4ckl",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755709600219-9n4zh4ckl_prompts-initialization.md",
+    "size": 460,
+    "hash": "e4e9750a13a47e717d31df60ff7c7cc0ef6bf8281868c7c6501e2376e31a09ec",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:06:40.235Z",
+    "lastAccessed": "2025-08-20T17:06:40.235Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755710802432-6djgim7sr": {
+    "id": "1755710802432-6djgim7sr",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755710802432-6djgim7sr_timeline-initialization.md",
+    "size": 1624,
+    "hash": "82d9fa73055f7e941a2aae49f9ed99c651c498a94b7d64dea02f9bec4bf0bdf1",
+    "metadata": {
+      "sessionId": "1755710801666-d2i1tk903"
+    },
+    "createdAt": "2025-08-20T17:26:42.436Z",
+    "lastAccessed": "2025-08-20T17:26:42.436Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755710802438-uxtlqpbdn": {
+    "id": "1755710802438-uxtlqpbdn",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755710802438-uxtlqpbdn_artifacts-initialization.md",
+    "size": 787,
+    "hash": "5b4828d225c2b86b73ebf7a4cf14d02479b687f4f3ac76fc37c2fa15282b4f62",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:26:42.439Z",
+    "lastAccessed": "2025-08-20T17:26:42.439Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755710802441-cu13huqzl": {
+    "id": "1755710802441-cu13huqzl",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755710802441-cu13huqzl_prompts-initialization.md",
+    "size": 460,
+    "hash": "e551d69dea70c02e46b40ab3d7d2dee3b20d1e5ef4d42e5cdba67d3cc83c1c3c",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:26:42.442Z",
+    "lastAccessed": "2025-08-20T17:26:42.443Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755711219875-n4fq7iamv": {
+    "id": "1755711219875-n4fq7iamv",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711219875-n4fq7iamv_timeline-initialization.md",
+    "size": 1624,
+    "hash": "39a2435172317d6ea3ca87356afa66132f3388bfb55b66a100469a61ed487f54",
+    "metadata": {
+      "sessionId": "1755711219197-xeribronj"
+    },
+    "createdAt": "2025-08-20T17:33:39.877Z",
+    "lastAccessed": "2025-08-20T17:33:39.877Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755711219878-4we05snaq": {
+    "id": "1755711219878-4we05snaq",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711219878-4we05snaq_artifacts-initialization.md",
+    "size": 807,
+    "hash": "452ab2e11cbe30fab4d86fe9af51c2312c5d72b91084f8af9e8c2a3b011935a0",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:33:39.879Z",
+    "lastAccessed": "2025-08-20T17:33:39.879Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755711219883-a3ocjp4iw": {
+    "id": "1755711219883-a3ocjp4iw",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711219883-a3ocjp4iw_prompts-initialization.md",
+    "size": 460,
+    "hash": "778421fb472e4a418a780ca365bed171e054e11db07bece7726bff5138c89c06",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:33:39.884Z",
+    "lastAccessed": "2025-08-20T17:33:39.884Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755711357909-uuxkin86q": {
+    "id": "1755711357909-uuxkin86q",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711357909-uuxkin86q_timeline-initialization.md",
+    "size": 1745,
+    "hash": "b33e72f53f9f103ebbb712e841104a37fa78cc23425f72cb641138edff1775a1",
+    "metadata": {
+      "sessionId": "1755711357077-q5pj0j9t1"
+    },
+    "createdAt": "2025-08-20T17:35:57.910Z",
+    "lastAccessed": "2025-08-20T17:35:57.910Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755711357912-uf04t2nru": {
+    "id": "1755711357912-uf04t2nru",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711357912-uf04t2nru_artifacts-initialization.md",
+    "size": 810,
+    "hash": "cffa5d4aa6055635743f45939944093d983637be117e8a9a550d9c7032b6813e",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:35:57.913Z",
+    "lastAccessed": "2025-08-20T17:35:57.913Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755711357916-o30wvxvd3": {
+    "id": "1755711357916-o30wvxvd3",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711357916-o30wvxvd3_prompts-initialization.md",
+    "size": 460,
+    "hash": "3ec5199344c61a3409a8b045f8227059bccb3484b05e30f84162fa9030346b28",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:35:57.919Z",
+    "lastAccessed": "2025-08-20T17:35:57.919Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755711402347-u6gd5t6jn": {
+    "id": "1755711402347-u6gd5t6jn",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711402347-u6gd5t6jn_timeline-initialization.md",
+    "size": 1745,
+    "hash": "91b466e2289edc125cc1b2dcfdb70e121143cd8cc7a1cae1f3818c6344a26c98",
+    "metadata": {
+      "sessionId": "1755711401656-atdk1a9q7"
+    },
+    "createdAt": "2025-08-20T17:36:42.349Z",
+    "lastAccessed": "2025-08-20T17:36:42.349Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755711402352-c1dutisv4": {
+    "id": "1755711402352-c1dutisv4",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711402352-c1dutisv4_artifacts-initialization.md",
+    "size": 810,
+    "hash": "b7e9b3ab1d00d4142607438fea495352dc33d97f30fb7f5892adc3a13d4205ad",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:36:42.357Z",
+    "lastAccessed": "2025-08-20T17:36:42.357Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755711402359-ahiuleetd": {
+    "id": "1755711402359-ahiuleetd",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711402359-ahiuleetd_prompts-initialization.md",
+    "size": 460,
+    "hash": "859cef2213b10691264b9a092e1d8a7b1c1f09bf08206166ecef852e51a0a764",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:36:42.365Z",
+    "lastAccessed": "2025-08-20T17:36:42.365Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755711422120-htpzcz375": {
+    "id": "1755711422120-htpzcz375",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711422120-htpzcz375_timeline-initialization.md",
+    "size": 1744,
+    "hash": "babe2eadb9220f66862de5e08b19de2f11849ad3212cb0fc3a467cb31f9f2ac8",
+    "metadata": {
+      "sessionId": "1755711420747-xwys8buwq"
+    },
+    "createdAt": "2025-08-20T17:37:02.123Z",
+    "lastAccessed": "2025-08-20T17:37:02.123Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755711422126-dzwgw49vr": {
+    "id": "1755711422126-dzwgw49vr",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711422126-dzwgw49vr_artifacts-initialization.md",
+    "size": 810,
+    "hash": "4083448e87cb133fdedcc471171b6c84e4dc9ac23b3052fc424efab5c42f43f8",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:37:02.129Z",
+    "lastAccessed": "2025-08-20T17:37:02.129Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755711422132-i3od3isrj": {
+    "id": "1755711422132-i3od3isrj",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711422132-i3od3isrj_prompts-initialization.md",
+    "size": 460,
+    "hash": "b93f138e32a2d2bd380ac3069b6ff98e77c15caf6cf97fc7ca39d50320870c33",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:37:02.134Z",
+    "lastAccessed": "2025-08-20T17:37:02.134Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755711538746-g95kvbedq": {
+    "id": "1755711538746-g95kvbedq",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711538746-g95kvbedq_timeline-initialization.md",
+    "size": 1735,
+    "hash": "970d94d512293324836c9f532b83244bcea7d4eed06115835a25bcd256a01936",
+    "metadata": {
+      "sessionId": "1755711446811-ufcall9qe"
+    },
+    "createdAt": "2025-08-20T17:38:58.747Z",
+    "lastAccessed": "2025-08-20T17:38:58.747Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755711538749-f33t1gg8c": {
+    "id": "1755711538749-f33t1gg8c",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711538749-f33t1gg8c_artifacts-initialization.md",
+    "size": 810,
+    "hash": "231c2a69ff02c1ad5ca1a75ce6b82a9af7f30655bfd373247ec2cf3505ed1cfd",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:38:58.751Z",
+    "lastAccessed": "2025-08-20T17:38:58.751Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755711538752-ymvwlfqfa": {
+    "id": "1755711538752-ymvwlfqfa",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755711538752-ymvwlfqfa_prompts-initialization.md",
+    "size": 460,
+    "hash": "119655cada3ff2b3b2ba0fcc92f169aaf01f519de2e2d43a7c6401449e659e67",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:38:58.753Z",
+    "lastAccessed": "2025-08-20T17:38:58.753Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755712140037-fi29tui2k": {
+    "id": "1755712140037-fi29tui2k",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755712140037-fi29tui2k_timeline-initialization.md",
+    "size": 1735,
+    "hash": "f3f836241b8e3d2b70aaa0a24979e0347958444487ceed70a046c4c6f1d25da9",
+    "metadata": {
+      "sessionId": "1755712042033-vlhjogvzv"
+    },
+    "createdAt": "2025-08-20T17:49:00.057Z",
+    "lastAccessed": "2025-08-20T17:49:00.057Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755712140073-ixd2i8vrr": {
+    "id": "1755712140073-ixd2i8vrr",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755712140073-ixd2i8vrr_artifacts-initialization.md",
+    "size": 810,
+    "hash": "8e8e162e6817c899717e3c6e5e7f6997fcf05595d654bf10d4112446fe8201c7",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:49:00.075Z",
+    "lastAccessed": "2025-08-20T17:49:00.075Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755712140078-wjeavkl95": {
+    "id": "1755712140078-wjeavkl95",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755712140078-wjeavkl95_prompts-initialization.md",
+    "size": 460,
+    "hash": "bc5808edb5a0f528bf66f17fb07eb43fb301145452de5bab10452b8016e6f2ba",
+    "metadata": {},
+    "createdAt": "2025-08-20T17:49:00.079Z",
+    "lastAccessed": "2025-08-20T17:49:00.079Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755713008166-rizadw60j": {
+    "id": "1755713008166-rizadw60j",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713008166-rizadw60j_timeline-initialization.md",
+    "size": 1744,
+    "hash": "2ce7274f04250637096a6968c3c2c41f7394c6f887492913c3e3e7b0ab50de73",
+    "metadata": {
+      "sessionId": "1755713003875-30xw54g9z"
+    },
+    "createdAt": "2025-08-20T18:03:28.170Z",
+    "lastAccessed": "2025-08-20T18:03:28.170Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755713008192-0j3chl5bi": {
+    "id": "1755713008192-0j3chl5bi",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713008192-0j3chl5bi_artifacts-initialization.md",
+    "size": 810,
+    "hash": "c2584d877c2c45afb0133d1f44d76116b742ee1e4c4f07ab51a14369af93cb39",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:03:28.196Z",
+    "lastAccessed": "2025-08-20T18:03:28.196Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755713008199-p1cqto5di": {
+    "id": "1755713008199-p1cqto5di",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713008199-p1cqto5di_prompts-initialization.md",
+    "size": 460,
+    "hash": "3d4044ffe521d76d43034ebfeaebe44eb06814d858526b2f7c87f8d58a9aa015",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:03:28.202Z",
+    "lastAccessed": "2025-08-20T18:03:28.202Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755713033328-kovcd6mjh": {
+    "id": "1755713033328-kovcd6mjh",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713033328-kovcd6mjh_timeline-initialization.md",
+    "size": 1744,
+    "hash": "70cdeb306c17d2cd133b4c8729bc811a91e146af19156bb8a10e4a7a28547fb5",
+    "metadata": {
+      "sessionId": "1755713031332-io3hpk83o"
+    },
+    "createdAt": "2025-08-20T18:03:53.351Z",
+    "lastAccessed": "2025-08-20T18:03:53.351Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755713033354-1p9ca9kzf": {
+    "id": "1755713033354-1p9ca9kzf",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713033354-1p9ca9kzf_artifacts-initialization.md",
+    "size": 810,
+    "hash": "976484039ab6b6f74321bf435cc67e39c561a9622c8e9b83582ff9f606315997",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:03:53.363Z",
+    "lastAccessed": "2025-08-20T18:03:53.363Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755713033373-ru4q44kvs": {
+    "id": "1755713033373-ru4q44kvs",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713033373-ru4q44kvs_prompts-initialization.md",
+    "size": 460,
+    "hash": "eb4ee42a6c5ca67566e3db3a5d1c6505621a7fb425e18e698265979bc98fbb5c",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:03:53.384Z",
+    "lastAccessed": "2025-08-20T18:03:53.384Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  },
+  "1755713338446-pnz5mhoju": {
+    "id": "1755713338446-pnz5mhoju",
+    "type": "report",
+    "name": "timeline-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713338446-pnz5mhoju_timeline-initialization.md",
+    "size": 1744,
+    "hash": "e4dc6b646f7ddf7ec7847b731a87b4c1440368645af0fb444c5b280cb91ea456",
+    "metadata": {
+      "sessionId": "1755713333046-2xdhelx8l"
+    },
+    "createdAt": "2025-08-20T18:08:58.447Z",
+    "lastAccessed": "2025-08-20T18:08:58.447Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "timeline"
+    ],
+    "dependencies": []
+  },
+  "1755713338449-ka7kw6lnp": {
+    "id": "1755713338449-ka7kw6lnp",
+    "type": "report",
+    "name": "artifacts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713338449-ka7kw6lnp_artifacts-initialization.md",
+    "size": 810,
+    "hash": "6c0b611d942d70707d4c6cdd6f1c6dce464c1cfb97d8243133d98f0ac1c9ce4b",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:08:58.450Z",
+    "lastAccessed": "2025-08-20T18:08:58.450Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "artifacts"
+    ],
+    "dependencies": []
+  },
+  "1755713338452-6ubtoklj7": {
+    "id": "1755713338452-6ubtoklj7",
+    "type": "report",
+    "name": "prompts-initialization.md",
+    "path": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/output/artifacts/report/1755713338452-6ubtoklj7_prompts-initialization.md",
+    "size": 460,
+    "hash": "d647c0f9bed19ccbde41a5207f15fc72883e37db1a52bdfd95f297449242d6a6",
+    "metadata": {},
+    "createdAt": "2025-08-20T18:08:58.453Z",
+    "lastAccessed": "2025-08-20T18:08:58.453Z",
+    "accessCount": 0,
+    "tags": [
+      "initialization",
+      "prompts"
+    ],
+    "dependencies": []
+  }
+}

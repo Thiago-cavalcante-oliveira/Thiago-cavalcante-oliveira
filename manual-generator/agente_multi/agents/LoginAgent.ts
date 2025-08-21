@@ -1,6 +1,6 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
 import { Page } from 'playwright';
-import { MinIOService } from '../services/MinIOService';
+import { MinIOService } from '../services/MinIOService.js';
 import { AuthDetectionResult } from './interfaces/AuthTypes';
 
 export interface LoginCredentials {
@@ -237,20 +237,66 @@ export class LoginAgent extends BaseAgent {
         }
       };
 
-      const form = document.querySelector('form');
-      if (form) {
-        const inputs = form.querySelectorAll('input');
-        inputs.forEach(input => {
-          const name = input.name || input.id || input.placeholder;
-          if (name) {
-            if (input.hasAttribute('required')) {
-              standardAuth.fields.required.push(name);
-            } else {
-              standardAuth.fields.optional.push(name);
-            }
+      // Procurar por campos de login em toda a página, não apenas em formulários
+      const allInputs = document.querySelectorAll('input');
+      const loginInputs: HTMLInputElement[] = [];
+      const passwordInputs: HTMLInputElement[] = [];
+      
+      allInputs.forEach(input => {
+        const inputElement = input as HTMLInputElement;
+        const type = inputElement.type?.toLowerCase();
+        const name = inputElement.name?.toLowerCase() || '';
+        const id = inputElement.id?.toLowerCase() || '';
+        const placeholder = inputElement.placeholder?.toLowerCase() || '';
+        const className = inputElement.className?.toLowerCase() || '';
+        
+        // Detectar campos de senha
+        if (type === 'password') {
+          passwordInputs.push(inputElement);
+        }
+        // Detectar campos de usuário/email
+        else if (
+          type === 'email' ||
+          type === 'text' ||
+          name.includes('user') ||
+          name.includes('login') ||
+          name.includes('email') ||
+          id.includes('user') ||
+          id.includes('login') ||
+          id.includes('email') ||
+          placeholder.includes('user') ||
+          placeholder.includes('login') ||
+          placeholder.includes('email') ||
+          placeholder.includes('usuário') ||
+          className.includes('user') ||
+          className.includes('login') ||
+          className.includes('email')
+        ) {
+          loginInputs.push(inputElement);
+        }
+      });
+      
+      // Considerar disponível se encontrou pelo menos um campo de cada tipo
+      if (loginInputs.length > 0 && passwordInputs.length > 0) {
+        standardAuth.available = true;
+        
+        loginInputs.forEach(input => {
+          const identifier = input.name || input.id || input.placeholder || 'username';
+          if (input.hasAttribute('required')) {
+            standardAuth.fields.required.push(identifier);
+          } else {
+            standardAuth.fields.optional.push(identifier);
           }
         });
-        standardAuth.available = standardAuth.fields.required.length > 0;
+        
+        passwordInputs.forEach(input => {
+          const identifier = input.name || input.id || input.placeholder || 'password';
+          if (input.hasAttribute('required')) {
+            standardAuth.fields.required.push(identifier);
+          } else {
+            standardAuth.fields.optional.push(identifier);
+          }
+        });
       }
 
       // Detectar provedores OAuth
@@ -325,16 +371,38 @@ export class LoginAgent extends BaseAgent {
     try {
       this.log('Executando autenticação básica');
 
-      // Localizar campos de login
+      // Aguardar que os campos apareçam (importante para SPAs)
+      this.log('Aguardando campos de login aparecerem...');
+      
+      // Aguardar campo de senha aparecer (mais específico)
+      await this.page.waitForSelector('input[type="password"]', { timeout: 15000 });
+      
+      // Aguardar um pouco mais para garantir que todos os campos carregaram
+      await this.page.waitForTimeout(2000);
+
+      // Localizar campos de login com seletores mais abrangentes
       const usernameField = await this.page.$(
-        'input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"]'
+        'input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"], input[placeholder*="user"], input[id*="user"], input[id*="login"], input[id*="email"]'
       );
       
       const passwordField = await this.page.$('input[type="password"]');
 
       if (!usernameField || !passwordField) {
+        // Log adicional para debug
+        const allInputs = await this.page.$$eval('input', inputs => 
+          inputs.map(input => ({
+            type: input.type,
+            name: input.name,
+            id: input.id,
+            placeholder: input.placeholder,
+            className: input.className
+          }))
+        );
+        this.log(`Inputs encontrados na página: ${JSON.stringify(allInputs)}`, 'error');
         throw new Error('Campos de login não encontrados');
       }
+      
+      this.log('Campos de login localizados com sucesso');
 
       // Preencher credenciais
       await usernameField.fill(credentials.username);
@@ -529,13 +597,16 @@ export class LoginAgent extends BaseAgent {
     return minioUrl || localPath;
   }
 
-  private determineAuthType(authMethods: AuthDetectionResult): 'basic' | 'oauth' | 'custom' {
+  private determineAuthType(authMethods: AuthDetectionResult): 'basic' | 'oauth' | 'custom' | 'fallback' {
     if (authMethods.standardAuth.available) {
       return 'basic';
     } else if (authMethods.oauthProviders.length > 0) {
-      return 'oauth';
+      // Ignorar métodos de login alternativos (Google, Facebook, etc.)
+      this.log('Métodos OAuth detectados mas serão ignorados conforme configuração');
     }
-    return 'custom';
+    // Para SPAs que carregam campos dinamicamente, sempre tentar basic primeiro
+    // O performBasicAuth agora aguarda os campos aparecerem
+    return 'basic';
   }
 
   private async validateSession(): Promise<boolean> {
