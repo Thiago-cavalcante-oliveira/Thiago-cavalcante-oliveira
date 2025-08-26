@@ -1,0 +1,31 @@
+{
+  "testSuite": "Crawling Orchestrator Test",
+  "timestamp": "2025-08-25T15:30:45.459Z",
+  "outputDirectory": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/tests/output/crawling-orchestrator-test-2025-08-25T15-30-13-260Z",
+  "results": [
+    {
+      "agent": "OrchestratorAgent (Full Pipeline)",
+      "success": false,
+      "data": {
+        "documentsGenerated": {},
+        "statistics": {
+          "pagesProcessed": 0,
+          "elementsAnalyzed": 0,
+          "totalElements": 0,
+          "screenshotsCaptured": 0,
+          "wordCount": 0
+        }
+      },
+      "errors": [
+        "crawlerAgent.setMenuModalAgent is not a function"
+      ],
+      "timestamp": "2025-08-25T15:30:45.458Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 1,
+    "successful": 0,
+    "failed": 1,
+    "successRate": "0.00%"
+  }
+}

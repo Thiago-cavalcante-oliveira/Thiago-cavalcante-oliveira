@@ -115,15 +115,8 @@ export class SmartLoginAgent extends BaseAgent {
     const { baseUrl, credentials } = task.data;
     
     if (!credentials?.username || !credentials?.password) {
-      this.log('Sem credenciais - pulando SmartLoginAgent');
-      return {
-        id: task.id + '_result',
-        taskId: task.id,
-        success: true,
-        data: { skipped: true, reason: 'No credentials provided', outputDir: this.outputDir },
-        timestamp: new Date(),
-        processingTime: 0
-      };
+      this.log('Sem credenciais - pulando SmartLoginAgent', 'error');
+      throw new Error('Credenciais não fornecidas para o SmartLoginAgent');
     }
 
     if (!this.page) {

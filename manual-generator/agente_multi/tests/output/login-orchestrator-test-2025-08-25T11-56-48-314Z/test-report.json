@@ -1,0 +1,24 @@
+{
+  "testSuite": "Login Orchestrator Test",
+  "timestamp": "2025-08-25T11:57:22.175Z",
+  "outputDirectory": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/tests/output/login-orchestrator-test-2025-08-25T11-56-48-314Z",
+  "results": [
+    {
+      "agent": "OrchestratorAgent (Login Only)",
+      "success": true,
+      "method": "SmartLoginAgent",
+      "duration": 29184,
+      "errors": [
+        "LoginAgent: Falha na autenticação - verifique as credenciais"
+      ],
+      "screenshots": [],
+      "timestamp": "2025-08-25T11:57:22.048Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 1,
+    "successful": 1,
+    "failed": 0,
+    "successRate": "100.00%"
+  }
+}

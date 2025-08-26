@@ -71,8 +71,8 @@ export interface UserFAQItem {
 }
 
 export class ContentAgent extends BaseAgent {
-  private keyManager: GeminiKeyManager;
-  private llmManager: LLMManager;
+  private keyManager: GeminiKeyManager | null;
+  private llmManager: LLMManager | null;
   private minioService: MinIOService;
   private currentContent: UserManualContent | null = null;
   private contentCacheFile: string;
@@ -128,8 +128,14 @@ export class ContentAgent extends BaseAgent {
 
     super(config);
     this.prompt = prompt;
-    this.keyManager = new GeminiKeyManager();
-    this.llmManager = new LLMManager(this.keyManager);
+    try {
+      this.keyManager = new GeminiKeyManager();
+      this.llmManager = new LLMManager(this.keyManager);
+    } catch (error) {
+      this.log('Não foi possível inicializar o GeminiKeyManager/LLMManager. O agente de conteúdo continuará sem as capacidades de IA.', 'warn');
+      this.keyManager = null;
+      this.llmManager = null;
+    }
     this.minioService = new MinIOService();
     this.contentCacheFile = path.join(process.cwd(), 'output', 'content-draft.md');
     this.logDir = path.join(process.cwd(), 'output', 'logs');

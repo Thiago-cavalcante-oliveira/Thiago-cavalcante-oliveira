@@ -33,10 +33,14 @@ class LoginOrchestratorTest {
     this.browser = await chromium.launch({
       headless: false,
       slowMo: 1000,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     
-    this.page = await this.browser.newPage();
+    const context = await this.browser.newContext({
+      ignoreHTTPSErrors: true
+    });
+    
+    this.page = await context.newPage();
     
     // Configurar viewport
     await this.page.setViewportSize({ width: 1280, height: 720 });
@@ -50,7 +54,7 @@ class LoginOrchestratorTest {
     console.log('🔐 Testando login via orquestrador...');
     
     const testConfig = {
-      url: 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+      url: 'https://saeb-h1.pmfi.pr.gov.br/',
       credentials: {
         username: 'admin',
         password: 'admin123'

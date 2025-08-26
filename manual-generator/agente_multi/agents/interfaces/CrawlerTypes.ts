@@ -1,76 +1,66 @@
-export type InteractionType = 'input' | 'submit' | 'select' | 'click' | 'navigate' | 'toggle';
-export type ContentType = 'heading' | 'text' | 'image' | 'description';
-export type InteractivityLevel = 'static' | 'interactive' | 'dynamic';
+import { DetectionConfig } from '../../config/detection-strategies';
 
-export interface BaseElement {
-  type: string;
-  purpose: string;
+export interface FoundElement {
   selector: string;
-}
-
-export interface InteractiveElement extends BaseElement {
-  action: string;
-  required: boolean;
-  interactionType: InteractionType;
-  isStatic: false;
-}
-
-export interface StaticElement extends BaseElement {
-  content: string;
-  contentType: ContentType;
-  isStatic: true;
-}
-
-export interface RelatedElement {
-  type: string;
-  relationship: 'describes' | 'validates' | 'submits' | 'contains';
-  dependent: boolean;
-  selector: string;
-}
-
-export interface ElementGroup {
-  primary: InteractiveElement | StaticElement;
-  related: RelatedElement[];
-  context: {
-    workflow: string;
-    location: string;
-    importance: 'primary' | 'secondary';
-    interactivityLevel: InteractivityLevel;
-  };
+  text: string;
+  type: 'button' | 'link' | 'other';
 }
 
 export interface CrawlResult {
-  url: string;
-  title: string;
-  elements: ElementGroup[];
-  workflows: Array<{
-    name: string;
-    steps: string[];
-    elements: string[];
-  }>;
-  stats: {
-    staticElements: number;
-    interactiveElements: number;
-    totalElements: number;
-  };
-  metadata: {
-    timestamp: Date;
-    loadTime: number;
-    elementCount: number;
-  };
-  pages: Array<{
-    url: string;
-    title: string;
-    elements: ElementGroup[];
-  }>;
-  errors: string[];
+  pageData: any[]; 
+  interactions: any[];
+  stats: { [key: string]: number };
+  totalElements: number;
 }
 
 export interface ElementContext {
+  elements: any[]; 
+  config: DetectionConfig;
+}
+
+export interface ElementGroup {
   type: string;
-  purpose: string;
-  actionType: string;
-  workflow?: string;
-  importance: 'primary' | 'secondary';
-  interactivityLevel: InteractivityLevel;
+  elements: any[];
+}
+
+export interface HomePageMap {
+  mainMenu: any | null;
+  modals: any[];
+  majorActions: any[];
+}
+
+export enum InteractionType {
+  Click = 'click',
+  Hover = 'hover',
+  FormFill = 'form_fill',
+}
+
+export interface InteractiveElement {
+  type: string;
+  text: string;
+  selector: string;
+  href?: string;
+}
+
+export interface NavigationElement {
+  type: string;
+  text: string;
+  selector: string;
+  href: string;
+}
+
+export interface StaticElement {
+  type: string;
+  text: string;
+  selector: string;
+}
+
+export interface UserClickRequest {
+  element: any;
+  action: string;
+}
+
+export interface RelatedElement {
+  element: any;
+  relationship: string;
 }

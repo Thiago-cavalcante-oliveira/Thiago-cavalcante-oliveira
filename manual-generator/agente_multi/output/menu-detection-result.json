@@ -1,0 +1,403 @@
+{
+  "menus": [
+    {
+      "selector": "nav.m_45252eee mantine-AppShell-navbar",
+      "items": [
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "DashboardVisão geral do sistema",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "EscolasGerenciar escolas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "TurmasGerenciar turmas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "AlunosGerenciar alunos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Correção de GabaritoCorrigir gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar GabaritoCadastrar gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "SairLogout do sistema",
+          "href": null
+        }
+      ]
+    },
+    {
+      "selector": "nav.m_45252eee mantine-AppShell-navbar",
+      "items": [
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "DashboardVisão geral do sistema",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "EscolasGerenciar escolas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "TurmasGerenciar turmas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "AlunosGerenciar alunos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Correção de GabaritoCorrigir gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar GabaritoCadastrar gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "SairLogout do sistema",
+          "href": null
+        }
+      ]
+    },
+    {
+      "selector": "nav.m_45252eee mantine-AppShell-navbar",
+      "items": [
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "DashboardVisão geral do sistema",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "EscolasGerenciar escolas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "TurmasGerenciar turmas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "AlunosGerenciar alunos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Correção de GabaritoCorrigir gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar GabaritoCadastrar gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "SairLogout do sistema",
+          "href": null
+        }
+      ]
+    },
+    {
+      "selector": "nav.m_45252eee mantine-AppShell-navbar",
+      "items": [
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "DashboardVisão geral do sistema",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "EscolasGerenciar escolas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "TurmasGerenciar turmas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "AlunosGerenciar alunos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Correção de GabaritoCorrigir gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar GabaritoCadastrar gabaritos",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+          "href": null
+        },
+        {
+          "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+          "label": "SairLogout do sistema",
+          "href": null
+        }
+      ]
+    }
+  ],
+  "modals": [],
+  "interactiveElements": [
+    {
+      "selector": "#mantine-znwfx6i4l-target",
+      "type": "button",
+      "text": "Admin Sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 1100.84375,
+        "y": 9.5,
+        "width": 163.15625,
+        "height": 40
+      }
+    },
+    {
+      "selector": "#mantine-nasow2nof-target",
+      "type": "button",
+      "text": "Admin Sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 1100.84375,
+        "y": 9.5,
+        "width": 163.15625,
+        "height": 40
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "DashboardVisão geral do sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 76,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "EscolasGerenciar escolas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 139.390625,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "TurmasGerenciar turmas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 202.78125,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "AlunosGerenciar alunos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 266.171875,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Correção de GabaritoCorrigir gabaritos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 329.5625,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Cadastrar GabaritoCadastrar gabaritos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 392.953125,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 456.34375,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "SairLogout do sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 644.609375,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "DashboardVisão geral do sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 76,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "EscolasGerenciar escolas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 139.390625,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "TurmasGerenciar turmas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 202.78125,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "AlunosGerenciar alunos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 266.171875,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Correção de GabaritoCorrigir gabaritos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 329.5625,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Cadastrar GabaritoCadastrar gabaritos",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 392.953125,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 456.34375,
+        "width": 267,
+        "height": 59.390625
+      }
+    },
+    {
+      "selector": "a.mantine-focu.-auto m_f0824112 mantine-NavLink-root m_87cf2631 mantine-Un.tyledButton-root",
+      "type": "a",
+      "text": "SairLogout do sistema",
+      "isVisible": true,
+      "boundingBox": {
+        "x": 16,
+        "y": 644.609375,
+        "width": 267,
+        "height": 59.390625
+      }
+    }
+  ]
+}

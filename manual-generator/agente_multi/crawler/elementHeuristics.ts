@@ -39,14 +39,14 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
     
     await page.waitForLoadState("networkidle", { timeout: 10000 });
     
-    const result = await page.evaluate((allowDanger) => {
-      function visible(el: Element): boolean {
-        const s = getComputedStyle(el as HTMLElement);
-        const r = (el as HTMLElement).getBoundingClientRect();
+    const result = await page.evaluate((allowDangerParam: boolean) => {
+      function visible(el: any): boolean {
+        const s = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
         return s && s.visibility !== "hidden" && s.display !== "none" && r.width > 2 && r.height > 2;
       }
       
-      function labelFor(input: HTMLElement): string {
+      function labelFor(input: any): string {
         const id = input.getAttribute("id");
         if (id) {
           const l = document.querySelector(`label[for="${id}"]`);
@@ -58,11 +58,11 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         return aria || "";
       }
       
-      function dangerText(t: string): boolean {
+      function dangerText(t: any): boolean {
         return /(excluir|deletar|remover|apagar|publicar|enviar definitivo|submit definitivo|delete|remove)/i.test(t);
       }
       
-      function getValidations(input: HTMLInputElement): string[] {
+      function getValidations(input: any): string[] {
         const validations: string[] = [];
         
         if (input.required) validations.push('required');
@@ -75,7 +75,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         return validations;
       }
       
-      function getHints(input: HTMLElement): string[] {
+      function getHints(input: any): string[] {
         const hints: string[] = [];
         
         const placeholder = input.getAttribute('placeholder');
@@ -100,7 +100,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         return hints.filter(h => h.length > 0);
       }
 
-      const actions: ElementAction[] = [];
+      const actions: any[] = [];
       const inputs: any[] = [];
       const tables: any[] = [];
       const actionsSet = new Set<string>();
@@ -133,7 +133,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
 
       // Extract visible inputs
       document.querySelectorAll('input, textarea, select').forEach(el => {
-        const input = el as HTMLInputElement;
+        const input = el as any;
         if (!visible(input)) return;
         
         const name = input.name || input.id || input.getAttribute('data-name') || '';
@@ -174,15 +174,15 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
       document.querySelectorAll('button, a[href], [role="button"], input[type="submit"], input[type="button"]').forEach(el => {
         if (!visible(el)) return;
         
-        const element = el as HTMLElement;
+        const element = el as any;
         const text = element.textContent?.trim() || element.getAttribute('title') || element.getAttribute('aria-label') || '';
         const href = element.getAttribute('href') || undefined;
-          const type = element.getAttribute('type') || undefined;
-          const role = element.getAttribute('role') || undefined;
+        const type = element.getAttribute('type') || undefined;
+        const role = element.getAttribute('role') || undefined;
         
         if (text) {
           const isDanger = dangerText(text);
-          if (isDanger && !allowDanger) return;
+          if (isDanger && !allowDangerParam) return;
           
           const selector = element.id ? `#${element.id}` : 
                           element.className ? `.${element.className.split(' ')[0]}` :
@@ -205,38 +205,33 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         analysis: {
           title,
           url,
-          breadcrumb,
-          inputs,
-          tables,
-          actions: Array.from(actionsSet)
+          breadcrumb: breadcrumb as string[],
+          inputs: inputs as any[],
+          tables: tables as any[],
+          actions: Array.from(actionsSet) as string[]
         },
-        actions
+        actions: actions as any[]
       };
     }, allowDanger);
 
     log.info(`Análise concluída: ${result.analysis.inputs.length} inputs, ${result.analysis.tables.length} tabelas, ${result.actions.length} ações`);
-    return result;
+    return result as { analysis: PageAnalysis; actions: ElementAction[] };
   }, 3, 1000);
 }
 
 export async function extractPagePurpose(page: Page): Promise<string> {
   return retry(async () => {
     const purpose = await page.evaluate(() => {
-      // Try to extract purpose from meta description
+      // Extract from meta description
       const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute('content');
       if (metaDesc) return metaDesc;
       
-      // Try to extract from main heading
+      // Extract from main heading
       const h1 = document.querySelector('h1')?.textContent?.trim();
       if (h1) return h1;
       
-      // Try to extract from page title
-      const title = document.title;
-      if (title) return title;
-      
-      // Fallback to first paragraph
-      const firstP = document.querySelector('main p, .content p, article p, p')?.textContent?.trim();
-      return firstP || 'Página sem descrição identificada';
+      // Extract from title
+      return document.title || 'Página sem descrição identificada';
     });
     
     return purpose;
@@ -248,27 +243,17 @@ export async function extractMainActions(page: Page): Promise<string[]> {
     const actions = await page.evaluate(() => {
       const actionTexts = new Set<string>();
       
-      // Primary buttons and CTAs
-      document.querySelectorAll('button.primary, .btn-primary, .cta, [role="button"].primary').forEach(el => {
-        const text = el.textContent?.trim();
-        if (text) actionTexts.add(text);
+      // Primary buttons and links
+      document.querySelectorAll('button, a[href], [role="button"], input[type="submit"]').forEach(el => {
+        const text = el.textContent?.trim() || el.getAttribute('title') || el.getAttribute('aria-label');
+        if (text && text.length > 0 && text.length < 100) {
+          actionTexts.add(text);
+        }
       });
       
-      // Form submit buttons
-      document.querySelectorAll('input[type="submit"], button[type="submit"]').forEach(el => {
-        const text = el.textContent?.trim() || (el as HTMLInputElement).value;
-        if (text) actionTexts.add(text);
-      });
-      
-      // Navigation links in main areas
-      document.querySelectorAll('main a, .content a, nav.primary a').forEach(el => {
-        const text = el.textContent?.trim();
-        if (text && text.length < 50) actionTexts.add(text);
-      });
-      
-      return Array.from(actionTexts).slice(0, 10); // Limit to top 10 actions
+      return Array.from(actionTexts).slice(0, 20); // Limit to 20 main actions
     });
     
-    return actions;
+    return actions as string[];
   }, 2, 500);
 }

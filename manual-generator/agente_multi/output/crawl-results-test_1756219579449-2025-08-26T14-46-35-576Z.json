@@ -1,0 +1,39 @@
+{
+  "taskId": "test_1756219579449",
+  "timestamp": "2025-08-26T14:46:35.576Z",
+  "summary": {
+    "modals": 0,
+    "detectedElements": 0,
+    "successfulInteractions": 0,
+    "totalPages": 1,
+    "totalRoutes": 0
+  },
+  "pages": [
+    {
+      "url": "http://localhost:3000",
+      "title": "",
+      "content": ""
+    }
+  ],
+  "interactions": [],
+  "detailedCrawlResults": [
+    {
+      "url": "http://localhost:3000",
+      "title": "",
+      "purpose": "",
+      "analysis": {
+        "title": "",
+        "url": "http://localhost:3000",
+        "breadcrumb": [],
+        "inputs": [],
+        "tables": [],
+        "actions": []
+      },
+      "actions": [],
+      "mainActions": [],
+      "routes": [],
+      "timestamp": "2025-08-26T14:46:35.561Z",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"networkidle\"\u001b[22m\n"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "taskId": "task_1756219720848_w0tgjrba9",
+  "timestamp": "2025-08-26T14:49:21.738Z",
+  "summary": {
+    "modals": 0,
+    "detectedElements": 0,
+    "successfulInteractions": 0,
+    "totalPages": 1,
+    "totalRoutes": 0
+  },
+  "pages": [
+    {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/",
+      "title": "",
+      "content": ""
+    }
+  ],
+  "interactions": [],
+  "detailedCrawlResults": [
+    {
+      "url": "https://saeb-h1.pmfi.pr.gov.br/",
+      "title": "",
+      "purpose": "",
+      "analysis": {
+        "title": "",
+        "url": "https://saeb-h1.pmfi.pr.gov.br/",
+        "breadcrumb": [],
+        "inputs": [],
+        "tables": [],
+        "actions": []
+      },
+      "actions": [],
+      "mainActions": [],
+      "routes": [],
+      "timestamp": "2025-08-26T14:49:20.909Z",
+      "error": "page.evaluate: ReferenceError: __name is not defined\n    at eval (eval at evaluate (:291:30), <anonymous>:1:178)\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  ]
+}

@@ -204,6 +204,7 @@ export class LoginAgent extends BaseAgent {
 
   private async handleLogout(task: TaskData): Promise<TaskResult> {
     const { page } = task.data;
+    this.log(`[MONITOR] Recebendo page em handleLogout: ${!!page}`);
     this.page = page;
 
     try {
@@ -371,21 +372,41 @@ export class LoginAgent extends BaseAgent {
     try {
       this.log('Executando autenticação básica');
 
-      // Aguardar que os campos apareçam (importante para SPAs)
-      this.log('Aguardando campos de login aparecerem...');
-      
-      // Aguardar campo de senha aparecer (mais específico)
-      await this.page.waitForSelector('input[type="password"]', { timeout: 15000 });
-      
-      // Aguardar um pouco mais para garantir que todos os campos carregaram
-      await this.page.waitForTimeout(2000);
-
-      // Localizar campos de login com seletores mais abrangentes
-      const usernameField = await this.page.$(
-        'input[type="email"], input[type="text"], input[name*="user"], input[name*="login"], input[placeholder*="email"], input[placeholder*="usuário"], input[placeholder*="user"], input[id*="user"], input[id*="login"], input[id*="email"]'
+      const usernameField = await this.page.waitForSelector(
+        [
+          'input[name="login"]',
+          'input[name="usuario"]',
+          'input[name="user"]',
+          'input[name="username"]',
+          'input[name="email"]',
+          'input[id="login"]',
+          'input[id="usuario"]',
+          'input[id="user"]',
+          'input[id="username"]',
+          'input[id="email"]',
+          'input[placeholder*="suário"]',
+          'input[placeholder*="sername"]',
+          'input[placeholder*="mail"]',
+          'input[aria-label*="suário"]',
+          'input[aria-label*="sername"]',
+        ].join(', '),
+        { timeout: 7000 }
       );
       
-      const passwordField = await this.page.$('input[type="password"]');
+      const passwordField = await this.page.waitForSelector(
+        [
+          'input[type="password"]',
+          'input[name="senha"]',
+          'input[name="password"]',
+          'input[id="senha"]',
+          'input[id="password"]',
+          'input[placeholder*="enha"]',
+          'input[placeholder*="assword"]',
+          'input[aria-label*="enha"]',
+          'input[aria-label*="assword"]',
+        ].join(', '),
+        { timeout: 7000 }
+      );
 
       if (!usernameField || !passwordField) {
         // Log adicional para debug

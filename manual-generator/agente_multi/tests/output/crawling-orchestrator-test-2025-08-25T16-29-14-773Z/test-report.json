@@ -1,0 +1,33 @@
+{
+  "testSuite": "Crawling Orchestrator Test",
+  "timestamp": "2025-08-25T16:31:12.446Z",
+  "outputDirectory": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/tests/output/crawling-orchestrator-test-2025-08-25T16-29-14-773Z",
+  "results": [
+    {
+      "agent": "OrchestratorAgent (Full Pipeline)",
+      "success": true,
+      "data": {
+        "documentsGenerated": {
+          "markdown": "https://minio-s3.pmfi.pr.gov.br/documentacao/manual_usuario_1756139470800.md",
+          "html": "https://minio-s3.pmfi.pr.gov.br/documentacao/manual_usuario_1756139470802.html",
+          "pdf": "https://minio-s3.pmfi.pr.gov.br/documentacao/manual_usuario_1756139472392.pdf"
+        },
+        "statistics": {
+          "pagesProcessed": 1,
+          "elementsAnalyzed": 0,
+          "totalElements": 0,
+          "screenshotsCaptured": 0,
+          "wordCount": 647
+        }
+      },
+      "errors": [],
+      "timestamp": "2025-08-25T16:31:12.445Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 1,
+    "successful": 1,
+    "failed": 0,
+    "successRate": "100.00%"
+  }
+}

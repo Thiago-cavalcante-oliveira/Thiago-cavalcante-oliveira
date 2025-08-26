@@ -1205,5 +1205,633 @@
     },
     "endTime": "2025-08-20T19:42:48.971Z",
     "summary": "1755718967538-rf3ecldf7"
+  },
+  {
+    "id": "1755787793464-tayg17cqp",
+    "startTime": "2025-08-21T14:49:53.464Z",
+    "events": [
+      {
+        "id": "1755787793464-8l79lb1pl",
+        "timestamp": "2025-08-21T14:49:53.464Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755787793464-tayg17cqp"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755787793465-1i3n28qvt",
+        "timestamp": "2025-08-21T14:49:53.465Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755787793464-tayg17cqp",
+          "duration": 1
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "test": "menu-modal-agent"
+    },
+    "endTime": "2025-08-21T14:49:53.465Z",
+    "summary": "Teste do MenuModalAgent falhou"
+  },
+  {
+    "id": "1755787838204-xvb703de8",
+    "startTime": "2025-08-21T14:50:38.204Z",
+    "events": [
+      {
+        "id": "1755787838204-vh7iiqp3l",
+        "timestamp": "2025-08-21T14:50:38.204Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755787838204-xvb703de8"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755787840517-yxjkjzz0k",
+        "timestamp": "2025-08-21T14:50:40.517Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 1
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755787840519-hi66t889x",
+        "timestamp": "2025-08-21T14:50:40.519Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755787838204-xvb703de8",
+          "duration": 2314
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "test": "menu-modal-agent"
+    },
+    "endTime": "2025-08-21T14:50:40.518Z",
+    "summary": "Teste do MenuModalAgent concluído com sucesso"
+  },
+  {
+    "id": "1755788047734-9b5pyxyb2",
+    "startTime": "2025-08-21T14:54:07.734Z",
+    "events": [
+      {
+        "id": "1755788047735-nmvvl6n10",
+        "timestamp": "2025-08-21T14:54:07.735Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755788047734-9b5pyxyb2"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755788053120-td48ny247",
+        "timestamp": "2025-08-21T14:54:13.120Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 1
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755788085584-9gbzx6has",
+        "timestamp": "2025-08-21T14:54:45.584Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755788047734-9b5pyxyb2",
+          "duration": 37850
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "test": "crawler-with-menu-detection"
+    },
+    "endTime": "2025-08-21T14:54:45.584Z",
+    "summary": "Teste do CrawlerAgent com MenuModalAgent concluído"
+  },
+  {
+    "id": "1755788402609-9vp7jxho7",
+    "startTime": "2025-08-21T15:00:02.609Z",
+    "events": [
+      {
+        "id": "1755788402609-fg2zgp3fk",
+        "timestamp": "2025-08-21T15:00:02.609Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755788402609-9vp7jxho7"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755788651351-b6n6l3mhj",
+        "timestamp": "2025-08-21T15:04:11.351Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755788402609-9vp7jxho7",
+          "duration": 248742
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {},
+    "endTime": "2025-08-21T15:04:11.351Z",
+    "summary": "1755788402609-9vp7jxho7"
+  },
+  {
+    "id": "1755795090262-uhaxgfiek",
+    "startTime": "2025-08-21T16:51:30.262Z",
+    "events": [
+      {
+        "id": "1755795090262-ie47gsf21",
+        "timestamp": "2025-08-21T16:51:30.262Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755795090262-uhaxgfiek"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755795097020-km2uh3b67",
+        "timestamp": "2025-08-21T16:51:37.020Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 3
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755795097502-mod4uban1",
+        "timestamp": "2025-08-21T16:51:37.502Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755795090262-uhaxgfiek",
+          "duration": 7240
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "testType": "menu-modal-isolated",
+      "sessionId": "8c133d39-adfb-4ef5-b731-43dd3207d19c",
+      "outputDir": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/tests/output/menu-modal-isolated-2025-08-21T16-51-30-257Z"
+    },
+    "endTime": "2025-08-21T16:51:37.502Z",
+    "summary": "Teste isolado do MenuModalAgent concluído"
+  },
+  {
+    "id": "1755796234816-vb38ek9eb",
+    "startTime": "2025-08-21T17:10:34.816Z",
+    "events": [
+      {
+        "id": "1755796234816-bzz31b67n",
+        "timestamp": "2025-08-21T17:10:34.816Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755796234816-vb38ek9eb"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755796242615-a573rsy9t",
+        "timestamp": "2025-08-21T17:10:42.616Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 3
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755796243359-tcgdlzviw",
+        "timestamp": "2025-08-21T17:10:43.359Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755796234816-vb38ek9eb",
+          "duration": 8543
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "testType": "menu-modal-isolated",
+      "sessionId": "690cb4e0-3b37-4fd1-bc78-1733f1750c71",
+      "outputDir": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/tests/output/menu-modal-isolated-2025-08-21T17-10-34-812Z"
+    },
+    "endTime": "2025-08-21T17:10:43.359Z",
+    "summary": "Teste isolado do MenuModalAgent concluído"
+  },
+  {
+    "id": "1755796395246-a0948zuyq",
+    "startTime": "2025-08-21T17:13:15.246Z",
+    "events": [
+      {
+        "id": "1755796395246-y9uojpx3f",
+        "timestamp": "2025-08-21T17:13:15.246Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755796395246-a0948zuyq"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755796418959-wphvg9qds",
+        "timestamp": "2025-08-21T17:13:38.959Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 3
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755796426651-gg2yy8s9v",
+        "timestamp": "2025-08-21T17:13:46.651Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755796395246-a0948zuyq",
+          "duration": 31405
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "testType": "menu-modal-isolated",
+      "sessionId": "d3a249ff-2f95-47f5-91b6-de0bd639152e",
+      "outputDir": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/tests/output/menu-modal-isolated-2025-08-21T17-13-15-243Z"
+    },
+    "endTime": "2025-08-21T17:13:46.651Z",
+    "summary": "Teste isolado do MenuModalAgent concluído"
+  },
+  {
+    "id": "1755796650966-dex0hspcc",
+    "startTime": "2025-08-21T17:17:30.966Z",
+    "events": [
+      {
+        "id": "1755796650966-qczmadjdp",
+        "timestamp": "2025-08-21T17:17:30.966Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755796650966-dex0hspcc"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755796673219-p5li7e3ze",
+        "timestamp": "2025-08-21T17:17:53.220Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 3
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755796711082-c0ijhptsq",
+        "timestamp": "2025-08-21T17:18:31.082Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755796650966-dex0hspcc",
+          "duration": 60116
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "testType": "menu-modal-isolated",
+      "sessionId": "687e79ad-2083-43ff-a2ad-e04f65978cee",
+      "outputDir": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/tests/output/menu-modal-isolated-2025-08-21T17-17-30-962Z"
+    },
+    "endTime": "2025-08-21T17:18:31.082Z",
+    "summary": "Teste isolado do MenuModalAgent concluído"
+  },
+  {
+    "id": "1755796818334-983om8o9m",
+    "startTime": "2025-08-21T17:20:18.334Z",
+    "events": [
+      {
+        "id": "1755796818334-fhprcz2qe",
+        "timestamp": "2025-08-21T17:20:18.334Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1755796818334-983om8o9m"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1755796841663-114li3bws",
+        "timestamp": "2025-08-21T17:20:41.663Z",
+        "type": "milestone",
+        "description": "menus.modals.detected",
+        "metadata": {
+          "menus": 0,
+          "modals": 0,
+          "interactiveElements": 3
+        },
+        "status": "success",
+        "tags": [
+          "menu-detection"
+        ]
+      },
+      {
+        "id": "1755796856817-idheoyu8n",
+        "timestamp": "2025-08-21T17:20:56.817Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1755796818334-983om8o9m",
+          "duration": 38483
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {
+      "testType": "menu-modal-isolated",
+      "sessionId": "628a2ba1-4838-432b-b8ed-29ab44ebeaf4",
+      "outputDir": "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/agente_multi/dist/tests/output/menu-modal-isolated-2025-08-21T17-20-18-331Z"
+    },
+    "endTime": "2025-08-21T17:20:56.817Z",
+    "summary": "Teste isolado do MenuModalAgent concluído"
+  },
+  {
+    "id": "1756219405625-jsfrh8cvj",
+    "startTime": "2025-08-26T14:43:25.625Z",
+    "events": [
+      {
+        "id": "1756219405625-htdb1jc0q",
+        "timestamp": "2025-08-26T14:43:25.625Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1756219405625-jsfrh8cvj"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1756219405728-9y2gxujyh",
+        "timestamp": "2025-08-26T14:43:25.728Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1756219405625-jsfrh8cvj",
+          "duration": 103
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {},
+    "endTime": "2025-08-26T14:43:25.728Z",
+    "summary": "Teste do CrawlerAgent completo finalizado"
+  },
+  {
+    "id": "1756219507964-lrb9v5tab",
+    "startTime": "2025-08-26T14:45:07.964Z",
+    "events": [
+      {
+        "id": "1756219507964-tlc4j2jiv",
+        "timestamp": "2025-08-26T14:45:07.964Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1756219507964-lrb9v5tab"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1756219509554-8mwojz0f6",
+        "timestamp": "2025-08-26T14:45:09.554Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1756219507964-lrb9v5tab",
+          "duration": 1590
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {},
+    "endTime": "2025-08-26T14:45:09.554Z",
+    "summary": "Teste do CrawlerAgent completo finalizado"
+  },
+  {
+    "id": "1756219578447-o9l7k4f8l",
+    "startTime": "2025-08-26T14:46:18.447Z",
+    "events": [
+      {
+        "id": "1756219578447-hf0apn2iq",
+        "timestamp": "2025-08-26T14:46:18.447Z",
+        "type": "milestone",
+        "description": "Sessão iniciada",
+        "metadata": {
+          "sessionId": "1756219578447-o9l7k4f8l"
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "start"
+        ]
+      },
+      {
+        "id": "1756219579450-y1s76w9be",
+        "timestamp": "2025-08-26T14:46:19.450Z",
+        "type": "milestone",
+        "description": "Crawling iniciado",
+        "metadata": {
+          "url": "http://localhost:3000",
+          "options": {
+            "maxPages": 10,
+            "maxDepth": 3,
+            "allowDanger": false,
+            "includeInteractive": true,
+            "timeout": 30000,
+            "excludePatterns": [
+              "/logout",
+              "/delete",
+              "/remove"
+            ],
+            "includePatterns": []
+          },
+          "timestamp": "2025-08-26T14:46:19.450Z"
+        },
+        "status": "info",
+        "tags": []
+      },
+      {
+        "id": "1756219595576-b0v8yng8v",
+        "timestamp": "2025-08-26T14:46:35.576Z",
+        "type": "milestone",
+        "description": "Crawling concluído com sucesso",
+        "metadata": {
+          "url": "http://localhost:3000",
+          "pagesAnalyzed": 1,
+          "totalElements": 0,
+          "totalRoutes": 0,
+          "processingTime": 16126,
+          "timestamp": "2025-08-26T14:46:35.576Z"
+        },
+        "status": "success",
+        "tags": []
+      },
+      {
+        "id": "1756219595607-b427ztmlt",
+        "timestamp": "2025-08-26T14:46:35.607Z",
+        "type": "milestone",
+        "description": "Sessão finalizada",
+        "metadata": {
+          "sessionId": "1756219578447-o9l7k4f8l",
+          "duration": 17160
+        },
+        "status": "info",
+        "tags": [
+          "session",
+          "end"
+        ]
+      }
+    ],
+    "metadata": {},
+    "endTime": "2025-08-26T14:46:35.607Z",
+    "summary": "Teste do CrawlerAgent completo finalizado"
   }
 ]
