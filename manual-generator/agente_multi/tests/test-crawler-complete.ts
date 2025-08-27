@@ -4,6 +4,10 @@ import { logger } from '../utils/logger';
 import { chromium, Browser, Page } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente
+dotenv.config();
 
 async function testCrawlerComplete() {
   console.log('🚀 Iniciando teste do CrawlerAgent completo...');
@@ -32,6 +36,11 @@ async function testCrawlerComplete() {
     page = await context.newPage();
     await page.setViewportSize({ width: 1280, height: 720 });
     
+    // Adiciona init script para corrigir erro __name is not defined
+    await page.addInitScript({ content: `
+      (function(){ window.__name = window.__name || ((o,n)=>{ try{Object.defineProperty(o,'name',{value:n,configurable:true});}catch{}; return o; }); })();
+    `});
+    
     crawler = new CrawlerAgent();
     crawler.setTimeline(timeline);
     crawler.setBrowser(browser);
@@ -47,7 +56,11 @@ async function testCrawlerComplete() {
       id: `test_${Date.now()}`,
       type: 'crawl_site',
       data: {
-        url: 'http://localhost:3000',
+        url: process.env.SAEB_URL || 'http://localhost:3000',
+        credentials: {
+          username: process.env.SAEB_USERNAME || 'admin',
+          password: process.env.SAEB_PASSWORD || 'admin123'
+        },
         options: {
           includeMenuDetection: true,
           includeInteractiveElements: true,

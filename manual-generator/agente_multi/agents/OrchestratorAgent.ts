@@ -14,6 +14,10 @@ import { GeneratorAgent } from './GeneratorAgent';
 import { MenuModalAgent } from './MenuModalAgent';
 import { Timeline } from '../services/Timeline';
 import { Browser, Page, chromium } from 'playwright';
+import * as dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente
+dotenv.config();
 
 export interface OrchestrationConfig {
   maxRetries: number;
@@ -86,10 +90,129 @@ export class OrchestratorAgent extends BaseAgent {
     }, new Timeline()));
   }
 
+  /**
+   * Cria uma configuração padrão usando variáveis de ambiente
+   */
+  static createDefaultConfig(overrides: Partial<OrchestrationConfig> = {}): OrchestrationConfig {
+    return {
+      maxRetries: 2,
+      timeoutMinutes: 15,
+      enableScreenshots: true,
+      outputFormats: ['markdown'],
+      targetUrl: process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+      crawlingStrategy: 'advanced',
+      credentials: {
+        username: process.env.SAEB_USERNAME || 'admin',
+        password: process.env.SAEB_PASSWORD || 'admin123',
+        loginUrl: process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
+      },
+      ...overrides
+    };
+  }
+
+  /**
+   * Executa o pipeline completo usando configurações do ambiente
+   */
+  async executeWithEnvConfig(overrides: Partial<OrchestrationConfig> = {}): Promise<OrchestrationResult> {
+    const config = OrchestratorAgent.createDefaultConfig(overrides);
+    return this.executeFullPipeline(config);
+  }
+
   protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
     const timestamp = new Date().toISOString();
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
     console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
+  }
+
+  /**
+   * Implementação obrigatória do método abstrato processTask
+   */
+  async processTask(task: TaskData): Promise<TaskResult> {
+    const startTime = Date.now();
+    
+    try {
+      let result: any;
+      
+      switch (task.type) {
+        case 'execute_pipeline':
+          result = await this.executeFullPipeline(task.data);
+          break;
+        case 'execute_with_env':
+          result = await this.executeWithEnvConfig(task.data);
+          break;
+        case 'login_only':
+          result = await this.executeLoginOnly(task.data);
+          break;
+        default:
+          throw new Error(`Tipo de tarefa não suportado: ${task.type}`);
+      }
+      
+      return {
+        id: `result_${Date.now()}`,
+        taskId: task.id,
+        success: true,
+        data: result,
+        timestamp: new Date(),
+        processingTime: Date.now() - startTime
+      };
+      
+    } catch (error) {
+      return {
+        id: `result_${Date.now()}`,
+        taskId: task.id,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date(),
+        processingTime: Date.now() - startTime
+      };
+    }
+  }
+
+  /**
+   * Implementação obrigatória do método abstrato generateMarkdownReport
+   */
+  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
+    const { success, data, error, processingTime } = taskResult;
+    
+    let report = `# Relatório de Execução - OrchestratorAgent\n\n`;
+    report += `**Status:** ${success ? '✅ Sucesso' : '❌ Falha'}\n`;
+    report += `**Tempo de Processamento:** ${processingTime}ms\n`;
+    report += `**Timestamp:** ${taskResult.timestamp.toISOString()}\n\n`;
+    
+    if (success && data) {
+      report += `## Resultados\n\n`;
+      
+      if (data.agentsExecuted) {
+        report += `**Agentes Executados:** ${data.agentsExecuted.join(', ')}\n`;
+      }
+      
+      if (data.statistics) {
+        report += `\n### Estatísticas\n`;
+        report += `- Páginas processadas: ${data.statistics.pagesProcessed || 0}\n`;
+        report += `- Elementos analisados: ${data.statistics.elementsAnalyzed || 0}\n`;
+        report += `- Screenshots capturados: ${data.statistics.screenshotsCaptured || 0}\n`;
+      }
+      
+      if (data.documentsGenerated) {
+        report += `\n### Documentos Gerados\n`;
+        Object.entries(data.documentsGenerated).forEach(([format, path]) => {
+          if (path) report += `- ${format.toUpperCase()}: \`${path}\`\n`;
+        });
+      }
+    }
+    
+    if (error) {
+      report += `## Erro\n\n\`\`\`\n${error}\n\`\`\`\n`;
+    }
+    
+    if (data?.errors && data.errors.length > 0) {
+      report += `\n## Erros Adicionais\n\n`;
+      data.errors.forEach((err: string, index: number) => {
+        report += `${index + 1}. ${err}\n`;
+      });
+    }
+    
+    return report;
   }
 
   async initialize(): Promise<void> {
@@ -115,6 +238,40 @@ export class OrchestratorAgent extends BaseAgent {
     if (this.browser) { await this.browser.close(); this.browser = null; }
     this.page = null;
     this.log('OrchestratorAgent finalizado');
+  }
+
+  getPage(): Page | null {
+    return this.page;
+  }
+
+  getBrowser(): Browser | null {
+    return this.browser;
+  }
+
+  getAgent(agentName: string): any {
+    return this.agents.get(agentName);
+  }
+
+  async executeLoginOnly(config: { url: string; credentials: { username: string; password: string }; outputDir?: string }): Promise<{ success: boolean; method?: string; duration?: number; errors?: string[]; screenshots?: string[] }> {
+    const orchestrationConfig: OrchestrationConfig = {
+      maxRetries: 2,
+      timeoutMinutes: 5,
+      enableScreenshots: true,
+      outputFormats: ['markdown'],
+      targetUrl: config.url,
+      outputDir: config.outputDir,
+      stopAfterPhase: 'login',
+      credentials: config.credentials
+    };
+
+    const result = await this.executeFullPipeline(orchestrationConfig);
+    return {
+      success: result.success,
+      method: result.agentsExecuted.join(', '),
+      duration: result.totalDuration,
+      errors: result.errors,
+      screenshots: []
+    };
   }
 
   private async executeAgentTask(agentName: string, taskType: string, data: any): Promise<TaskResult> {

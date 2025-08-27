@@ -10,8 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
- * Teste específico para o agente de crawling via orquestrador.
- * Executa o pipeline até a fase de crawling e salva um relatório simples.
+ * Teste completo para o agente de crawling via orquestrador.
+ * Executa o pipeline completo incluindo login, crawling e geração de documentos.
  */
 class CrawlingOrchestratorTest {
   private outputDir: string;
@@ -31,12 +31,12 @@ class CrawlingOrchestratorTest {
   async testCrawlingWithOrchestrator(): Promise<void> {
     console.log('🔐 Testando crawling via OrchestratorAgent...');
 
-    // Configuração de teste com credenciais explícitas
+    // Configuração de teste com credenciais das variáveis de ambiente
     const testConfig = {
-      url: process.env.TEST_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+      url: process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
       credentials: {
-        username: process.env.TEST_USER || 'admin',
-        password: process.env.TEST_PASS || 'admin123',
+        username: process.env.SAEB_USERNAME || 'admin',
+        password: process.env.SAEB_PASSWORD || 'admin123',
       },
       outputDir: this.outputDir,
     };
@@ -58,16 +58,19 @@ class CrawlingOrchestratorTest {
         enableScreenshots: true,
         outputFormats: ['markdown', 'pdf'] as ('markdown' | 'html' | 'pdf')[],
         crawlingStrategy: 'advanced' as 'basic' | 'advanced',
-        stopAfterPhase: 'crawling' as 'crawling',
-        maxRetries: 2,
-        timeoutMinutes: 15,
+        maxRetries: 3,
+        timeoutMinutes: 30,
+        crawlingDepth: 3,
+        maxPagesPerDomain: 50,
+        enableDetailedAnalysis: true,
+        generateTimeline: true
       };
 
-      console.log('🚀 Executando pipeline (até crawling)...');
+      console.log('🚀 Executando pipeline completo (login + crawling + geração de documentos)...');
       const result = await orchestrator.executeFullPipeline(fullPipelineConfig);
 
       this.testResults.push({
-        agent: 'OrchestratorAgent (Full Pipeline até crawling)',
+        agent: 'OrchestratorAgent (Full Pipeline Completo)',
         success: result.success,
         data: {
           documentsGenerated: result.documentsGenerated,
@@ -88,7 +91,7 @@ class CrawlingOrchestratorTest {
       console.error('❌ Erro durante teste de crawling:', error);
 
       this.testResults.push({
-        agent: 'OrchestratorAgent (Full Pipeline até crawling)',
+        agent: 'OrchestratorAgent (Full Pipeline Completo)',
         success: false,
         error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
@@ -105,7 +108,7 @@ class CrawlingOrchestratorTest {
       failed: this.testResults.filter(r => !r.success).length,
     };
     const report = {
-      testSuite: 'Crawling Orchestrator Test',
+      testSuite: 'Complete Crawling Orchestrator Test',
       timestamp: new Date().toISOString(),
       outputDirectory: this.outputDir,
       results: this.testResults,
@@ -124,7 +127,7 @@ class CrawlingOrchestratorTest {
     );
 
     const readableReport = `
-# Relatório de Teste - Agente de Crawling via Orquestrador
+# Relatório de Teste Completo - Agente de Crawling via Orquestrador
 
 ## Resumo
 - **Total de Testes**: ${report.summary.totalTests}

@@ -1,1 +1,0 @@
-Analise a página https://exemplo.com e extraia botões e links. Foque em acessibilidade.

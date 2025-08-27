@@ -7,6 +7,11 @@
   "scripts": {
     "start": "tsx main.ts",
     "test": "tsx tests/menu-modal-agent.test.ts",
+    "test:crawler": "tsx tests/test-crawler-complete.ts",
+    "test:full": "tsx tests/test-full-crawling-with-login.ts",
+    "test:orchestrator": "tsx tests/test-crawling-orchestrator.ts",
+    "orchestrator": "tsx run-orchestrator.ts",
+    "orchestrator:login": "tsx run-orchestrator.ts --login-only",
     "build": "tsc",
     "dev": "tsx --watch main.ts"
   },

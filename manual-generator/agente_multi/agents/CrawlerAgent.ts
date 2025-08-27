@@ -7,6 +7,7 @@ import { Page, Browser } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BaseAgent, TaskData, TaskResult } from '../core/AgnoSCore';
+import { discoverRoutes, interactiveDiscovery, RouteInfo } from '../crawler/routeDiscovery';
 
 export class CrawlerAgent extends BaseAgent {
   private page!: Page;
@@ -31,8 +32,40 @@ export class CrawlerAgent extends BaseAgent {
   setTimeline(tl: any) { this.timeline = tl; }
   setMenuModalAgent(m: any) { this.menuModalAgent = m; }
 
-  async initialize() { /* noop */ }
+  async initialize() {
+    // Adiciona init script para corrigir erro __name is not defined
+    if (this.page) {
+      await this.page.addInitScript(() => {
+        window.__name = window.__name || function(obj, name) {
+          try {
+            Object.defineProperty(obj, 'name', { value: name, configurable: true });
+          } catch (e) {
+            // Ignore errors
+          }
+          return obj;
+        };
+      });
+    }
+  }
   async cleanup() { /* noop */ }
+
+  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
+    const { success, data, error, processingTime } = taskResult;
+    const stats = data?.stats || {};
+    
+    return `# Relatório de Crawling
+
+` +
+           `**Status:** ${success ? '✅ Sucesso' : '❌ Falha'}\n` +
+           `**Tempo de Processamento:** ${processingTime}ms\n` +
+           `**Páginas Processadas:** ${stats.pages || 0}\n` +
+           `**Total de Elementos:** ${stats.totalElements || 0}\n` +
+           (error ? `**Erro:** ${error}\n` : '') +
+           `\n**Detalhes:**\n` +
+           `- URLs descobertas e analisadas\n` +
+           `- Elementos interativos identificados\n` +
+           `- Screenshots capturados\n`;
+  }
 
   protected override log(message: string, level: 'info'|'warn'|'error' = 'info') {
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '🕷️';
@@ -41,9 +74,18 @@ export class CrawlerAgent extends BaseAgent {
 
   async processTask(task: TaskData): Promise<TaskResult> {
     const start = Date.now();
-    if (task.type !== 'start_authenticated_crawl') {
-      return { id: task.id, taskId: task.id, success: false, error: 'Unsupported task', timestamp: new Date(), processingTime: 0 };
+    
+    switch (task.type) {
+      case 'start_authenticated_crawl':
+        return await this.handleAuthenticatedCrawl(task, start);
+      case 'crawl_site':
+        return await this.handleCrawlSite(task, start);
+      default:
+        return { id: task.id, taskId: task.id, success: false, error: 'Unsupported task', timestamp: new Date(), processingTime: 0 };
     }
+  }
+
+  private async handleAuthenticatedCrawl(task: TaskData, start: number): Promise<TaskResult> {
 
     const outputDir: string | undefined = task.data?.outputDir;
 
@@ -53,10 +95,31 @@ export class CrawlerAgent extends BaseAgent {
       const visited = new Set<string>();
       const pages: any[] = [];
 
-      let routes: string[] = [];
+      let routeInfos: RouteInfo[] = [];
       try {
-        routes = await this.menuModalAgent?.discoverRoutes?.(this.page) || [];
+        routeInfos = await discoverRoutes(this.page);
       } catch { }
+      let routes = Array.from(new Set(routeInfos.map((r: RouteInfo) => r.url)));
+
+      // Fallback: se não achou quase nada (SPA sem <a href>), tente cliques guiados:
+      if (routes.length < 5) {
+        try {
+          const inter = await interactiveDiscovery(this.page, { maxInteractions: 8, timeout: 4000 });
+          routes = Array.from(new Set([...routes, ...inter.map((r: RouteInfo) => r.url)]));
+        } catch { }
+      }
+
+      // Fallback extra: se existir o MenuModalAgent, use os hrefs dos menus detectados
+      if (routes.length < 5 && this.menuModalAgent?.detectMenus) {
+        try {
+          const menus = await this.menuModalAgent.detectMenus();
+          const origin = new URL(this.page.url()).origin;
+          const hrefs = (menus ?? [])
+            .flatMap((m: any) => (m.items ?? []).map((i: any) => i.href).filter(Boolean))
+            .map((u: string) => (u.startsWith('http') ? u : new URL(u, origin).href));
+          routes = Array.from(new Set([...routes, ...hrefs]));
+        } catch { }
+      }
 
       const current = this.page.url();
       if (!routes.includes(current)) routes.unshift(current);
@@ -109,8 +172,140 @@ export class CrawlerAgent extends BaseAgent {
     }
   }
 
-  private async saveCrawlResult(data: any, outputDir?: string) {
+  private async handleCrawlSite(task: TaskData, start: number): Promise<TaskResult> {
+    if (!this.page || !this.browser) {
+      return { id: task.id, taskId: task.id, success: false, error: 'CrawlerAgent not initialized with browser/page.', timestamp: new Date(), processingTime: 0 };
+    }
+
+    const { url, options } = task.data || {};
+    if (!url) {
+      return { id: task.id, taskId: task.id, success: false, error: 'Missing url in crawl_site task.', timestamp: new Date(), processingTime: 0 };
+    }
+
+    const {
+      includeMenuDetection = true,
+      includeInteractiveElements = true,
+      saveResults = true,
+      maxPages = 10,
+    } = options || {};
+
+    const visited = new Set<string>();
+    const queue: string[] = [url];
+    const allElements: Array<{ type: string; selector: string; text?: string; role?: string }> = [];
+    const workflows: any[] = [];
+    let pagesProcessed = 0;
+
     try {
+      // Garante pasta de saída
+      await fs.mkdir('./output', { recursive: true });
+
+      while (queue.length && pagesProcessed < maxPages) {
+        const current = queue.shift()!;
+        if (visited.has(current)) continue;
+        visited.add(current);
+
+        await this.safeGoto(current);
+        pagesProcessed++;
+
+        // (1) Menu/modal detection
+        if (includeMenuDetection && this.menuModalAgent?.detectMenus) {
+          try {
+            const menus = await this.menuModalAgent.detectMenus();
+            const origin = new URL(this.page.url()).origin;
+            const hrefs = (menus ?? [])
+              .flatMap((m: any) => (m.items ?? []).map((i: any) => i.href).filter(Boolean))
+              .map((u: string) => (u.startsWith('http') ? u : new URL(u, origin).href));
+            for (const u of hrefs) if (!visited.has(u)) queue.push(u);
+          } catch { /* silencioso */ }
+        }
+
+        // (2) Coleta de elementos interativos
+        if (includeInteractiveElements) {
+          const pageElements = await this.page.evaluate(() => {
+            const snapshot: Array<{ type: string; selector: string; text?: string; role?: string }> = [];
+
+            function buildCssPath(element: any): string {
+              if (!element || element.nodeType !== 1) return '';
+              const pathParts: string[] = [];
+              let currentNode = element;
+              
+              while (currentNode && pathParts.length < 6) {
+                const nodeName = currentNode.nodeName.toLowerCase();
+                const nodeId = currentNode.id ? `#${currentNode.id}` : '';
+                const nodeClass = currentNode.className
+                  ? '.' + String(currentNode.className).trim().split(/\s+/).slice(0, 2).join('.')
+                  : '';
+                pathParts.unshift(nodeName + nodeId + nodeClass);
+                currentNode = currentNode.parentElement;
+              }
+              return pathParts.join('>');
+            }
+
+            function addElement(elementType: string, element: any): void {
+              const selector = buildCssPath(element);
+              const text = (element.textContent || '').trim().slice(0, 120);
+              const role = element.getAttribute ? element.getAttribute('role') : undefined;
+              snapshot.push({ type: elementType, selector, text, role });
+            }
+
+            document.querySelectorAll('a,button,input,select,textarea,[role="button"],[role="menuitem"]').forEach(function(el) {
+              const tagType = el.tagName.toLowerCase();
+              addElement(tagType, el);
+            });
+
+            return snapshot;
+          });
+
+          allElements.push(...pageElements);
+        }
+      }
+
+      const duration = Date.now() - start;
+
+      const resultPayload = {
+        stats: {
+          totalElements: allElements.length,
+          pages: pagesProcessed,
+          visited: Array.from(visited),
+          durationMs: duration,
+        },
+        elements: allElements,
+        workflows,
+      };
+
+      if (saveResults) {
+        const file = path.join('./output', `crawl-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+        await fs.writeFile(file, JSON.stringify(resultPayload, null, 2), 'utf-8');
+      }
+
+      return {
+        id: task.id,
+        taskId: task.id,
+        success: true,
+        data: resultPayload,
+        timestamp: new Date(),
+        processingTime: duration
+      };
+    } catch (error: any) {
+      this.log(`Erro no crawl_site: ${error}`, 'error');
+      return { id: task.id, taskId: task.id, success: false, error: String(error), timestamp: new Date(), processingTime: Date.now() - start };
+    }
+  }
+
+  private async safeGoto(targetUrl: string) {
+     try {
+       await this.page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+       await Promise.race([
+         this.page.waitForLoadState('networkidle', { timeout: 10_000 }),
+         this.page.waitForTimeout(800),
+       ]);
+     } catch (e) {
+       if (this.timeline?.add) this.timeline.add('warn', `Falhou goto em ${targetUrl}: ${String(e)}`);
+     }
+   }
+
+   private async saveCrawlResult(data: any, outputDir?: string) {
+     try {
       if (!outputDir) return null;
       await fs.mkdir(outputDir, { recursive: true });
       const file = path.join(outputDir, 'crawl-result.json');
@@ -137,14 +332,7 @@ export class CrawlerAgent extends BaseAgent {
     });
   }
 
-  private async safeGoto(url: string) {
-    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
-    await Promise.race([
-      this.page.waitForLoadState('networkidle').catch(()=>{}),
-      this.page.waitForEvent('framenavigated').catch(()=>{}),
-      this.page.waitForTimeout(800)
-    ]);
-  }
+
 
   private async collectInternalLinks(max = 20): Promise<string[]> {
     const origin = new URL(this.page.url()).origin;
@@ -211,46 +399,50 @@ export class CrawlerAgent extends BaseAgent {
       return { kind, hints, title };
     });
 
-    const elements = await this.page.evaluate(() => {
-      function sel(el: Element): string {
-        try {
-          const id = (el as HTMLElement).id; if (id) return `#${CSS.escape(id)}`;
-          const name = (el as HTMLElement).getAttribute('name'); if (name) return `${el.tagName.toLowerCase()}[name="${CSS.escape(name)}"]`;
+    let elements: any[] = [];
+    try {
+      elements = await this.page.evaluate(() => {
+        const results: any[] = [];
+        
+        // Função simples para gerar seletor
+        function getSelector(el: Element): string {
+          if (el.id) return '#' + el.id;
           const tag = el.tagName.toLowerCase();
-          const idx = Array.from(el.parentElement?.children || []).filter(s => s.tagName === el.tagName).indexOf(el) + 1;
-          return `${tag}:nth-of-type(${idx})`;
-        } catch { return (el as HTMLElement).tagName?.toLowerCase?.() || 'element'; }
-      }
-
-      function collectFrom(root: Document | ShadowRoot): any[] {
-        const out: any[] = [];
-        const doc = (root as any).ownerDocument || document; // <— FIX: ShadowRoot não possui createTreeWalker
-        const walker = doc.createTreeWalker(root as any, NodeFilter.SHOW_ELEMENT);
-        while (walker.nextNode()) {
-          const el = walker.currentNode as HTMLElement;
-          if (!el.matches) continue;
-          if (el.matches('input,select,textarea,button,a,[role="button"],[role="link"],[role="menuitem"],[role="tab"],[role="dialog"]')) {
-            const label = (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim().slice(0, 200);
-            const role = el.getAttribute('role') || '';
-            const type = (el as HTMLInputElement).type || '';
-            out.push({ tag: el.tagName.toLowerCase(), label, role, type, selector: sel(el) });
+          const parent = el.parentElement;
+          if (!parent) return tag;
+          const siblings = Array.from(parent.children).filter(child => child.tagName === el.tagName);
+          const index = siblings.indexOf(el) + 1;
+          return `${tag}:nth-of-type(${index})`;
+        }
+        
+        // Coletar elementos interativos
+         const interactiveElements = Array.from(document.querySelectorAll('input,select,textarea,button,a,[role="button"],[role="link"],[role="menuitem"],[role="tab"],[role="dialog"]'));
+         
+         for (const el of interactiveElements) {
+          try {
+            const htmlEl = el as HTMLElement;
+            const label = (htmlEl.getAttribute('aria-label') || htmlEl.getAttribute('title') || htmlEl.textContent || '').trim().slice(0, 200);
+            const role = htmlEl.getAttribute('role') || '';
+            const type = (htmlEl as HTMLInputElement).type || '';
+            
+            results.push({
+              tag: htmlEl.tagName.toLowerCase(),
+              label,
+              role,
+              type,
+              selector: getSelector(htmlEl)
+            });
+          } catch (err) {
+            // Ignorar erros de elementos individuais
           }
         }
-        return out;
-      }
-
-      const results = collectFrom(document);
-      const all = Array.from(document.querySelectorAll('*'));
-      for (const e of all) {
-        const sr = (e as any).shadowRoot as ShadowRoot | undefined;
-        if (sr) results.push(...collectFrom(sr));
-      }
-      const ifr = Array.from(document.querySelectorAll('iframe')) as HTMLIFrameElement[];
-      for (const i of ifr) {
-        try { const doc = i.contentDocument; if (doc) results.push(...collectFrom(doc)); } catch {}
-      }
-      return results;
-    });
+        
+        return results;
+      });
+    } catch (error) {
+      this.log(`Erro ao extrair elementos: ${error instanceof Error ? error.message : String(error)}`, 'warn');
+      elements = [];
+    }
 
     // Screenshot por página dentro do outputDir, se fornecido
     try {

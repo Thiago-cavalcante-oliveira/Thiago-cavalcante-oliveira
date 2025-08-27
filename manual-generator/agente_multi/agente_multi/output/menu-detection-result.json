@@ -184,24 +184,24 @@
   "modals": [],
   "interactiveElements": [
     {
-      "selector": "#mantine-q2z0wvor2-target",
+      "selector": "#mantine-dss6c83pd-target",
       "type": "button",
       "text": "Admin Sistema",
       "isVisible": true,
       "boundingBox": {
-        "x": 1085.84375,
+        "x": 1100.84375,
         "y": 9.5,
         "width": 163.15625,
         "height": 40
       }
     },
     {
-      "selector": "#mantine-p502nhcl3-target",
+      "selector": "#mantine-qb5xjjw49-target",
       "type": "button",
       "text": "Admin Sistema",
       "isVisible": true,
       "boundingBox": {
-        "x": 1085.84375,
+        "x": 1100.84375,
         "y": 9.5,
         "width": 163.15625,
         "height": 40
