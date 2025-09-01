@@ -84,6 +84,10 @@ export class ContentAgent extends BaseAgent {
 
   private async logToFile(message: string, stage: string = 'content'): Promise<void> {
     try {
+      if (!this.logDir) {
+        console.error('Erro: logDir não está definido no ContentAgent.');
+        return;
+      }
       await fs.mkdir(this.logDir, { recursive: true });
       const logMsg = `[${new Date().toISOString()}][${stage}] ${message}\n`;
       await fs.appendFile(this.logFile, logMsg, 'utf-8');
@@ -144,7 +148,9 @@ export class ContentAgent extends BaseAgent {
 
   async initialize(): Promise<void> {
     await this.minioService.initialize();
-    await this.keyManager.loadStatus();
+    if (this.keyManager) {
+      await this.keyManager.loadStatus();
+    }
     this.log('ContentAgent inicializado para criação de conteúdo user-friendly');
     await this.logToFile('ContentAgent inicializado para criação de conteúdo user-friendly', 'init');
   }
@@ -256,6 +262,134 @@ export class ContentAgent extends BaseAgent {
     }
   }
 
+  private async generateUserGuideSections(crawlAnalysis: any, rawData: any[]): Promise<UserManualContent['sections']> {
+    await this.logToFile('Iniciando geração de seções do guia', 'sections');
+    
+    if (!crawlAnalysis || !rawData) {
+      this.log('AVISO: crawlAnalysis ou rawData estão undefined em generateUserGuideSections', 'warn');
+      return this.getFallbackSections();
+    }
+
+    try {
+      const prompt = `
+Baseado nesta análise e dados brutos, gere seções para um manual do usuário:
+
+ANÁLISE:
+${JSON.stringify(crawlAnalysis, null, 2)}
+
+DADOS BRUTOS (${rawData.length} itens):
+${JSON.stringify(rawData.slice(0, 3), null, 2)}
+
+Gere seções organizadas por funcionalidades principais.
+`;
+
+      const result = await this.retryAICall(
+        () => this.llmManager.generateContent(prompt),
+        'generateUserGuideSections'
+      );
+
+      if (result) {
+        return this.parseAISections(result.response.text());
+      }
+    } catch (error) {
+      this.log(`Erro ao gerar seções: ${error}`, 'error');
+    }
+
+    return this.getFallbackSections();
+  }
+
+  private getFallbackSections(): UserManualContent['sections'] {
+    return [
+      {
+        title: 'Funcionalidades Básicas',
+        content: 'Guia passo a passo para as funcionalidades básicas da aplicação.'
+      }
+    ];
+  }
+
+  private async generateAppendices(crawlAnalysis: any): Promise<UserManualContent['appendices']> {
+    await this.logToFile('Iniciando geração de apêndices', 'appendices');
+    
+    if (!crawlAnalysis) {
+      this.log('AVISO: crawlAnalysis está undefined em generateAppendices', 'warn');
+      return this.getFallbackAppendices();
+    }
+
+    try {
+      const prompt = `
+Baseado nesta análise, gere apêndices úteis para um manual do usuário:
+
+ANÁLISE:
+${JSON.stringify(crawlAnalysis, null, 2)}
+
+Gere apêndices como glossário, FAQ e informações técnicas.
+`;
+
+      const result = await this.retryAICall(
+        () => this.llmManager.generateContent(prompt),
+        'generateAppendices'
+      );
+
+      if (result) {
+        return this.parseAIAppendices(result.response.text());
+      }
+    } catch (error) {
+      this.log(`Erro ao gerar apêndices: ${error}`, 'error');
+    }
+
+    return this.getFallbackAppendices();
+  }
+
+  private getFallbackAppendices(): UserManualContent['appendices'] {
+    return [
+      {
+        title: 'Glossário',
+        content: 'Termos técnicos e suas definições.'
+      }
+    ];
+  }
+
+  private async generateSummary(crawlAnalysis: any): Promise<UserManualContent['summary']> {
+    await this.logToFile('Iniciando geração de resumo', 'summary');
+    
+    if (!crawlAnalysis) {
+      this.log('AVISO: crawlAnalysis está undefined em generateSummary', 'warn');
+      return this.getFallbackSummary();
+    }
+
+    try {
+      const prompt = `
+Baseado nesta análise, gere um resumo conciso para o manual do usuário:
+
+ANÁLISE:
+${JSON.stringify(crawlAnalysis, null, 2)}
+
+Gere um resumo que destaque os pontos principais.
+`;
+
+      const result = await this.retryAICall(
+        () => this.llmManager.generateContent(prompt),
+        'generateSummary'
+      );
+
+      if (result) {
+        return {
+          keyPoints: this.parseAISummary(result.response.text())
+        };
+      }
+    } catch (error) {
+      this.log(`Erro ao gerar resumo: ${error}`, 'error');
+    }
+
+    return this.getFallbackSummary();
+  }
+
+  private getFallbackSummary(): UserManualContent['summary'] {
+    return {
+      keyPoints: ['Este manual fornece orientações para utilizar a aplicação web.']
+    };
+  }
+
   private async generateUserFriendlyContent(crawlAnalysis: any, authContext: any, rawData: any[]): Promise<UserManualContent> {
     this.log('Gerando conteúdo estruturado para usuários finais');
 
@@ -317,7 +451,12 @@ Foque em linguagem clara e acessível para usuários finais.
 `;
 
     const result = await this.retryAICall(
-      () => this.llmManager.generateContent(prompt),
+      () => {
+        if (!this.llmManager) {
+          this.llmManager = new LLMManager(this.keyManager);
+        }
+        return this.llmManager.generateContent(prompt);
+      },
       'generateMetadata'
     );
     
@@ -340,6 +479,10 @@ Foque em linguagem clara e acessível para usuários finais.
     
     // Fallback
     await this.logToFile('Usando metadados de fallback', 'metadata');
+    return this.getFallbackMetadata();
+  }
+
+  private getFallbackMetadata(): UserManualContent['metadata'] {
     return {
       title: 'Manual do Usuário - Aplicação Web',
       subtitle: 'Guia completo para utilização da aplicação',
@@ -350,17 +493,30 @@ Foque em linguagem clara e acessível para usuários finais.
     };
   }
 
+  private getFallbackIntroduction(): UserManualContent['introduction'] {
+    return {
+      overview: 'Este manual fornece um guia completo para a utilização da aplicação web.',
+      requirements: 'Nenhum requisito especial. Acesso à internet e um navegador web moderno são suficientes.',
+      howToUseManual: 'Navegue pelas seções para encontrar informações sobre funcionalidades específicas.'
+    };
+  }
+
   private async generateIntroduction(analysis: any, authContext: any): Promise<UserManualContent['introduction']> {
     await this.logToFile('Iniciando geração de introdução', 'introduction');
     
+    if (!analysis) {
+      this.log('AVISO: analysis está undefined em generateIntroduction. Usando fallback.', 'warn');
+      return this.getFallbackIntroduction();
+    }
+
     const prompt = `
 Crie uma introdução amigável para um manual do usuário baseado nesta análise:
 
 ANÁLISE:
-${analysis.summary}
+${analysis.summary ?? 'N/A'}
 
 FUNCIONALIDADES PRINCIPAIS:
-${analysis.keyFunctionalities.join(', ')}
+${analysis.keyFunctionalities?.join(', ') ?? 'N/A'}
 
 CONTEXTO DE AUTENTICAÇÃO:
 ${authContext?.authType || 'Não requer autenticação'}
@@ -374,7 +530,12 @@ Use linguagem simples e acolhedora. Responda em JSON.
 `;
 
     const result = await this.retryAICall(
-      () => this.llmManager.generateContent(prompt),
+      () => {
+        if (!this.llmManager) {
+          this.llmManager = new LLMManager(this.keyManager);
+        }
+        return this.llmManager.generateContent(prompt);
+      },
       'generateIntroduction'
     );
     
@@ -401,31 +562,67 @@ Use linguagem simples e acolhedora. Responda em JSON.
     };
   }
 
-  private async generateUserGuideSections(analysis: any, rawData: any[]): Promise<UserGuideSection[]> {
-    const sections: UserGuideSection[] = [];
-
-    // Primeira seção: Acesso e Login (se aplicável)
-    if (analysis.pageAnalyses.some((page: any) => page.purpose.toLowerCase().includes('login') || 
-                                             page.purpose.toLowerCase().includes('auth'))) {
-      sections.push(await this.generateLoginSection(analysis));
+  private async generateUserGuideSections(crawlAnalysis: any, rawData: any[]): Promise<UserManualContent['sections']> {
+    await this.logToFile('Iniciando geração de seções do guia', 'sections');
+    
+    if (!crawlAnalysis) {
+      this.log('AVISO: crawlAnalysis está undefined em generateUserGuideSections. Usando fallback.', 'warn');
+      return this.getFallbackSections();
     }
 
-    // Seções baseadas nas páginas analisadas
-    for (const pageAnalysis of analysis.pageAnalyses) {
-      const section = await this.generatePageSection(pageAnalysis, rawData);
-      if (section) {
-        sections.push(section);
+    const prompt = `
+Baseado nesta análise de aplicação web, gere seções detalhadas para um manual do usuário:
+
+ANÁLISE:
+${crawlAnalysis.summary ?? 'N/A'}
+
+DADOS CRUS:
+${rawData?.length ? JSON.stringify(rawData.slice(0, 5), null, 2) : 'N/A'}
+
+Gere seções em formato JSON com:
+- title: Título da seção
+- content: Conteúdo detalhado
+- examples: Exemplos de uso (se aplicável)
+- warnings: Avisos importantes (se aplicável)
+
+Foque em explicar funcionalidades principais de forma clara e passo a passo.
+`;
+
+    const result = await this.retryAICall(
+      () => {
+        if (!this.llmManager) {
+          this.llmManager = new LLMManager(this.keyManager);
+        }
+        return this.llmManager.generateContent(prompt);
+      },
+      'generateSections'
+    );
+    
+    if (result) {
+      try {
+        const aiSections = this.parseAIResponse(result.response.text());
+        await this.logToFile(`Seções geradas: ${aiSections.length}`, 'sections');
+        return aiSections;
+      } catch (parseError) {
+        await this.logToFile(`Erro ao parsear seções: ${parseError}`, 'error');
+        return this.getFallbackSections();
       }
     }
+    
+    // Fallback
+    await this.logToFile('Usando seções de fallback', 'sections');
+    return this.getFallbackSections();
+  }
 
-    // Seção de workflows principais
-    const workflowSection = await this.generateWorkflowSection(analysis);
-    if (workflowSection) {
-      sections.push(workflowSection);
-    }
-
-    this.log(`${sections.length} seções de usuário geradas`);
-    return sections;
+  private getFallbackSections(): UserManualContent['sections'] {
+    return [
+      {
+        title: 'Funcionalidade Principal',
+        content: 'Esta seção descreve como usar a funcionalidade principal da aplicação.',
+        examples: ['Exemplo 1', 'Exemplo 2'],
+        warnings: ['Aviso importante sobre uso']
+      }
+    ];
   }
 
   private async generateLoginSection(analysis: any): Promise<UserGuideSection> {
@@ -507,6 +704,25 @@ Foque em linguagem clara e instruções práticas.
 `;
 
     try {
+  if (!this.llmManager) {
+      this.llmManager = new LLMManager(this.keyManager);
+    }
+    if (!this.llmManager) {
+      this.log('LLMManager não inicializado. Não é possível gerar conteúdo.', 'error');
+      throw new Error('LLMManager não inicializado.');
+    }
+    if (!this.llmManager) {
+    this.log('LLMManager não inicializado. Não é possível gerar conteúdo.', 'error');
+    throw new Error('LLMManager não inicializado.');
+  }
+  if (!this.llmManager) {
+    this.log('LLMManager não inicializado. Não é possível gerar conteúdo.', 'error');
+    throw new Error('LLMManager não inicializado.');
+  }
+  if (!this.llmManager) {
+    this.log('LLMManager não inicializado. Não é possível gerar conteúdo.', 'error');
+    throw new Error('LLMManager não inicializado.');
+  }
   const response = await this.llmManager.generateContent(prompt);
   const aiSection = this.parseAIResponse(response.response.text());
       
@@ -547,6 +763,10 @@ Inclua title, description, steps detalhados, tips e troubleshooting.
 `;
 
     try {
+  if (!this.llmManager) {
+    this.log('LLMManager não inicializado. Não é possível gerar conteúdo.', 'error');
+    throw new Error('LLMManager não inicializado.');
+  }
   const response = await this.llmManager.generateContent(prompt);
   const aiSection = this.parseAIResponse(response.response.text());
       
@@ -566,21 +786,64 @@ Inclua title, description, steps detalhados, tips e troubleshooting.
     }
   }
 
-  private async generateAppendices(analysis: any): Promise<UserManualContent['appendices']> {
-    // Gerar itens de troubleshooting
-    const troubleshooting = await this.generateTroubleshootingItems(analysis);
+  private async generateAppendices(crawlAnalysis: any): Promise<UserManualContent['appendices']> {
+    await this.logToFile('Iniciando geração de apêndices', 'appendices');
     
-    // Gerar glossário
-    const glossary = await this.generateGlossaryItems(analysis);
-    
-    // Gerar FAQs
-    const faqs = await this.generateFAQItems(analysis);
+    if (!crawlAnalysis) {
+      this.log('AVISO: crawlAnalysis está undefined em generateAppendices. Usando fallback.', 'warn');
+      return this.getFallbackAppendices();
+    }
 
-    return {
-      troubleshooting,
-      glossary,
-      faqs
-    };
+    const prompt = `
+Baseado nesta análise de aplicação web, gere apêndices úteis para um manual do usuário:
+
+ANÁLISE:
+${crawlAnalysis.summary ?? 'N/A'}
+
+Gere apêndices em formato JSON com:
+- title: Título do apêndice
+- content: Conteúdo detalhado
+
+Foque em informações de referência rápida, troubleshooting e perguntas frequentes.
+`;
+
+    const result = await this.retryAICall(
+      () => {
+        if (!this.llmManager) {
+          this.llmManager = new LLMManager(this.keyManager);
+        }
+        return this.llmManager.generateContent(prompt);
+      },
+      'generateAppendices'
+    );
+    
+    if (result) {
+      try {
+        const aiAppendices = this.parseAIResponse(result.response.text());
+        await this.logToFile(`Apêndices gerados: ${aiAppendices.length}`, 'appendices');
+        return aiAppendices;
+      } catch (parseError) {
+        await this.logToFile(`Erro ao parsear apêndices: ${parseError}`, 'error');
+        return this.getFallbackAppendices();
+      }
+    }
+    
+    // Fallback
+    await this.logToFile('Usando apêndices de fallback', 'appendices');
+    return this.getFallbackAppendices();
+  }
+
+  private getFallbackAppendices(): UserManualContent['appendices'] {
+    return [
+      {
+        title: 'Perguntas Frequentes',
+        content: 'Respostas para perguntas comuns sobre o uso da aplicação.'
+      },
+      {
+        title: 'Troubleshooting',
+        content: 'Soluções para problemas comuns encontrados pelos usuários.'
+      }
+    ];
   }
 
   private async generateTroubleshootingItems(analysis: any): Promise<UserTroubleshootingItem[]> {
@@ -662,26 +925,66 @@ Inclua title, description, steps detalhados, tips e troubleshooting.
     return faqs;
   }
 
-  private async generateSummary(analysis: any): Promise<UserManualContent['summary']> {
+  private async generateSummary(crawlAnalysis: any): Promise<UserManualContent['summary']> {
+    await this.logToFile('Iniciando geração de resumo', 'summary');
+    
+    if (!crawlAnalysis) {
+      this.log('AVISO: crawlAnalysis está undefined em generateSummary. Usando fallback.', 'warn');
+      return this.getFallbackSummary();
+    }
+
+    const prompt = `
+Baseado nesta análise de aplicação web, gere um resumo conciso para o manual do usuário:
+
+ANÁLISE:
+${crawlAnalysis.summary ?? 'N/A'}
+
+O resumo deve incluir:
+- keyPoints: Lista de pontos-chave (3-5 itens)
+- nextSteps: Próximos passos recomendados para o usuário
+- contactInfo: Informações de contato para suporte
+
+Seja breve e direto ao ponto.
+`;
+
+    const result = await this.retryAICall(
+      () => {
+        if (!this.llmManager) {
+          this.llmManager = new LLMManager(this.keyManager);
+        }
+        return this.llmManager.generateContent(prompt);
+      },
+      'generateSummary'
+    );
+    
+    if (result) {
+      try {
+        const aiSummary = this.parseAIResponse(result.response.text());
+        await this.logToFile('Resumo gerado com sucesso via IA', 'summary');
+        return aiSummary;
+      } catch (parseError) {
+        await this.logToFile(`Erro ao parsear resumo: ${parseError}`, 'error');
+        return this.getFallbackSummary();
+      }
+    }
+    
+    // Fallback
+    await this.logToFile('Usando resumo de fallback', 'summary');
+    return this.getFallbackSummary();
+  }
+
+  private getFallbackSummary(): UserManualContent['summary'] {
     return {
-      keyTakeaways: [
-        'Esta aplicação oferece diversas funcionalidades para melhorar sua produtividade',
-        'Siga os fluxos de trabalho sugeridos para obter melhores resultados',
-        'Consulte a seção de troubleshooting em caso de dificuldades',
-        'Mantenha suas credenciais seguras e atualize regularmente'
+      keyPoints: [
+        'A aplicação fornece funcionalidades principais para [descrever propósito]',
+        'Interface intuitiva e fácil de usar',
+        'Suporte disponível através de [contato]'
       ],
       nextSteps: [
-        'Explore cada seção do manual conforme sua necessidade',
-        'Pratique os fluxos de trabalho principais',
-        'Marque esta página para consultas futuras',
-        'Entre em contato com o suporte se precisar de ajuda adicional'
+        'Revise as seções principais para aprender a usar as funcionalidades',
+        'Consulte os apêndices para troubleshooting e perguntas frequentes'
       ],
-      supportContacts: [
-        'Email: suporte@aplicacao.com',
-        'Telefone: (11) 1234-5678',
-        'Chat online disponível durante horário comercial',
-        'Base de conhecimento: help.aplicacao.com'
-      ]
+      contactInfo: 'Entre em contato com suporte@exemplo.com para assistência.'
     };
   }
 
@@ -727,14 +1030,93 @@ Inclua title, description, steps detalhados, tips e troubleshooting.
 
   private parseAIResponse(text: string): any {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
+      // Primeiro, tenta parsear o texto diretamente como JSON
       return JSON.parse(text);
     } catch (error) {
-      this.log(`Erro ao parsear resposta da IA: ${error}`, 'warn');
-      return {};
+      try {
+        // Se falhar, procura por um bloco JSON válido no texto
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          // Tenta encontrar o JSON mais completo possível
+          let jsonText = jsonMatch[0];
+          
+          // Remove possíveis caracteres extras no final
+          let braceCount = 0;
+          let endIndex = 0;
+          
+          for (let i = 0; i < jsonText.length; i++) {
+            if (jsonText[i] === '{') braceCount++;
+            if (jsonText[i] === '}') {
+              braceCount--;
+              if (braceCount === 0) {
+                endIndex = i + 1;
+                break;
+              }
+            }
+          }
+          
+          if (endIndex > 0) {
+            jsonText = jsonText.substring(0, endIndex);
+          }
+          
+          return JSON.parse(jsonText);
+        }
+        
+        // Se não encontrar JSON, retorna objeto vazio
+        this.log(`Não foi possível extrair JSON da resposta da IA: ${text.substring(0, 200)}...`, 'warn');
+        return {};
+      } catch (parseError) {
+        this.log(`Erro ao parsear resposta da IA: ${parseError}`, 'warn');
+        return {};
+      }
+    }
+  }
+
+  private parseAIIntroduction(text: string): UserManualContent['introduction'] {
+    try {
+      const parsed = this.parseAIResponse(text);
+      return {
+        overview: parsed.overview || this.getFallbackIntroduction().overview,
+        requirements: parsed.requirements || this.getFallbackIntroduction().requirements,
+        howToUseManual: parsed.howToUseManual || this.getFallbackIntroduction().howToUseManual,
+      };
+    } catch (error) {
+      this.log(`Erro ao parsear introdução da IA: ${error}`, 'warn');
+      return this.getFallbackIntroduction();
+    }
+  }
+
+  private parseAISections(text: string): UserManualContent['sections'] {
+    try {
+      const parsed = this.parseAIResponse(text);
+      return Array.isArray(parsed) ? parsed : [this.getFallbackSections()[0]];
+    } catch (error) {
+      this.log(`Erro ao parsear seções da IA: ${error}`, 'warn');
+      return this.getFallbackSections();
+    }
+  }
+
+  private parseAIAppendices(text: string): UserManualContent['appendices'] {
+    try {
+      const parsed = this.parseAIResponse(text);
+      return Array.isArray(parsed) ? parsed : [this.getFallbackAppendices()[0]];
+    } catch (error) {
+      this.log(`Erro ao parsear apêndices da IA: ${error}`, 'warn');
+      return this.getFallbackAppendices();
+    }
+  }
+
+  private parseAISummary(text: string): UserManualContent['summary'] {
+    try {
+      const parsed = this.parseAIResponse(text);
+      return {
+        keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints : this.getFallbackSummary().keyPoints,
+        nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps : this.getFallbackSummary().nextSteps,
+        contactInfo: parsed.contactInfo || this.getFallbackSummary().contactInfo,
+      };
+    } catch (error) {
+      this.log(`Erro ao parsear resumo da IA: ${error}`, 'warn');
+      return this.getFallbackSummary();
     }
   }
 

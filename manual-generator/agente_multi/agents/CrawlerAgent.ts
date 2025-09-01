@@ -36,7 +36,7 @@ export class CrawlerAgent extends BaseAgent {
     // Adiciona init script para corrigir erro __name is not defined
     if (this.page) {
       await this.page.addInitScript(() => {
-        window.__name = window.__name || function(obj, name) {
+        (window as any).__name = (window as any).__name || function(obj: any, name: string) {
           try {
             Object.defineProperty(obj, 'name', { value: name, configurable: true });
           } catch (e) {
@@ -173,30 +173,28 @@ export class CrawlerAgent extends BaseAgent {
   }
 
   private async handleCrawlSite(task: TaskData, start: number): Promise<TaskResult> {
-    if (!this.page || !this.browser) {
-      return { id: task.id, taskId: task.id, success: false, error: 'CrawlerAgent not initialized with browser/page.', timestamp: new Date(), processingTime: 0 };
+    const { url, maxPages = 10, includeMenuDetection = true, includeInteractiveElements = true, saveResults = true } = task.data;
+    
+    this.log(`Iniciando crawl do site: ${url}`);
+    
+    if (!this.page) {
+      return {
+        id: task.id,
+        taskId: task.id,
+        success: false,
+        error: 'Browser não inicializado',
+        timestamp: new Date(),
+        processingTime: Date.now() - start
+      };
     }
-
-    const { url, options } = task.data || {};
-    if (!url) {
-      return { id: task.id, taskId: task.id, success: false, error: 'Missing url in crawl_site task.', timestamp: new Date(), processingTime: 0 };
-    }
-
-    const {
-      includeMenuDetection = true,
-      includeInteractiveElements = true,
-      saveResults = true,
-      maxPages = 10,
-    } = options || {};
 
     const visited = new Set<string>();
     const queue: string[] = [url];
-    const allElements: Array<{ type: string; selector: string; text?: string; role?: string }> = [];
+    const allElements: any[] = [];
     const workflows: any[] = [];
     let pagesProcessed = 0;
 
     try {
-      // Garante pasta de saída
       await fs.mkdir('./output', { recursive: true });
 
       while (queue.length && pagesProcessed < maxPages) {
@@ -207,7 +205,6 @@ export class CrawlerAgent extends BaseAgent {
         await this.safeGoto(current);
         pagesProcessed++;
 
-        // (1) Menu/modal detection
         if (includeMenuDetection && this.menuModalAgent?.detectMenus) {
           try {
             const menus = await this.menuModalAgent.detectMenus();
@@ -216,79 +213,38 @@ export class CrawlerAgent extends BaseAgent {
               .flatMap((m: any) => (m.items ?? []).map((i: any) => i.href).filter(Boolean))
               .map((u: string) => (u.startsWith('http') ? u : new URL(u, origin).href));
             for (const u of hrefs) if (!visited.has(u)) queue.push(u);
-          } catch { /* silencioso */ }
+          } catch {}
         }
 
-        // (2) Coleta de elementos interativos
         if (includeInteractiveElements) {
-          const pageElements = await this.page.evaluate(() => {
-            const snapshot: Array<{ type: string; selector: string; text?: string; role?: string }> = [];
-
-            function buildCssPath(element: any): string {
-              if (!element || element.nodeType !== 1) return '';
-              const pathParts: string[] = [];
-              let currentNode = element;
-              
-              while (currentNode && pathParts.length < 6) {
-                const nodeName = currentNode.nodeName.toLowerCase();
-                const nodeId = currentNode.id ? `#${currentNode.id}` : '';
-                const nodeClass = currentNode.className
-                  ? '.' + String(currentNode.className).trim().split(/\s+/).slice(0, 2).join('.')
-                  : '';
-                pathParts.unshift(nodeName + nodeId + nodeClass);
-                currentNode = currentNode.parentElement;
-              }
-              return pathParts.join('>');
-            }
-
-            function addElement(elementType: string, element: any): void {
-              const selector = buildCssPath(element);
-              const text = (element.textContent || '').trim().slice(0, 120);
-              const role = element.getAttribute ? element.getAttribute('role') : undefined;
-              snapshot.push({ type: elementType, selector, text, role });
-            }
-
-            document.querySelectorAll('a,button,input,select,textarea,[role="button"],[role="menuitem"]').forEach(function(el) {
-              const tagType = el.tagName.toLowerCase();
-              addElement(tagType, el);
-            });
-
-            return snapshot;
-          });
-
+          const pageElements = await this.page.$$eval(
+            'a,button,input,select,textarea,[role="button"],[role="menuitem"]',
+            (els) => (els as Element[]).map(el => {
+              const tag = el.tagName.toLowerCase();
+              const role = el.getAttribute('role') || '';
+              const text = (el.textContent || '').trim().slice(0,120);
+              const id = (el as HTMLElement).id;
+              const cls = (el as HTMLElement).className?.split?.(' ')?.[0];
+              const selector = id ? ('#'+id) : (cls ? ('.'+cls) : tag);
+              return { type: tag, role, text, selector };
+            })
+          );
           allElements.push(...pageElements);
         }
       }
 
       const duration = Date.now() - start;
-
-      const resultPayload = {
-        stats: {
-          totalElements: allElements.length,
-          pages: pagesProcessed,
-          visited: Array.from(visited),
-          durationMs: duration,
-        },
-        elements: allElements,
-        workflows,
-      };
+      const resultPayload = { stats: { totalElements: allElements.length, pages: pagesProcessed, visited: Array.from(visited), durationMs: duration }, elements: allElements, workflows };
 
       if (saveResults) {
-        const file = path.join('./output', `crawl-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+        const file = path.join('./output', `crawl-results-${new Date().toISOString().replace(/[:.]/g,'-')}.json`);
         await fs.writeFile(file, JSON.stringify(resultPayload, null, 2), 'utf-8');
       }
 
-      return {
-        id: task.id,
-        taskId: task.id,
-        success: true,
-        data: resultPayload,
-        timestamp: new Date(),
-        processingTime: duration
-      };
+      return { id: task.id, taskId: task.id, success: true, data: resultPayload, timestamp: new Date(), processingTime: duration };
     } catch (error: any) {
       this.log(`Erro no crawl_site: ${error}`, 'error');
-      return { id: task.id, taskId: task.id, success: false, error: String(error), timestamp: new Date(), processingTime: Date.now() - start };
+      return { id: task.id, taskId: task.id, success: false, error: String(error), timestamp: new Date(), processingTime: Date.now()-start };
     }
   }
 

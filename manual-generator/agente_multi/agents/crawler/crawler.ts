@@ -2,7 +2,7 @@ import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../../core/AgnoSCo
 import { Page, Browser } from 'playwright';
 import { MinIOService } from '../../services/MinIOService.js';
 import { LLMManager } from '../../services/LLMManager.js';
-import { MenuModalAgent, MenuDetectionResult } from '../MenuModalAgent.js';
+import { MenuModalAgent } from '../MenuModalAgent.js';
 import { Timeline } from '../../services/Timeline.js';
 import { DetectionConfig, DEFAULT_DETECTION_CONFIG, getSystemConfig, mergeDetectionConfig } from '../../config/detection-strategies.js';
 import * as fs from 'fs/promises';
@@ -98,7 +98,7 @@ export class CrawlerAgent extends BaseAgent {
     this.log('CrawlerAgent: página definida');
     
     if (this.menuModalAgent && page) {
-      this.menuModalAgent.setPage(page);
+
     }
   }
 
@@ -109,7 +109,7 @@ export class CrawlerAgent extends BaseAgent {
   setMenuModalAgent(agent: MenuModalAgent): void {
     this.menuModalAgent = agent;
     if (this.page) {
-      agent.setPage(this.page);
+
     }
     if (this.browser) {
       agent.setBrowser(this.browser);

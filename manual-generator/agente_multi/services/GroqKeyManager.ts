@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { safeValidateEnvironment } from '../config/environment';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -28,7 +29,16 @@ export class GroqKeyManager {
 
   constructor() {
     this.statusFilePath = path.join(process.cwd(), 'groq-keys-status.json');
-    this.model = process.env.GROQ_MODEL || 'mixtral-8x7b-32768';
+    
+    // Validar variáveis de ambiente usando Zod
+    const envValidation = safeValidateEnvironment();
+    
+    if (!envValidation.success) {
+      console.warn('⚠️ [GroqKeyManager] Erro na validação de ambiente:', envValidation.error);
+      this.model = 'mixtral-8x7b-32768'; // valor padrão
+    } else {
+      this.model = envValidation.data.GROQ_MODEL || 'mixtral-8x7b-32768';
+    }
     
     this.keyManager = {
       keys: [],
@@ -42,18 +52,19 @@ export class GroqKeyManager {
   private loadApiKeys(): void {
     const keys: string[] = [];
     
-    // Carregar todas as chaves configuradas no .env
-    for (let i = 1; i <= 10; i++) {
-      const key = process.env[`GROQ_API_KEY_${i}`];
-      if (key && key.trim() !== '') {
-        keys.push(key.trim());
-      }
+    // Validar variáveis de ambiente usando Zod
+    const envValidation = safeValidateEnvironment();
+    
+    if (!envValidation.success) {
+      console.warn('⚠️ [GroqKeyManager] Erro na validação de ambiente:', envValidation.error);
+      throw new Error('Erro na validação das variáveis de ambiente para Groq API');
     }
-
-    // Compatibilidade com chave única (versão anterior)
-    const singleKey = process.env.GROQ_API_KEY;
-    if (singleKey && singleKey.trim() !== '' && !keys.includes(singleKey.trim())) {
-      keys.push(singleKey.trim());
+    
+    const env = envValidation.data;
+    
+    // Compatibilidade com chave única
+    if (env.GROQ_API_KEY && env.GROQ_API_KEY.trim() !== '') {
+      keys.push(env.GROQ_API_KEY.trim());
     }
 
     if (keys.length === 0) {

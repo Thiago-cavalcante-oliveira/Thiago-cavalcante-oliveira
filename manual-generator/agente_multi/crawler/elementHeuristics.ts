@@ -7,28 +7,28 @@ const log = logger.child({ module: "elementHeuristics" });
 export interface ElementAction {
   selector: string;
   role?: string;
-  text?: string;
+  text: string;
   type?: string;
   href?: string;
-  danger?: boolean;
+  danger: boolean;
 }
 
 export interface PageAnalysis {
   title: string;
   url: string;
   breadcrumb: string[];
-  inputs: Array<{ 
-    name: string; 
-    label?: string; 
-    type: string; 
-    required: boolean; 
-    validations: string[]; 
-    hints: string[] 
+  inputs: Array<{
+    name: string;
+    label?: string;
+    type: string;
+    required: boolean;
+    validations: string[];
+    hints: string[];
   }>;
-  tables: Array<{ 
-    name: string; 
-    columns: string[]; 
-    actions: string[] 
+  tables: Array<{
+    name: string;
+    columns: string[];
+    actions: string[];
   }>;
   actions: string[];
 }
@@ -37,32 +37,35 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
   return retry(async () => {
     log.info('Iniciando análise da página atual');
     
-    await page.waitForLoadState("networkidle", { timeout: 10000 });
-    
-    const result = await page.evaluate((allowDangerParam: boolean) => {
-      function visible(el: any): boolean {
-        const s = getComputedStyle(el);
-        const r = el.getBoundingClientRect();
-        return s && s.visibility !== "hidden" && s.display !== "none" && r.width > 2 && r.height > 2;
-      }
+    const result = await page.evaluate((allowDangerParam) => {
+      const visible = (el: Element): boolean => {
+        if (!el) return false;
+        const htmlEl = el as HTMLElement;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && 
+               style.visibility !== 'hidden' && 
+               style.opacity !== '0' &&
+               htmlEl.offsetWidth > 0 && 
+               htmlEl.offsetHeight > 0;
+      };
       
-      function labelFor(input: any): string {
-        const id = input.getAttribute("id");
+      const labelFor = (input: Element): string => {
+        const id = input.getAttribute('id');
         if (id) {
-          const l = document.querySelector(`label[for="${id}"]`);
-          if (l) return (l.textContent || "").trim();
+          const label = document.querySelector(`label[for="${id}"]`);
+          if (label) return (label.textContent || "").trim();
         }
         const parentLabel = input.closest("label");
         if (parentLabel) return (parentLabel.textContent || "").trim();
         const aria = input.getAttribute("aria-label") || input.getAttribute("placeholder");
         return aria || "";
-      }
+      };
       
-      function dangerText(t: any): boolean {
+      const dangerText = (t: string): boolean => {
         return /(excluir|deletar|remover|apagar|publicar|enviar definitivo|submit definitivo|delete|remove)/i.test(t);
-      }
+      };
       
-      function getValidations(input: any): string[] {
+      const getValidations = (input: HTMLInputElement): string[] => {
         const validations: string[] = [];
         
         if (input.required) validations.push('required');
@@ -73,9 +76,9 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         if (input.pattern) validations.push(`pattern:${input.pattern}`);
         
         return validations;
-      }
+      };
       
-      function getHints(input: any): string[] {
+      const getHints = (input: Element): string[] => {
         const hints: string[] = [];
         
         const placeholder = input.getAttribute('placeholder');
@@ -98,9 +101,9 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
         }
         
         return hints.filter(h => h.length > 0);
-      }
+      };
 
-      const actions: any[] = [];
+      const actions: ElementAction[] = [];
       const inputs: any[] = [];
       const tables: any[] = [];
       const actionsSet = new Set<string>();
@@ -133,7 +136,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
 
       // Extract visible inputs
       document.querySelectorAll('input, textarea, select').forEach(el => {
-        const input = el as any;
+        const input = el as HTMLInputElement;
         if (!visible(input)) return;
         
         const name = input.name || input.id || input.getAttribute('data-name') || '';
@@ -174,7 +177,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
       document.querySelectorAll('button, a[href], [role="button"], input[type="submit"], input[type="button"]').forEach(el => {
         if (!visible(el)) return;
         
-        const element = el as any;
+        const element = el as HTMLElement;
         const text = element.textContent?.trim() || element.getAttribute('title') || element.getAttribute('aria-label') || '';
         const href = element.getAttribute('href') || undefined;
         const type = element.getAttribute('type') || undefined;
@@ -210,7 +213,7 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
           tables: tables as any[],
           actions: Array.from(actionsSet) as string[]
         },
-        actions: actions as any[]
+        actions: actions as ElementAction[]
       };
     }, allowDanger);
 
@@ -222,38 +225,33 @@ export async function analyzeCurrentPage(page: Page, allowDanger = false): Promi
 export async function extractPagePurpose(page: Page): Promise<string> {
   return retry(async () => {
     const purpose = await page.evaluate(() => {
-      // Extract from meta description
-      const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute('content');
-      if (metaDesc) return metaDesc;
+      const title = document.title || '';
+      const h1 = document.querySelector('h1')?.textContent?.trim() || '';
+      const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       
-      // Extract from main heading
-      const h1 = document.querySelector('h1')?.textContent?.trim();
-      if (h1) return h1;
-      
-      // Extract from title
-      return document.title || 'Página sem descrição identificada';
+      return `Título: ${title}\nCabeçalho principal: ${h1}\nDescrição: ${description}`;
     });
     
     return purpose;
-  }, 2, 500);
+  }, 3, 1000);
 }
 
 export async function extractMainActions(page: Page): Promise<string[]> {
   return retry(async () => {
     const actions = await page.evaluate(() => {
-      const actionTexts = new Set<string>();
+      const actionElements = document.querySelectorAll('button, a[href], [role="button"], input[type="submit"], input[type="button"]');
+      const actions: string[] = [];
       
-      // Primary buttons and links
-      document.querySelectorAll('button, a[href], [role="button"], input[type="submit"]').forEach(el => {
-        const text = el.textContent?.trim() || el.getAttribute('title') || el.getAttribute('aria-label');
-        if (text && text.length > 0 && text.length < 100) {
-          actionTexts.add(text);
+      actionElements.forEach(el => {
+        const text = el.textContent?.trim() || el.getAttribute('title') || el.getAttribute('aria-label') || '';
+        if (text && !actions.includes(text)) {
+          actions.push(text);
         }
       });
       
-      return Array.from(actionTexts).slice(0, 20); // Limit to 20 main actions
+      return actions;
     });
     
-    return actions as string[];
-  }, 2, 500);
+    return actions;
+  }, 3, 1000);
 }

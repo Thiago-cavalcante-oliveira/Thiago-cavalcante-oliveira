@@ -76,7 +76,7 @@ export class SmartLoginAgent extends BaseAgent {
     
     super(config);
     this.minioService = new MinIOService();
-    this.outputDir = path.join(process.cwd(), 'logs', `login-session-${Date.now()}`);
+    this.outputDir = path.join(process.cwd(), 'output', `login-session-${Date.now()}`);
   }
 
   async initialize(): Promise<void> {

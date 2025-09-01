@@ -1,0 +1,14 @@
+{
+  "extends": "./agente_multi/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@agents/*": ["agente_multi/agents/*"],
+      "@crawler/*": ["agente_multi/crawler/*"]
+    },
+    "rootDir": ".",
+    "outDir": "./dist"
+  },
+  "include": ["agente_multi/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

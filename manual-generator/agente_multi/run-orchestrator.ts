@@ -48,12 +48,24 @@ async function main() {
     await orchestrator.initialize();
     
     // Executar pipeline com configurações do ambiente
-    const result = await orchestrator.executeWithEnvConfig({
-      outputDir,
-      enableScreenshots: true,
-      outputFormats: ['markdown', 'html'],
-      stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined
-    });
+    let result;
+    if (process.argv.includes('--explore-page')) {
+      const startUrl = process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin';
+      console.log(`
+🧭 Explorando página: ${startUrl}`);
+      result = await orchestrator.executePageExplore({
+        startUrl,
+        outputDir,
+        enableScreenshots: true,
+      });
+    } else {
+      result = await orchestrator.executeWithEnvConfig({
+        outputDir,
+        enableScreenshots: true,
+        outputFormats: ['markdown', 'html'],
+        stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined
+      });
+    }
     
     // Mostrar resultados
     console.log('\n📊 Resultados:');
@@ -65,7 +77,7 @@ async function main() {
     
     if (result.errors.length > 0) {
       console.log('\n❌ Erros:');
-      result.errors.forEach(error => console.log(`   - ${error}`));
+      result.errors.forEach((error: any) => console.log(`   - ${error}`));
     }
     
     if (Object.keys(result.documentsGenerated).length > 0) {

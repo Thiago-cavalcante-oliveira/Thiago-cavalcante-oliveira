@@ -184,7 +184,7 @@
   "modals": [],
   "interactiveElements": [
     {
-      "selector": "#mantine-dss6c83pd-target",
+      "selector": "#mantine-d1o7t8t0k-target",
       "type": "button",
       "text": "Admin Sistema",
       "isVisible": true,
@@ -196,7 +196,7 @@
       }
     },
     {
-      "selector": "#mantine-qb5xjjw49-target",
+      "selector": "#mantine-nb2vfkbkv-target",
       "type": "button",
       "text": "Admin Sistema",
       "isVisible": true,

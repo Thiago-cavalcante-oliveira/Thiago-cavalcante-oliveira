@@ -1,10 +1,46 @@
 {
+  "name": "manual-generator",
+  "version": "1.0.0",
+  "description": "Sistema multi-agente para geração de manuais",
+  "main": "agente_multi/main.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx agente_multi/main.ts",
+    "test": "tsx agente_multi/tests/menu-modal-agent.test.ts",
+    "test:crawler": "tsx agente_multi/tests/test-crawler-complete.ts",
+    "test:full": "tsx agente_multi/tests/test-full-crawling-with-login.ts",
+    "test:orchestrator": "tsx agente_multi/tests/test-crawling-orchestrator.ts",
+    "orchestrator": "tsx agente_multi/run-orchestrator.ts",
+    "orchestrator:login": "tsx agente_multi/run-orchestrator.ts --login-only",
+    "build": "tsc",
+    "dev": "tsx --watch agente_multi/main.ts"
+  },
   "dependencies": {
+    "@google/generative-ai": "^0.2.0",
+    "dotenv": "^16.3.0",
     "eventemitter3": "^5.0.1",
+    "groq-sdk": "^0.3.0",
+    "marked": "^9.0.0",
+    "minio": "^7.1.0",
+    "pdf-lib": "^1.17.1",
+    "pino": "^9.9.0",
+    "playwright": "^1.40.0",
+    "puppeteer": "^21.0.0",
     "ts-node": "^10.9.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
-    "tsx": "^4.20.5"
-  }
+    "@types/node": "^20.0.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "automation",
+    "web-scraping",
+    "ai",
+    "manual-generation"
+  ],
+  "author": "Thiago Cavalcante Oliveira",
+  "license": "MIT"
 }

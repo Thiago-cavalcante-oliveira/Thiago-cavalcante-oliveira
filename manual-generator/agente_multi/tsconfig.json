@@ -3,6 +3,11 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@agents/*": ["agents/*"],
+      "@crawler/*": ["crawler/*"]
+    },
     "lib": ["ES2020", "DOM"],
     "outDir": "./dist",
     "rootDir": "./",
@@ -19,7 +24,7 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
@@ -31,8 +36,9 @@
     "types": ["node"]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules",

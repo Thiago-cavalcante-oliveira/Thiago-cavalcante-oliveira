@@ -14,7 +14,14 @@ import { GeneratorAgent } from './GeneratorAgent';
 import { MenuModalAgent } from './MenuModalAgent';
 import { Timeline } from '../services/Timeline';
 import { Browser, Page, chromium } from 'playwright';
+import { explorePage } from '../crawler/index';
+import { safeValidateEnvironment } from '../config/environment';
 import * as dotenv from 'dotenv';
+
+// Shim global para evitar erro '__name is not defined'
+if (typeof (globalThis as any).__name === 'undefined') {
+  (globalThis as any).__name = 'OrchestratorAgent';
+}
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -80,32 +87,74 @@ export class OrchestratorAgent extends BaseAgent {
     this.agents.set('AnalysisAgent', new AnalysisAgent(''));
     this.agents.set('ContentAgent', new ContentAgent(''));
     this.agents.set('GeneratorAgent', new GeneratorAgent(''));
-    this.agents.set('MenuModalAgent', new MenuModalAgent({
-      maxRetries: 2,
-      timeoutMinutes: 5,
-      enableScreenshots: true,
-      outputFormats: ['markdown'],
-      targetUrl: '',
-      credentials: { username: '', password: '' }
-    }, new Timeline()));
   }
 
+  private async initializeBrowserAndPage(): Promise<void> {
+    if (!this.browser) {
+      this.browser = await chromium.launch({ headless: false });
+    }
+    if (!this.page) {
+      this.page = await this.browser.newPage();
+      // Shim global para evitar erro '__name is not defined' em contextos de página
+      await this.page.evaluate(() => {
+        if (typeof (window as any).__name === 'undefined') {
+          (window as any).__name = 'OrchestratorAgentPage';
+        }
+      });
+      // Propagar a página e o navegador para os agentes que precisam
+      for (const agent of this.agents.values()) {
+        if (agent.setPage) {
+          agent.setPage(this.page);
+        }
+        if (agent.setBrowser) {
+          agent.setBrowser(this.browser);
+        }
+      }
+    }
+  }
+
+
+
   /**
-   * Cria uma configuração padrão usando variáveis de ambiente
+   * Cria uma configuração padrão usando variáveis de ambiente validadas com Zod
    */
   static createDefaultConfig(overrides: Partial<OrchestrationConfig> = {}): OrchestrationConfig {
+    // Validar variáveis de ambiente usando Zod
+    const envValidation = safeValidateEnvironment();
+    
+    if (!envValidation.success) {
+      console.warn('⚠️ Erro na validação de ambiente, usando valores padrão:', envValidation.error);
+      // Usar valores padrão se a validação falhar
+      return {
+        maxRetries: 2,
+        timeoutMinutes: 15,
+        enableScreenshots: true,
+        outputFormats: ['markdown'],
+        targetUrl: 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+        crawlingStrategy: 'advanced',
+        credentials: {
+          username: 'admin',
+          password: 'admin123',
+          loginUrl: 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
+        },
+        ...overrides
+      };
+    }
+    
+    const env = envValidation.data;
+    
     return {
-      maxRetries: 2,
+      maxRetries: env.GEMINI_MAX_RETRIES || 2,
       timeoutMinutes: 15,
       enableScreenshots: true,
       outputFormats: ['markdown'],
-      targetUrl: process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+      targetUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
       crawlingStrategy: 'advanced',
-      credentials: {
-        username: process.env.SAEB_USERNAME || 'admin',
-        password: process.env.SAEB_PASSWORD || 'admin123',
-        loginUrl: process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
-      },
+      credentials: env.SAEB_USERNAME && env.SAEB_PASSWORD ? {
+        username: env.SAEB_USERNAME,
+        password: env.SAEB_PASSWORD,
+        loginUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
+      } : undefined,
       ...overrides
     };
   }
@@ -143,6 +192,9 @@ export class OrchestratorAgent extends BaseAgent {
         case 'login_only':
           result = await this.executeLoginOnly(task.data);
           break;
+        case 'execute_page_explore':
+          result = await this.executePageExplore(task.data);
+          break;
         default:
           throw new Error(`Tipo de tarefa não suportado: ${task.type}`);
       }
@@ -156,14 +208,58 @@ export class OrchestratorAgent extends BaseAgent {
         processingTime: Date.now() - startTime
       };
       
-    } catch (error) {
-      return {
-        id: `result_${Date.now()}`,
-        taskId: task.id,
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
+    } catch (error: any) {
+      throw error; // Re-lança o erro para ser capturado pelo chamador
+    }
+  }
+
+  async executePageExplore(config: any): Promise<any> {
+    const startTime = Date.now();
+    let success = true;
+    let errors: string[] = [];
+    let pagesProcessed = 0;
+    let elementsAnalyzed = 0;
+    let documentsGenerated: { [key: string]: string | undefined } = {};
+
+    try {
+      await this.initializeBrowserAndPage();
+      if (!this.page) {
+        throw new Error('Falha ao inicializar a página para exploração.');
+      }
+
+      const { pageReport, initialBefore, outputDir } = await explorePage(this.page, {
+        startUrl: config.startUrl,
+        outputDir: config.outputDir,
+        enableScreenshots: config.enableScreenshots,
+      });
+
+      // Enviar o relatório da página para o AnalysisAgent
+      await (this.agents.get('AnalysisAgent') as AnalysisAgent).processTask({
+        id: `analyze_page_${Date.now()}`,
+        type: 'analyze_page',
+        data: pageReport,
         timestamp: new Date(),
-        processingTime: Date.now() - startTime
+        sender: this.config.name,
+        priority: 'high',
+      });
+
+      pagesProcessed = 1; // Apenas uma página é explorada por vez
+
+    } catch (error: any) {
+      success = false;
+      errors.push(error.message);
+      this.log(`Erro durante a exploração da página: ${error.message}`, 'error');
+    } finally {
+      await this.cleanup();
+      const totalDuration = Date.now() - startTime;
+      this.log(`Exploração de página concluída em ${totalDuration}ms com sucesso: ${success}`);
+      return {
+        success,
+        totalDuration,
+        agentsExecuted: ['OrchestratorAgent', 'AnalysisAgent', 'ContentAgent'], // Agentes envolvidos
+        statistics: { pagesProcessed, elementsAnalyzed },
+        errors,
+        documentsGenerated,
       };
     }
   }
@@ -215,10 +311,45 @@ export class OrchestratorAgent extends BaseAgent {
     return report;
   }
 
+  //#region lifecycle
+  async init(headless = false, slowMo = 100): Promise<void> {
+    this.browser = await chromium.launch({ 
+      headless, 
+      slowMo, 
+      args: ['--no-sandbox','--disable-setuid-sandbox'] 
+    });
+    const context = await this.browser.newContext({ ignoreHTTPSErrors: true });
+    this.page = await context.newPage();
+
+    // 🔧 Shim global para evitar ReferenceError: __name em page.evaluate
+    await this.page.addInitScript({ content: `
+      (function(){ window.__name = window.__name || ((o,n)=>{ try{Object.defineProperty(o,'name',{value:n,configurable:true});}catch{}; return o; }); })();
+    `});
+  }
+
+  async dispose(): Promise<void> {
+    try { 
+      await this.page?.context()?.storageState({ path: './artifacts/auth-state.json' }); 
+    } catch {}
+    await this.browser?.close();
+  }
+  //#endregion
+
+  //#region DI helpers
+  registerAgent(name: string, agent: any): void { this.agents.set(name, agent); }
+  //#endregion
+
   async initialize(): Promise<void> {
+    this.log('Inicializando OrchestratorAgent...');
+    
+    // Inicializar serviços
     await this.minioService.initialize?.();
 
-    this.browser = await chromium.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    this.browser = await chromium.launch({ 
+      headless: false, 
+      slowMo: 100,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+    });
     const context = await this.browser.newContext({ ignoreHTTPSErrors: true });
     this.page = await context.newPage();
 
@@ -230,12 +361,36 @@ export class OrchestratorAgent extends BaseAgent {
     (this.agents.get('MenuModalAgent') as any)?.setPage?.(this.page);
     (this.agents.get('MenuModalAgent') as any)?.setBrowser?.(this.browser);
 
-    this.log('OrchestratorAgent inicializado');
+    // Inicializar todos os agentes
+    for (const [name, agent] of this.agents) {
+      await agent.initialize?.();
+      this.log(`Agente ${name} inicializado`);
+    }
+
+    this.log('OrchestratorAgent inicializado com sucesso');
   }
 
-  async cleanup(): Promise<void> {
-    try { for (const [, agent] of this.agents) await agent.cleanup?.(); } catch { /* noop */ }
-    if (this.browser) { await this.browser.close(); this.browser = null; }
+  public async cleanup(): Promise<void> {
+    try {
+      // Salvar estado de autenticação se existir
+      if (this.page) {
+        try {
+          await this.page.context().storageState({ path: './artifacts/auth-state.json' });
+        } catch (error) {
+          this.log(`Erro ao salvar estado de autenticação: ${error}`, 'warn');
+        }
+      }
+      
+      // Finalizar agentes
+      for (const [, agent] of this.agents) {
+        await agent.cleanup?.();
+      }
+    } catch { /* noop */ }
+    
+    if (this.browser) { 
+      await this.browser.close(); 
+      this.browser = null; 
+    }
     this.page = null;
     this.log('OrchestratorAgent finalizado');
   }
@@ -365,6 +520,9 @@ export class OrchestratorAgent extends BaseAgent {
     };
 
     try {
+      // Inicializar browser e página antes de qualquer operação
+      await this.initializeBrowserAndPage();
+      
       // FASE 1: Login com fallback
       const loginOutcome = await this.loginWithFallback(config, result);
       if (config.stopAfterPhase === 'login') {

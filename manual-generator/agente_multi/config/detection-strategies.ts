@@ -140,7 +140,7 @@ export const SYSTEM_SPECIFIC_CONFIGS: Record<string, Partial<DetectionConfig>> =
       networkIdle: 15000, // Sistemas governamentais podem ser mais lentos
       dynamicLoad: 5000
     }
-  },
+  } as Partial<DetectionConfig>,
   
   'administrative-system': {
     limits: {
@@ -150,7 +150,7 @@ export const SYSTEM_SPECIFIC_CONFIGS: Record<string, Partial<DetectionConfig>> =
       hoverReveal: true,
       domObservation: true
     }
-  },
+  } as Partial<DetectionConfig>,
   
   'spa-system': {
     timeouts: {
@@ -161,7 +161,7 @@ export const SYSTEM_SPECIFIC_CONFIGS: Record<string, Partial<DetectionConfig>> =
       domObservation: true,
       aiAnalysis: true
     }
-  }
+  } as Partial<DetectionConfig>
 };
 
 /**

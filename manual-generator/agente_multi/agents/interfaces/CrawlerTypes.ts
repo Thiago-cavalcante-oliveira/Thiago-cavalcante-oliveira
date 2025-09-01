@@ -56,8 +56,17 @@ export interface StaticElement {
 }
 
 export interface UserClickRequest {
-  element: any;
+  clickedElement?: InteractiveElement;
   action: string;
+  userCancelled?: boolean;
+}
+
+export interface InteractionResult {
+  success: boolean;
+  interactionType?: InteractionType;
+  error?: string;
+  data?: any;
+  timestamp?: number;
 }
 
 export interface RelatedElement {
