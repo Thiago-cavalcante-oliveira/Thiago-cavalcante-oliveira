@@ -42,6 +42,7 @@ export async function explorePage(page: Page, options: ExplorePageOptions) {
 
   try {
     await page.goto(startUrl, { waitUntil: 'domcontentloaded' });
+    await this.waitForDomSteady(page);
     pageReport.title = await page.title();
 
     // Monitorar chamadas de API

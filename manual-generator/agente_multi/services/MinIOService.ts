@@ -1,7 +1,7 @@
 import { Client } from 'minio';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { safeValidateEnvironment } from '../config/environment';
+import { safeValidateEnvironment } from '../config/environment.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

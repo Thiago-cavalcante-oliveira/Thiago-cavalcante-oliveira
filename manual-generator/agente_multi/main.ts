@@ -1,5 +1,4 @@
-import 'dotenv/config';
-import { validateEnvironment, type Environment } from './config/environment.js';
+import { env } from './config/env.js';
 import { AgnoSCore } from './core/AgnoSCore.js';
 import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
 import { LoginAgent } from './agents/LoginAgent.js';
@@ -80,18 +79,11 @@ async function main() {
   console.log('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais...');
   
   // Validar variáveis de ambiente primeiro
-  console.log('🔍 Validando configurações de ambiente...');
-  let env: Environment;
-  try {
-    env = validateEnvironment();
-    console.log('✅ Configurações de ambiente validadas com sucesso');
-    console.log(`📊 Modo: ${env.NODE_ENV}`);
-    console.log(`📝 Log Level: ${env.LOG_LEVEL}`);
-    console.log(`🔑 Chaves configuradas: ${env.GOOGLE_API_KEY ? 'Gemini ✅' : 'Gemini ❌'} ${env.GROQ_API_KEY ? 'Groq ✅' : 'Groq ❌'} ${env.FIRECRAWL_API_KEY ? 'Firecrawl ✅' : 'Firecrawl ❌'}`);
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : 'Erro na validação de ambiente');
-    process.exit(1);
-  }
+  console.log('🔍 Carregando configurações de ambiente...');
+  console.log('✅ Configurações de ambiente carregadas com sucesso');
+  console.log(`📊 Modo: ${env.NODE_ENV}`);
+  console.log(`📝 Log Level: ${env.LOG_LEVEL}`);
+  console.log(`🔑 Chaves configuradas: ${env.GOOGLE_API_KEY ? 'Gemini ✅' : 'Gemini ❌'} ${env.GROQ_API_KEY ? 'Groq ✅' : 'Groq ❌'} ${env.FIRECRAWL_API_KEY ? 'Firecrawl ✅' : 'Firecrawl ❌'}`);
   
   // Processar argumentos da linha de comando
   const cmdArgs = parseArgs();

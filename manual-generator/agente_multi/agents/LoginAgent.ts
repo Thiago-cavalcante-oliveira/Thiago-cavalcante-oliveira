@@ -2,6 +2,7 @@ import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.
 import { Page } from 'playwright';
 import { MinIOService } from '../services/MinIOService.js';
 import { AuthDetectionResult } from './interfaces/AuthTypes';
+import { mkdir } from 'node:fs/promises';
 
 export interface LoginCredentials {
   username: string;
@@ -11,16 +12,16 @@ export interface LoginCredentials {
 }
 
 export interface LoginStep {
-  type: 'fill' | 'click' | 'wait' | 'waitForSelector';
-  selector: string;
+  type: 'fill' | 'click' | 'waitForSelector' | 'waitForLoadState' | 'waitForURL' | 'waitForNavigation';
+  selector?: string;              // não é necessário para alguns waits
   value?: string;
   timeout?: number;
+  urlPattern?: string;            // para waitForURL
+  state?: 'load' | 'domcontentloaded' | 'networkidle'; // para waitForLoadState
 }
 
 export class LoginAgent extends BaseAgent {
-  private page: Page | null = null;
-  private minioService: MinIOService;
-  private sessionData: any = null;
+  private minio?: MinIOService;
 
   constructor() {
     const config: AgentConfig = {
@@ -36,28 +37,30 @@ export class LoginAgent extends BaseAgent {
     };
 
     super(config);
-    this.minioService = new MinIOService();
   }
 
   async initialize(): Promise<void> {
-    await this.minioService.initialize();
     this.log('LoginAgent inicializado e pronto para autenticação');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
     const startTime = Date.now();
 
+    // opcional: permite injetar MinIO via task.data sem quebrar a assinatura da BaseAgent
+    const maybe = (task.data as any)?.minioService;
+    if (maybe) this.minio = maybe;
+
     try {
       switch (task.type) {
         case 'authenticate':
           return await this.handleAuthentication(task);
-        
+
         case 'check_session':
           return await this.handleSessionCheck(task);
-          
+
         case 'logout':
           return await this.handleLogout(task);
-          
+
         default:
           throw new Error(`Tipo de tarefa não suportada: ${task.type}`);
       }
@@ -75,10 +78,9 @@ export class LoginAgent extends BaseAgent {
   }
 
   private async handleAuthentication(task: TaskData): Promise<TaskResult> {
-    const { credentials, page } = task.data;
-    this.page = page;
+    const { credentials, page } = task.data as { credentials: LoginCredentials; page: Page };
 
-    if (!this.page) {
+    if (!page) {
       throw new Error('Página não fornecida para autenticação');
     }
 
@@ -87,15 +89,15 @@ export class LoginAgent extends BaseAgent {
     try {
       // Navegar para página de login se especificada
       if (credentials.loginUrl) {
-        await this.page.goto(credentials.loginUrl, { waitUntil: 'domcontentloaded' });
-        await this.page.waitForTimeout(2000);
+        await page.goto(credentials.loginUrl, { waitUntil: 'domcontentloaded' });
+        await page.waitForLoadState('domcontentloaded');
       }
 
       // Capturar screenshot da página de login
-      const loginScreenshot = await this.captureLoginPage();
+      const loginScreenshot = await this.captureLoginPage(page);
 
       // Detectar métodos de autenticação disponíveis
-      const authMethods = await this.detectAuthMethods();
+      const authMethods = await this.detectAuthMethods(page);
       this.log(`Métodos de autenticação detectados: ${JSON.stringify(authMethods)}`);
 
       // Determinar o tipo de autenticação a ser usado
@@ -106,13 +108,13 @@ export class LoginAgent extends BaseAgent {
       
       switch (authType) {
         case 'basic':
-          authResult = await this.performBasicAuth(credentials);
+          authResult = await this.performBasicAuth(credentials, page);
           break;
         case 'oauth':
           authResult = await this.performOAuthAuth(credentials);
           break;
         case 'custom':
-          authResult = await this.performCustomAuth(credentials);
+          authResult = await this.performCustomAuth(credentials, page);
           break;
         default:
           throw new Error(`Tipo de autenticação não suportado: ${authType}`);
@@ -120,14 +122,14 @@ export class LoginAgent extends BaseAgent {
 
       if (authResult) {
         // Capturar dados da sessão
-        this.sessionData = await this.captureSessionData();
-        
+        const sessionData = await this.captureSessionData(page);
+
         // Capturar screenshot pós-login
-        const postLoginScreenshot = await this.capturePostLoginPage();
+        const postLoginScreenshot = await this.capturePostLoginPage(page);
 
         // Notificar próximo agente (CrawlerAgent)
         this.sendTask('CrawlerAgent', 'start_authenticated_crawl', {
-          sessionData: this.sessionData,
+          sessionData,
           loginScreenshot,
           postLoginScreenshot,
           authType,
@@ -156,8 +158,8 @@ export class LoginAgent extends BaseAgent {
           data: {
             authenticated: true,
             authType,
-            sessionId: this.sessionData.sessionId,
-            userContext: this.sessionData.userContext,
+            sessionId: sessionData.sessionId,
+            userContext: sessionData.userContext,
             screenshots: [loginScreenshot, postLoginScreenshot]
           },
           timestamp: new Date(),
@@ -183,10 +185,9 @@ export class LoginAgent extends BaseAgent {
 
   private async handleSessionCheck(task: TaskData): Promise<TaskResult> {
     const { page } = task.data;
-    this.page = page;
 
     try {
-      const isValid = await this.validateSession();
+      const isValid = await this.validateSession(page);
       
       return {
         id: task.id,
@@ -203,13 +204,11 @@ export class LoginAgent extends BaseAgent {
   }
 
   private async handleLogout(task: TaskData): Promise<TaskResult> {
-    const { page } = task.data;
+    const { page } = task.data as { page: Page };
     this.log(`[MONITOR] Recebendo page em handleLogout: ${!!page}`);
-    this.page = page;
 
     try {
-      await this.performLogout();
-      this.sessionData = null;
+      await this.performLogout(page);
       
       return {
         id: task.id,
@@ -225,10 +224,10 @@ export class LoginAgent extends BaseAgent {
     }
   }
 
-  private async detectAuthMethods(): Promise<AuthDetectionResult> {
-    if (!this.page) throw new Error('Página não disponível');
+  private async detectAuthMethods(page: Page): Promise<AuthDetectionResult> {
+    this.log('Detectando métodos de autenticação na página...');
 
-    const authMethods = await this.page.evaluate(() => {
+    const authMethods = await page.evaluate(() => {
       // Detectar autenticação padrão
       const standardAuth = {
         available: false,
@@ -366,51 +365,30 @@ export class LoginAgent extends BaseAgent {
     return authMethods;
   }
 
-  private async performBasicAuth(credentials: LoginCredentials): Promise<boolean> {
-    if (!this.page) throw new Error('Página não disponível');
+  /**
+   * Performs basic authentication.
+   * @param credentials Login credentials.
+   * @param page The Playwright Page object.
+   */
+  private async performBasicAuth(credentials: LoginCredentials, page: Page): Promise<boolean> {
 
     try {
       this.log('Executando autenticação básica');
 
-      const usernameField = await this.page.waitForSelector(
-        [
-          'input[name="login"]',
-          'input[name="usuario"]',
-          'input[name="user"]',
-          'input[name="username"]',
-          'input[name="email"]',
-          'input[id="login"]',
-          'input[id="usuario"]',
-          'input[id="user"]',
-          'input[id="username"]',
-          'input[id="email"]',
-          'input[placeholder*="suário"]',
-          'input[placeholder*="sername"]',
-          'input[placeholder*="mail"]',
-          'input[aria-label*="suário"]',
-          'input[aria-label*="sername"]',
-        ].join(', '),
-        { timeout: 7000 }
-      );
+      const usernameField = page.getByRole('textbox', { name: /usuário|username|e-mail|email/i })
+        .or(page.getByPlaceholder(/usuário|username|e-mail|email/i))
+        .or(page.locator('input[name*="user"], input[name*="login"], input[name*="email"], input[id*="user"], input[id*="login"], input[id*="email"]'));
       
-      const passwordField = await this.page.waitForSelector(
-        [
-          'input[type="password"]',
-          'input[name="senha"]',
-          'input[name="password"]',
-          'input[id="senha"]',
-          'input[id="password"]',
-          'input[placeholder*="enha"]',
-          'input[placeholder*="assword"]',
-          'input[aria-label*="enha"]',
-          'input[aria-label*="assword"]',
-        ].join(', '),
-        { timeout: 7000 }
-      );
+      const passwordField = page.getByRole('textbox', { name: /senha|password/i, exact: true })
+        .or(page.getByPlaceholder(/senha|password/i))
+        .or(page.locator('input[type="password"], input[name*="senha"], input[name*="password"], input[id*="senha"], input[id*="password"]'));
+
+      await usernameField.waitFor({ state: 'visible', timeout: 7000 });
+      await passwordField.waitFor({ state: 'visible', timeout: 7000 });
 
       if (!usernameField || !passwordField) {
         // Log adicional para debug
-        const allInputs = await this.page.$$eval('input', inputs => 
+        const allInputs = await page.$$eval('input', inputs => 
           inputs.map(input => ({
             type: input.type,
             name: input.name,
@@ -427,15 +405,14 @@ export class LoginAgent extends BaseAgent {
 
       // Preencher credenciais
       await usernameField.fill(credentials.username);
-      await this.page.waitForTimeout(500);
+
       
       await passwordField.fill(credentials.password);
-      await this.page.waitForTimeout(500);
+
 
       // Submeter formulário
-      const submitButton = await this.page.$(
-        'button[type="submit"], input[type="submit"], button[class*="login"], button[class*="submit"], button[class*="signin"]'
-      );
+      const submitButton = page.getByRole('button', { name: /entrar|login|submit|sign in/i })
+        .or(page.locator('button[type="submit"], input[type="submit"], button[class*="login"], button[class*="submit"], button[class*="signin"]'));
 
       if (submitButton) {
         await submitButton.click();
@@ -445,10 +422,10 @@ export class LoginAgent extends BaseAgent {
       }
 
       // Aguardar resposta
-      await this.page.waitForTimeout(4000);
+      await this.waitForDomSteady(page);
 
       // Verificar sucesso
-      return await this.verifyAuthenticationSuccess();
+      return await this.verifyAuthenticationSuccess(page);
 
     } catch (error) {
       this.log(`Erro na autenticação básica: ${error}`, 'error');
@@ -461,7 +438,12 @@ export class LoginAgent extends BaseAgent {
     return false;
   }
 
-  private async performCustomAuth(credentials: LoginCredentials): Promise<boolean> {
+  /**
+   * Performs custom authentication steps.
+   * @param credentials Login credentials including custom steps.
+   * @param page The Playwright Page object.
+   */
+  private async performCustomAuth(credentials: LoginCredentials, page: Page): Promise<boolean> {
     if (!credentials.customSteps) {
       this.log('Steps customizados não fornecidos', 'error');
       return false;
@@ -471,10 +453,10 @@ export class LoginAgent extends BaseAgent {
       this.log('Executando autenticação customizada');
 
       for (const step of credentials.customSteps) {
-        await this.executeCustomStep(step);
+        await this.executeCustomStep(step, page);
       }
 
-      return await this.verifyAuthenticationSuccess();
+      return await this.verifyAuthenticationSuccess(page);
 
     } catch (error) {
       this.log(`Erro na autenticação customizada: ${error}`, 'error');
@@ -482,33 +464,47 @@ export class LoginAgent extends BaseAgent {
     }
   }
 
-  private async executeCustomStep(step: LoginStep): Promise<void> {
-    if (!this.page) throw new Error('Página não disponível');
+  private async executeCustomStep(step: LoginStep, page: Page): Promise<void> {
 
     switch (step.type) {
       case 'fill':
-        await this.page.fill(step.selector, step.value || '');
+        if (step.selector) {
+          await page.fill(step.selector, step.value || '');
+        }
         break;
       
       case 'click':
-        await this.page.click(step.selector);
+        if (step.selector) {
+          await page.click(step.selector);
+        }
         break;
         
-      case 'wait':
-        await this.page.waitForTimeout(step.timeout || 1000);
+      case 'waitForLoadState':
+        await page.waitForLoadState(step.state, { timeout: step.timeout || 30000 });
+        break;
+
+      case 'waitForURL':
+        if (step.urlPattern) {
+          await page.waitForURL(step.urlPattern, { timeout: step.timeout || 30000 });
+        }
+        break;
+
+      case 'waitForNavigation':
+        await page.waitForNavigation({ timeout: step.timeout || 30000 });
         break;
         
       case 'waitForSelector':
-        await this.page.waitForSelector(step.selector, { timeout: step.timeout || 10000 });
+        if (step.selector) {
+          await page.waitForSelector(step.selector, { timeout: step.timeout || 10000 });
+        }
         break;
     }
   }
 
-  private async verifyAuthenticationSuccess(): Promise<boolean> {
-    if (!this.page) return false;
+  private async verifyAuthenticationSuccess(page: Page): Promise<boolean> {
 
     try {
-      const authResult = await this.page.evaluate(() => {
+      const authResult = await page.evaluate(() => {
         // Verificar se não há mais campos de senha (indicativo de sucesso)
         const passwordFields = document.querySelectorAll('input[type="password"]');
         
@@ -553,10 +549,9 @@ export class LoginAgent extends BaseAgent {
     }
   }
 
-  private async captureSessionData(): Promise<any> {
-    if (!this.page) return null;
+  private async captureSessionData(page: Page): Promise<any> {
 
-    const sessionData = await this.page.evaluate(() => {
+    const sessionData = await page.evaluate(() => {
       const userInfo = {
         name: document.querySelector('[class*="user-name"], [class*="username"], [class*="display-name"]')?.textContent?.trim(),
         email: document.querySelector('[class*="user-email"], [class*="email"]')?.textContent?.trim(),
@@ -580,40 +575,32 @@ export class LoginAgent extends BaseAgent {
     };
   }
 
-  private async captureLoginPage(): Promise<string> {
-    if (!this.page) throw new Error('Página não disponível');
+  private async captureLoginPage(page: Page): Promise<string> {
 
     const filename = `login_page_${Date.now()}.png`;
     const localPath = `output/screenshots/${filename}`;
+    await mkdir('output/screenshots', { recursive: true });
 
-    await this.page.screenshot({
-      path: localPath,
-      fullPage: true,
-      type: 'png'
-    });
+    await page.screenshot({ path: localPath, fullPage: true, type: 'png' });
 
     // Upload para MinIO
-    const minioUrl = await this.minioService.uploadScreenshot(localPath, filename);
-    
+    const minioUrl = this.minio ? await this.minio.uploadScreenshot(localPath, filename) : undefined;
+
     this.log(`Screenshot da página de login capturado: ${filename}`);
     return minioUrl || localPath;
   }
 
-  private async capturePostLoginPage(): Promise<string> {
-    if (!this.page) throw new Error('Página não disponível');
+  private async capturePostLoginPage(page: Page): Promise<string> {
 
     const filename = `post_login_page_${Date.now()}.png`;
     const localPath = `output/screenshots/${filename}`;
+    await mkdir('output/screenshots', { recursive: true });
 
-    await this.page.screenshot({
-      path: localPath,
-      fullPage: true,
-      type: 'png'
-    });
+    await page.screenshot({ path: localPath, fullPage: true, type: 'png' });
 
     // Upload para MinIO
-    const minioUrl = await this.minioService.uploadScreenshot(localPath, filename);
-    
+    const minioUrl = this.minio ? await this.minio.uploadScreenshot(localPath, filename) : undefined;
+
     this.log(`Screenshot pós-login capturado: ${filename}`);
     return minioUrl || localPath;
   }
@@ -630,21 +617,20 @@ export class LoginAgent extends BaseAgent {
     return 'basic';
   }
 
-  private async validateSession(): Promise<boolean> {
-    return await this.verifyAuthenticationSuccess();
+  private async validateSession(page: Page): Promise<boolean> {
+    return await this.verifyAuthenticationSuccess(page);
   }
 
-  private async performLogout(): Promise<void> {
-    if (!this.page) return;
+  private async performLogout(page: Page): Promise<void> {
 
     try {
-      const logoutButton = await this.page.$(
+      const logoutButton = await page.$(
         'a[href*="logout"], button[class*="logout"], a[class*="signout"], button[class*="sign-out"]'
       );
 
       if (logoutButton) {
         await logoutButton.click();
-        await this.page.waitForTimeout(2000);
+        await page.waitForTimeout(2000);
         this.log('Logout realizado com sucesso');
       } else {
         this.log('Botão de logout não encontrado', 'warn');
@@ -656,7 +642,7 @@ export class LoginAgent extends BaseAgent {
 
   async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
     const timestamp = new Date().toISOString();
-    
+
     let report = `# Relatório do LoginAgent
 
 **Task ID:** ${taskResult.taskId}
@@ -708,19 +694,19 @@ export class LoginAgent extends BaseAgent {
 `;
     }
 
-    // Salvar relatório no MinIO
-    await this.minioService.uploadReportMarkdown(report, this.config.name, taskResult.taskId);
+    // Salvar relatório no MinIO (se disponível)
+    if (this.minio) {
+      await this.minio.uploadReportMarkdown(report, this.config.name, taskResult.taskId);
+    } else {
+      this.log('MinIOService não configurado em generateMarkdownReport', 'warn');
+    }
 
     return report;
   }
 
-  setPage(page: Page): void {
-    this.page = page;
-  }
+
 
   async cleanup(): Promise<void> {
-    this.page = null;
-    this.sessionData = null;
     this.log('LoginAgent finalizado e recursos liberados');
   }
 }

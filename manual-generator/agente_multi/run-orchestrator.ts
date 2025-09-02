@@ -14,7 +14,7 @@
  *   SAEB_PASSWORD=admin123
  */
 
-import { OrchestratorAgent } from './agents/OrchestratorAgent';
+import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
@@ -46,8 +46,14 @@ async function main() {
     // Inicializar orquestrador
     const orchestrator = new OrchestratorAgent();
     await orchestrator.initialize();
-    
     // Executar pipeline com configurações do ambiente
+    const config = OrchestratorAgent.createDefaultConfig({
+      outputDir,
+      enableScreenshots: true,
+      outputFormats: ['markdown', 'html'],
+      stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined
+    });
+
     let result;
     if (process.argv.includes('--explore-page')) {
       const startUrl = process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin';
@@ -56,15 +62,10 @@ async function main() {
       result = await orchestrator.executePageExplore({
         startUrl,
         outputDir,
-        enableScreenshots: true,
+        enableScreenshots: config.enableScreenshots,
       });
     } else {
-      result = await orchestrator.executeWithEnvConfig({
-        outputDir,
-        enableScreenshots: true,
-        outputFormats: ['markdown', 'html'],
-        stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined
-      });
+      result = await orchestrator.executeFullPipeline(config);
     }
     
     // Mostrar resultados

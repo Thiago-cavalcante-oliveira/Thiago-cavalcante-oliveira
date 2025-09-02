@@ -687,7 +687,11 @@ Esta seção contém soluções para os problemas mais comuns:
       const puppeteer = await import('puppeteer').catch(() => null);
       
       if (puppeteer) {
-        const browser = await puppeteer.launch();
+        const headless = process.env.HEADLESS !== 'false';
+        const browser = await puppeteer.launch({
+          headless,
+          args: ['--no-sandbox', '--disable-dev-shm-usage']
+        });
         const page = await browser.newPage();
         await page.setContent(htmlContent);
         

@@ -6,8 +6,8 @@
 import { Page, Browser } from 'playwright';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseAgent, TaskData, TaskResult } from '../core/AgnoSCore';
-import { discoverRoutes, interactiveDiscovery, RouteInfo } from '../crawler/routeDiscovery';
+import { BaseAgent, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { discoverRoutes, interactiveDiscovery, RouteInfo } from '../crawler/routeDiscovery.js';
 
 export class CrawlerAgent extends BaseAgent {
   private page!: Page;
@@ -251,6 +251,7 @@ export class CrawlerAgent extends BaseAgent {
   private async safeGoto(targetUrl: string) {
      try {
        await this.page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+       await this.waitForDomSteady(this.page);
        await Promise.race([
          this.page.waitForLoadState('networkidle', { timeout: 10_000 }),
          this.page.waitForTimeout(800),

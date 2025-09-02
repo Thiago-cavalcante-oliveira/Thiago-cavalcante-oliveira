@@ -40,16 +40,51 @@ export async function interactiveDiscovery(page: Page, opt: DiscoveryOptions = {
   const initial = await discoverRoutes(page);
   const all = new Set(initial.map(r => r.url));
 
-  // Hover/click leve em menus para revelar subrotas
-  const menuItems = await page.locator('nav a, [role="menuitem"], .menu a').all();
-  for (const item of menuItems.slice(0, Math.min(menuItems.length, maxInteractions))) {
-    try {
-      await item.hover({ timeout: 800 }).catch(() => {});
-      const href = await item.getAttribute('href');
-      if (href) {
-        try { const u = new URL(href, await page.evaluate(() => location.origin)); all.add(u.pathname + u.search); } catch {}
+  const processFrame = async (frame: Frame) => {
+    const frameUrl = frame.url();
+    const pageUrl = page.url();
+
+    // Verifica se a origem do frame é a mesma da página principal
+    if (new URL(frameUrl).origin !== new URL(pageUrl).origin) {
+      return;
+    }
+
+    // Clicks reais em elementos interativos para revelar subrotas dentro do frame
+    const items = frame.getByRole('link').or(frame.getByRole('button')).or(frame.getByRole('menuitem'));
+    for (const item of await items.all()) {
+      if (!(await item.isVisible())) continue;
+
+      const prevUrl = page.url(); // Usar page.url() para verificar a URL da página principal
+      try {
+        await Promise.all([
+          item.click().catch(() => {}),
+          page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {}),
+          page.waitForURL(u => u.toString() !== prevUrl, { timeout: 5000 }).catch(() => {}),
+        ]);
+        all.add(page.url()); // Adiciona a nova URL após o clique
+      } catch (e) {
+        // Ignora erros de clique ou navegação para continuar a descoberta
+        console.warn(`Erro ao interagir com elemento no frame ${frameUrl}: ${e}`);
       }
-    } catch {}
+      await page.waitForTimeout(500); // Pequena pausa para estabilidade
+    }
+
+    // Adiciona URLs de links estáticos que podem não ter sido clicados dentro do frame
+    const staticLinks = await frame.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a[href]'))
+        .map(a => (a as HTMLAnchorElement).href)
+        .filter(href => href.startsWith(location.origin));
+      return Array.from(new Set(links));
+    });
+    staticLinks.forEach(link => all.add(new URL(link).pathname + new URL(link).search));
+  };
+
+  // Processa a página principal
+  await processFrame(page.mainFrame());
+
+  // Percorre todos os iframes na página
+  for (const frame of page.frames()) {
+    await processFrame(frame);
   }
 
   return Array.from(all).sort().map(url => ({ url, type: 'dynamic' as const }));

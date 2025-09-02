@@ -123,9 +123,10 @@ ${data.duplicate ? '- **Status:** Duplicata detectada e otimizada' : ''}`;
 
   private async initializeBrowser(): Promise<void> {
     if (!this.browser) {
+      const headless = process.env.HEADLESS !== 'false';
       this.browser = await chromium.launch({
-      headless: false, // Permite visualizar o browser
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        headless,
+        args: ['--no-sandbox', '--disable-dev-shm-usage']
       });
       this.log('🌐 Browser inicializado');
     }
@@ -288,7 +289,8 @@ ${data.duplicate ? '- **Status:** Duplicata detectada e otimizada' : ''}`;
 
       const page = await this.browser!.newPage();
       await page.setViewportSize({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle' });
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      await this.waitForDomSteady(page);
 
       const results = [];
       
@@ -398,7 +400,8 @@ ${data.duplicate ? '- **Status:** Duplicata detectada e otimizada' : ''}`;
       }
     }
 
-    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await this.waitForDomSteady(page);
     
     // Aguardar um pouco para garantir que a página carregou completamente
     await new Promise(resolve => setTimeout(resolve, 2000));

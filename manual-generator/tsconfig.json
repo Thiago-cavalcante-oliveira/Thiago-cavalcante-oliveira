@@ -1,14 +1,49 @@
 {
-  "extends": "./agente_multi/tsconfig.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "@agents/*": ["agente_multi/agents/*"],
-      "@crawler/*": ["agente_multi/crawler/*"]
+      "@crawler/*": ["agente_multi/crawler/*"],
+      "@services/*": ["agente_multi/services/*"],
+      "@utils/*": ["agente_multi/utils/*"]
     },
+    "lib": ["ES2020", "DOM"],
+    "outDir": "./dist",
     "rootDir": ".",
-    "outDir": "./dist"
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["node", "jest"]
   },
-  "include": ["agente_multi/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "agente_multi/**/*.ts",
+    "agente_multi/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.js"
+  ]
 }

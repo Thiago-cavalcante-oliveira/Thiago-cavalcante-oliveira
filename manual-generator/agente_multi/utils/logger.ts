@@ -1,5 +1,5 @@
 import pino from "pino";
-import { safeValidateEnvironment } from '../config/environment';
+import { safeValidateEnvironment } from '../config/environment.js';
 
 // Validar variáveis de ambiente usando Zod
 const envValidation = safeValidateEnvironment();

@@ -3,28 +3,29 @@
  * Orquestra login (com fallback automático para SmartLogin), crawl (MenuModalAgent), análise, conteúdo e geração.
  */
 
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore';
-import { MinIOService } from '../services/MinIOService';
+import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { MinIOService } from '../services/MinIOService.js';
 import { LoginAgent } from './LoginAgent';
 import { SmartLoginAgent } from './SmartLoginAgent';
 import { CrawlerAgent } from './CrawlerAgent';
 import { AnalysisAgent } from './AnalysisAgent';
 import { ContentAgent } from './ContentAgent';
 import { GeneratorAgent } from './GeneratorAgent';
-import { MenuModalAgent } from './MenuModalAgent';
-import { Timeline } from '../services/Timeline';
-import { Browser, Page, chromium } from 'playwright';
-import { explorePage } from '../crawler/index';
-import { safeValidateEnvironment } from '../config/environment';
-import * as dotenv from 'dotenv';
+// import { MenuModalAgent } from './MenuModalAgent';
+// import { Timeline } from '../services/Timeline.js';
+import { Browser, Page, chromium, BrowserContext } from 'playwright';
+// import { v4 as uuidv4 } from 'uuid';
+import { explorePage } from '../crawler/index.js';
+import { env } from '../config/env.js';
+import { Semaphore } from '../core/sem.js';
+
 
 // Shim global para evitar erro '__name is not defined'
 if (typeof (globalThis as any).__name === 'undefined') {
   (globalThis as any).__name = 'OrchestratorAgent';
 }
 
-// Carregar variáveis de ambiente
-dotenv.config();
+
 
 export interface OrchestrationConfig {
   maxRetries: number;
@@ -60,10 +61,12 @@ export interface OrchestrationResult {
 export class OrchestratorAgent extends BaseAgent {
   private minioService: MinIOService;
   private agents: Map<string, any> = new Map();
-  private browser: Browser | null = null;
-  private page: Page | null = null;
+
+  // private executionId: string = '';
+  private semaphore: Semaphore;
 
   private readonly agentConfig: AgentConfig;
+  private orchestrationConfig: OrchestrationConfig;
 
   constructor() {
     const config: AgentConfig = {
@@ -79,39 +82,19 @@ export class OrchestratorAgent extends BaseAgent {
     super(config);
     this.agentConfig = config;
     this.minioService = new MinIOService();
+    this.orchestrationConfig = OrchestratorAgent.createDefaultConfig(); // Inicialização padrão
+    this.semaphore = new Semaphore(env.MAX_CONCURRENCY);
 
     // registra agentes
     this.agents.set('LoginAgent', new LoginAgent());
-    this.agents.set('SmartLoginAgent', new SmartLoginAgent());
+    this.agents.set('SmartLoginAgent', new SmartLoginAgent({ name: 'SmartLoginAgent', version: '1.0.0', description: 'Agente de login inteligente', capabilities: [] }));
     this.agents.set('CrawlerAgent', new CrawlerAgent());
-    this.agents.set('AnalysisAgent', new AnalysisAgent(''));
-    this.agents.set('ContentAgent', new ContentAgent(''));
-    this.agents.set('GeneratorAgent', new GeneratorAgent(''));
+    this.agents.set('AnalysisAgent', new AnalysisAgent('Análise inteligente de dados de crawling'));
+    this.agents.set('ContentAgent', new ContentAgent(this.minioService, null, null, 'logs', 'content.log'));
+    this.agents.set('GeneratorAgent', new GeneratorAgent('Geração de documentos finais'));
   }
 
-  private async initializeBrowserAndPage(): Promise<void> {
-    if (!this.browser) {
-      this.browser = await chromium.launch({ headless: false });
-    }
-    if (!this.page) {
-      this.page = await this.browser.newPage();
-      // Shim global para evitar erro '__name is not defined' em contextos de página
-      await this.page.evaluate(() => {
-        if (typeof (window as any).__name === 'undefined') {
-          (window as any).__name = 'OrchestratorAgentPage';
-        }
-      });
-      // Propagar a página e o navegador para os agentes que precisam
-      for (const agent of this.agents.values()) {
-        if (agent.setPage) {
-          agent.setPage(this.page);
-        }
-        if (agent.setBrowser) {
-          agent.setBrowser(this.browser);
-        }
-      }
-    }
-  }
+
 
 
 
@@ -119,42 +102,19 @@ export class OrchestratorAgent extends BaseAgent {
    * Cria uma configuração padrão usando variáveis de ambiente validadas com Zod
    */
   static createDefaultConfig(overrides: Partial<OrchestrationConfig> = {}): OrchestrationConfig {
-    // Validar variáveis de ambiente usando Zod
-    const envValidation = safeValidateEnvironment();
-    
-    if (!envValidation.success) {
-      console.warn('⚠️ Erro na validação de ambiente, usando valores padrão:', envValidation.error);
-      // Usar valores padrão se a validação falhar
-      return {
-        maxRetries: 2,
-        timeoutMinutes: 15,
-        enableScreenshots: true,
-        outputFormats: ['markdown'],
-        targetUrl: 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
-        crawlingStrategy: 'advanced',
-        credentials: {
-          username: 'admin',
-          password: 'admin123',
-          loginUrl: 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
-        },
-        ...overrides
-      };
-    }
-    
-    const env = envValidation.data;
-    
-    return {
-      maxRetries: env.GEMINI_MAX_RETRIES || 2,
-      timeoutMinutes: 15,
-      enableScreenshots: true,
-      outputFormats: ['markdown'],
-      targetUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
-      crawlingStrategy: 'advanced',
-      credentials: env.SAEB_USERNAME && env.SAEB_PASSWORD ? {
-        username: env.SAEB_USERNAME,
-        password: env.SAEB_PASSWORD,
-        loginUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
-      } : undefined,
+     // Usar variáveis de ambiente diretamente
+     return {
+       maxRetries: env.MAX_RETRIES || 2,
+       timeoutMinutes: 15,
+       enableScreenshots: true,
+       outputFormats: ['markdown'],
+       targetUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin',
+       crawlingStrategy: 'advanced',
+       credentials: env.SAEB_USERNAME && env.SAEB_PASSWORD ? {
+          username: env.SAEB_USERNAME,
+          password: env.SAEB_PASSWORD,
+          loginUrl: env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'
+        } : undefined,
       ...overrides
     };
   }
@@ -163,8 +123,8 @@ export class OrchestratorAgent extends BaseAgent {
    * Executa o pipeline completo usando configurações do ambiente
    */
   async executeWithEnvConfig(overrides: Partial<OrchestrationConfig> = {}): Promise<OrchestrationResult> {
-    const config = OrchestratorAgent.createDefaultConfig(overrides);
-    return this.executeFullPipeline(config);
+    this.orchestrationConfig = OrchestratorAgent.createDefaultConfig(overrides);
+    return this.executeFullPipeline(this.orchestrationConfig);
   }
 
   protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
@@ -177,6 +137,8 @@ export class OrchestratorAgent extends BaseAgent {
    * Implementação obrigatória do método abstrato processTask
    */
   async processTask(task: TaskData): Promise<TaskResult> {
+    // const executionId = task.executionId || uuidv4(); // Usar o ID da tarefa ou gerar um novo
+    this.orchestrationConfig = task.config as OrchestrationConfig; // Atribuir a configuração da tarefa
     const startTime = Date.now();
     
     try {
@@ -222,12 +184,10 @@ export class OrchestratorAgent extends BaseAgent {
     let documentsGenerated: { [key: string]: string | undefined } = {};
 
     try {
-      await this.initializeBrowserAndPage();
-      if (!this.page) {
-        throw new Error('Falha ao inicializar a página para exploração.');
-      }
+      // A página e o navegador são gerenciados pelo executeFullPipeline
+      // Não é necessário inicializá-los aqui
 
-      const { pageReport, initialBefore, outputDir } = await explorePage(this.page, {
+      const { pageReport } = await explorePage(config.page, {
         startUrl: config.startUrl,
         outputDir: config.outputDir,
         enableScreenshots: config.enableScreenshots,
@@ -239,7 +199,7 @@ export class OrchestratorAgent extends BaseAgent {
         type: 'analyze_page',
         data: pageReport,
         timestamp: new Date(),
-        sender: this.config.name,
+        sender: this.agentConfig.name,
         priority: 'high',
       });
 
@@ -250,7 +210,6 @@ export class OrchestratorAgent extends BaseAgent {
       errors.push(error.message);
       this.log(`Erro durante a exploração da página: ${error.message}`, 'error');
     } finally {
-      await this.cleanup();
       const totalDuration = Date.now() - startTime;
       this.log(`Exploração de página concluída em ${totalDuration}ms com sucesso: ${success}`);
       return {
@@ -312,28 +271,7 @@ export class OrchestratorAgent extends BaseAgent {
   }
 
   //#region lifecycle
-  async init(headless = false, slowMo = 100): Promise<void> {
-    this.browser = await chromium.launch({ 
-      headless, 
-      slowMo, 
-      args: ['--no-sandbox','--disable-setuid-sandbox'] 
-    });
-    const context = await this.browser.newContext({ ignoreHTTPSErrors: true });
-    this.page = await context.newPage();
 
-    // 🔧 Shim global para evitar ReferenceError: __name em page.evaluate
-    await this.page.addInitScript({ content: `
-      (function(){ window.__name = window.__name || ((o,n)=>{ try{Object.defineProperty(o,'name',{value:n,configurable:true});}catch{}; return o; }); })();
-    `});
-  }
-
-  async dispose(): Promise<void> {
-    try { 
-      await this.page?.context()?.storageState({ path: './artifacts/auth-state.json' }); 
-    } catch {}
-    await this.browser?.close();
-  }
-  //#endregion
 
   //#region DI helpers
   registerAgent(name: string, agent: any): void { this.agents.set(name, agent); }
@@ -344,22 +282,6 @@ export class OrchestratorAgent extends BaseAgent {
     
     // Inicializar serviços
     await this.minioService.initialize?.();
-
-    this.browser = await chromium.launch({ 
-      headless: false, 
-      slowMo: 100,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'] 
-    });
-    const context = await this.browser.newContext({ ignoreHTTPSErrors: true });
-    this.page = await context.newPage();
-
-    // propaga page/browser
-    (this.agents.get('CrawlerAgent') as CrawlerAgent).setPage(this.page);
-    (this.agents.get('CrawlerAgent') as CrawlerAgent).setBrowser(this.browser);
-    (this.agents.get('LoginAgent') as any)?.setPage?.(this.page);
-    (this.agents.get('SmartLoginAgent') as any)?.setPage?.(this.page);
-    (this.agents.get('MenuModalAgent') as any)?.setPage?.(this.page);
-    (this.agents.get('MenuModalAgent') as any)?.setBrowser?.(this.browser);
 
     // Inicializar todos os agentes
     for (const [name, agent] of this.agents) {
@@ -372,36 +294,16 @@ export class OrchestratorAgent extends BaseAgent {
 
   public async cleanup(): Promise<void> {
     try {
-      // Salvar estado de autenticação se existir
-      if (this.page) {
-        try {
-          await this.page.context().storageState({ path: './artifacts/auth-state.json' });
-        } catch (error) {
-          this.log(`Erro ao salvar estado de autenticação: ${error}`, 'warn');
-        }
-      }
-      
       // Finalizar agentes
       for (const [, agent] of this.agents) {
         await agent.cleanup?.();
       }
     } catch { /* noop */ }
     
-    if (this.browser) { 
-      await this.browser.close(); 
-      this.browser = null; 
-    }
-    this.page = null;
     this.log('OrchestratorAgent finalizado');
   }
 
-  getPage(): Page | null {
-    return this.page;
-  }
 
-  getBrowser(): Browser | null {
-    return this.browser;
-  }
 
   getAgent(agentName: string): any {
     return this.agents.get(agentName);
@@ -452,56 +354,6 @@ export class OrchestratorAgent extends BaseAgent {
     return await agent.processTask(task);
   }
 
-  private async loginWithFallback(config: OrchestrationConfig, result: OrchestrationResult) {
-    if (!config.credentials?.username || !config.credentials?.password) {
-      this.log('FASE 1: Login (opcional) - credenciais não fornecidas, pulando login');
-      return { success: true, method: 'none' } as const;
-    }
-
-    this.log(`FASE 1: Login - tentando autenticação com usuário: ${config.credentials.username}`);
-    const loginUrl = config.credentials.loginUrl || config.targetUrl;
-
-    // 1) Tenta LoginAgent
-    this.log('FASE 1: Login (LoginAgent) - primeira tentativa');
-    try {
-      const loginRes = await this.executeAgentTask('LoginAgent', 'authenticate', {
-        credentials: config.credentials,
-        loginUrl,
-        page: this.page
-      });
-      result.agentsExecuted.push('LoginAgent');
-
-      if (loginRes.success) {
-        this.log('✅ LoginAgent: sucesso na autenticação');
-        return { success: true, method: 'LoginAgent' } as const;
-      }
-      this.log(`⚠️ LoginAgent falhou: ${loginRes.error}`, 'warn');
-    } catch (error) {
-      this.log(`❌ LoginAgent erro: ${error instanceof Error ? error.message : String(error)}`, 'error');
-    }
-
-    // 2) Fallback: SmartLoginAgent
-    this.log('FASE 1: Fallback para SmartLoginAgent - segunda tentativa');
-    try {
-      const smartRes = await this.executeAgentTask('SmartLoginAgent', 'smart_login', {
-        baseUrl: loginUrl,
-        credentials: { username: config.credentials.username, password: config.credentials.password },
-      });
-      result.agentsExecuted.push('SmartLoginAgent');
-
-      if (smartRes.success) {
-        this.log('✅ SmartLoginAgent: sucesso na autenticação');
-        return { success: true, method: 'SmartLoginAgent' } as const;
-      }
-      this.log(`⚠️ SmartLoginAgent falhou: ${smartRes.error}`, 'warn');
-    } catch (error) {
-      this.log(`❌ SmartLoginAgent erro: ${error instanceof Error ? error.message : String(error)}`, 'error');
-    }
-
-    this.log('❌ FASE 1: Todos os métodos de login falharam, prosseguindo sem autenticação', 'warn');
-    return { success: false, method: 'AllMethodsFailed' } as const;
-  }
-
   async executeFullPipeline(config: OrchestrationConfig): Promise<OrchestrationResult> {
     const executionId = `exec_${Date.now()}`;
     const startTime = new Date();
@@ -519,20 +371,96 @@ export class OrchestratorAgent extends BaseAgent {
       errors: []
     };
 
+    await this.semaphore.acquire();
+    let browser: Browser | null = null;
+    let context: BrowserContext | null = null;
+    let page: Page | null = null;
+
     try {
-      // Inicializar browser e página antes de qualquer operação
-      await this.initializeBrowserAndPage();
+      const headless = env.HEADLESS !== 'false';
+      browser = await chromium.launch({
+        headless,
+        args: ['--no-sandbox', '--disable-dev-shm-usage']
+      });
+      context = await browser.newContext();
+      page = await context.newPage();
+
+      const { STEP_TIMEOUT_MS, NAV_TIMEOUT_MS } = env; // Destructure timeouts
+      page.setDefaultTimeout(STEP_TIMEOUT_MS);
+      page.setDefaultNavigationTimeout(NAV_TIMEOUT_MS);
+      await page.waitForLoadState('domcontentloaded');
+      await this.waitForDomSteady(page);
+
+      if (config.enableScreenshots) {
+        await page.context().tracing.start({
+          screenshots: true,
+          snapshots: true,
+          sources: true,
+        });
+      }
+
+      // Shim global para evitar erro '__name is not defined' em contextos de página
+      await page.evaluate(() => {
+        if (typeof (window as any).__name === 'undefined') {
+          (window as any).__name = 'OrchestratorAgentPage';
+        }
+      });
+
+      // Hook de histórico para detecção de navegação
+      await page.addInitScript(() => {
+        const pushState = history.pushState;
+        history.pushState = function(...args) {
+          window.dispatchEvent(new Event('manualgen:navigation'));
+          return pushState.apply(this, args);
+        };
+        const replaceState = history.replaceState;
+        history.replaceState = function(...args) {
+          window.dispatchEvent(new Event('manualgen:navigation'));
+          return replaceState.apply(this, args);
+        };
+      });
+
+      // Propagar a página e o navegador para os agentes que precisam
+      for (const agent of this.agents.values()) {
+        if (typeof (agent as any).setPage === 'function' && page) {
+          (agent as any).setPage(page);
+        }
+        if (typeof (agent as any).setBrowser === 'function' && browser) {
+          (agent as any).setBrowser(browser);
+        }
+      }
       
       // FASE 1: Login com fallback
-      const loginOutcome = await this.loginWithFallback(config, result);
+      const loginUrl = config.credentials?.loginUrl || config.targetUrl;
+      if (config?.credentials?.username && config?.credentials?.password) {
+        this.log('FASE 1: Login (LoginAgent)');
+        const loginRes = await this.executeAgentTask('LoginAgent', 'authenticate', {
+          credentials: config.credentials,
+          loginUrl,
+          page: page
+        });
+        if (!loginRes.success) {
+          this.log(`LoginAgent falhou: ${loginRes.error}. Fallback SmartLogin.`, 'warn');
+          const smartRes = await this.executeAgentTask('SmartLoginAgent', 'smart_login', {
+            baseUrl: loginUrl,
+            credentials: { username: config.credentials.username, password: config.credentials.password },
+            page: page,
+            outputDir: config.outputDir
+          });
+          if (!smartRes.success) throw new Error('Falha de autenticação (SmartLogin também falhou)');
+        }
+      } else {
+        this.log('FASE 1: Login pulado (sem credenciais)');
+      }
+
       if (config.stopAfterPhase === 'login') {
-        result.success = loginOutcome.success;
+        result.success = true; // Considerado sucesso se parou aqui
         result.endTime = new Date();
         result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
         return result;
       }
 
-      // FASE 2: Crawling (usar SEMPRE a targetUrl como start)
+      // FASE 2: Crawling (manter mesma sessão da page já autenticada)
       this.log('FASE 2: Crawling');
       const startUrl = config.targetUrl;
       const crawlerRes = await this.executeAgentTask('CrawlerAgent', 'start_authenticated_crawl', {
@@ -540,7 +468,9 @@ export class OrchestratorAgent extends BaseAgent {
         enableScreenshots: config.enableScreenshots,
         useCurrentPage: true,
         crawlingStrategy: config.crawlingStrategy || 'basic',
-        outputDir: config.outputDir || 'output'
+        outputDir: config.outputDir || 'output',
+        page: page, // Passa a página para o CrawlerAgent
+        browser: browser // Passa o navegador para o CrawlerAgent
       });
 
       if (!crawlerRes.success) throw new Error(`CrawlerAgent falhou: ${crawlerRes.error}`);
@@ -572,9 +502,12 @@ export class OrchestratorAgent extends BaseAgent {
       if (!analysisRes.success) this.log(`AnalysisAgent aviso: ${analysisRes.error}`, 'warn');
       result.agentsExecuted.push('AnalysisAgent');
 
-      // FASE 4: Content
+      // FASE 4: Content (novo ContentAgent)
       this.log('FASE 4: Content');
-      const contentRes = await this.executeAgentTask('ContentAgent', 'generate_user_friendly_content', { crawlAnalysis: analysisRes.data || payload });
+      const contentRes = await this.executeAgentTask('ContentAgent', 'generate_user_friendly_content', {
+        crawlAnalysis: analysisRes.data || payload,
+        rawData: crawlerRes.data?.pages
+      });
       if (!contentRes.success) this.log(`ContentAgent aviso: ${contentRes.error}`, 'warn');
       result.agentsExecuted.push('ContentAgent');
 

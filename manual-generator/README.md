@@ -77,6 +77,10 @@ GEMINI_MAX_RETRIES=5
 GEMINI_BASE_WAIT_TIME=1000
 GEMINI_MAX_WAIT_TIME=30000
 
+# Configurações do Browser (Playwright/Puppeteer)
+HEADLESS=true  # Para produção/Docker (padrão: true)
+# HEADLESS=false # Para desenvolvimento local com interface gráfica
+
 # Configurações do MinIO (Opcional)
 MINIO_ENDPOINT=localhost
 MINIO_PORT=9000
@@ -149,6 +153,58 @@ npm run test:full
 
 # Teste do orquestrador
 npm run test:orchestrator
+```
+
+## 🐳 Docker e Produção
+
+### Configurações para Docker
+
+Para executar em ambientes Docker ou servidores sem interface gráfica:
+
+```env
+# Configuração obrigatória para Docker
+HEADLESS=true
+
+# Outras configurações recomendadas
+NODE_ENV=production
+LOG_LEVEL=info
+```
+
+### Argumentos de Browser
+
+O sistema automaticamente adiciona os seguintes argumentos para compatibilidade com Docker:
+
+- `--no-sandbox`: Desabilita o sandbox do Chromium (necessário em containers)
+- `--disable-dev-shm-usage`: Evita problemas de memória compartilhada em Docker
+
+### Exemplo de Dockerfile
+
+```dockerfile
+FROM node:18-alpine
+
+# Instalar dependências do Playwright
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Definir variável de ambiente para Playwright
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV HEADLESS=true
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+CMD ["npm", "start"]
 ```
 
 ## 📖 Regras de Negócio

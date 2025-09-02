@@ -1,5 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { v4 as uuidv4 } from 'uuid';
+import { Page } from 'playwright';
 
 export interface AgentCapability {
   name: string;
@@ -15,6 +16,8 @@ export interface AgentConfig {
   dependencies?: string[];
 }
 
+import { OrchestrationConfig } from '../agents/OrchestratorAgent.js';
+
 export interface TaskData {
   id: string;
   type: string;
@@ -22,6 +25,9 @@ export interface TaskData {
   sender: string;
   timestamp: Date;
   priority: 'low' | 'medium' | 'high' | 'critical';
+  executionId?: string;
+  config?: OrchestrationConfig;
+  [key: string]: any;
 }
 
 export interface TaskResult {
@@ -116,6 +122,44 @@ export abstract class BaseAgent extends EventEmitter {
     const timestamp = new Date().toISOString();
     const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
     console.log(`${emoji} [${this.config.name}] ${timestamp} - ${message}`);
+  }
+
+  protected async waitForDomSteady(page: Page, timeout: number = 30000): Promise<void> {
+    let lastHash = '';
+    let steadyCount = 0;
+    const checkInterval = 500; // Check every 500ms
+    const requiredSteadyCycles = 2; // Wait for 2 identical cycles
+
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      const currentHash = await page.evaluate(() => {
+        const body = document.body;
+        if (!body) return '';
+        // Remove script tags and their content to avoid dynamic changes affecting the hash
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = body.innerHTML;
+        tempDiv.querySelectorAll('script, style, noscript, link, meta').forEach(el => el.remove());
+        return Array.from(tempDiv.querySelectorAll('*'))
+          .map(el => el.tagName + (el.textContent ? el.textContent.trim().substring(0, 50) : ''))
+          .join('');
+      });
+
+      if (currentHash === lastHash && currentHash !== '') {
+        steadyCount++;
+        if (steadyCount >= requiredSteadyCycles) {
+          this.log(`DOM steady after ${steadyCount} cycles.`, 'info');
+          return;
+        }
+      } else {
+        steadyCount = 0;
+      }
+      lastHash = currentHash;
+      await page.waitForTimeout(checkInterval);
+    }
+
+    this.log('DOM did not become steady within the timeout.', 'warn');
+    throw new Error('DOM did not become steady within the timeout.');
   }
 
   protected sendTask(agentName: string, type: string, data: any, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): TaskData {

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { safeValidateEnvironment } from '../config/environment';
+import { safeValidateEnvironment } from '../config/environment.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
