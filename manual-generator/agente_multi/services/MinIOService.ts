@@ -1,4 +1,3 @@
-import { Client } from 'minio';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { env } from '../config/env.js';

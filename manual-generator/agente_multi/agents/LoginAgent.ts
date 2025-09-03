@@ -1,4 +1,5 @@
 import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { v4 as uuidv4 } from 'uuid';
 import { Page } from 'playwright';
 import { MinIOService } from '../services/MinIOService.js';
 import { AuthDetectionResult } from './interfaces/AuthTypes';
@@ -23,20 +24,14 @@ export interface LoginStep {
 export class LoginAgent extends BaseAgent {
   private minio?: MinIOService;
 
-  constructor() {
-    const config: AgentConfig = {
-      name: 'LoginAgent',
-      version: '1.0.0',
-      description: 'Agente especializado em autenticação e gerenciamento de sessões',
-      capabilities: [
-        { name: 'basic_auth', description: 'Autenticação básica com usuário e senha', version: '1.0.0' },
-        { name: 'oauth_auth', description: 'Autenticação OAuth 2.0', version: '1.0.0' },
-        { name: 'session_management', description: 'Gerenciamento de sessões', version: '1.0.0' },
-        { name: 'custom_auth', description: 'Fluxos de autenticação customizados', version: '1.0.0' }
-      ]
-    };
-
+  constructor(config: AgentConfig) {
     super(config);
+  }
+
+
+
+  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
+    return `## Relatório do LoginAgent\n\n- Status: ${taskResult.success ? 'Sucesso' : 'Falha'}`;
   }
 
   async initialize(): Promise<void> {

@@ -1,7 +1,8 @@
-import { EventEmitter } from 'eventemitter3';
+import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import { Page } from 'playwright';
 
+// Interface restaurada para maior clareza
 export interface AgentCapability {
   name: string;
   description: string;
@@ -16,8 +17,6 @@ export interface AgentConfig {
   dependencies?: string[];
 }
 
-import { OrchestrationConfig } from '../agents/OrchestratorAgent.js';
-
 export interface TaskData {
   id: string;
   type: string;
@@ -26,8 +25,7 @@ export interface TaskData {
   timestamp: Date;
   priority: 'low' | 'medium' | 'high' | 'critical';
   executionId?: string;
-  config?: OrchestrationConfig;
-  [key: string]: any;
+  // A referência a OrchestrationConfig foi removida para manter o core agnóstico
 }
 
 export interface TaskResult {
@@ -127,16 +125,14 @@ export abstract class BaseAgent extends EventEmitter {
   protected async waitForDomSteady(page: Page, timeout: number = 30000): Promise<void> {
     let lastHash = '';
     let steadyCount = 0;
-    const checkInterval = 500; // Check every 500ms
-    const requiredSteadyCycles = 2; // Wait for 2 identical cycles
-
+    const checkInterval = 500;
+    const requiredSteadyCycles = 2;
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
       const currentHash = await page.evaluate(() => {
         const body = document.body;
         if (!body) return '';
-        // Remove script tags and their content to avoid dynamic changes affecting the hash
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = body.innerHTML;
         tempDiv.querySelectorAll('script, style, noscript, link, meta').forEach(el => el.remove());
@@ -157,12 +153,10 @@ export abstract class BaseAgent extends EventEmitter {
       lastHash = currentHash;
       await page.waitForTimeout(checkInterval);
     }
-
     this.log('DOM did not become steady within the timeout.', 'warn');
-    throw new Error('DOM did not become steady within the timeout.');
   }
 
-  protected sendTask(agentName: string, type: string, data: any, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): TaskData {
+  protected sendTask(agentName: string, type: string, data: any, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): void {
     const task: TaskData = {
       id: uuidv4(),
       type,
@@ -171,9 +165,7 @@ export abstract class BaseAgent extends EventEmitter {
       timestamp: new Date(),
       priority
     };
-
     this.emit('task_created', { target: agentName, task });
-    return task;
   }
 
   getConfig(): AgentConfig {
@@ -199,67 +191,62 @@ export class AgnoSCore extends EventEmitter {
   }
 
   registerAgent(agent: BaseAgent): void {
-    const config = agent.getConfig();
-    this.agents.set(config.name, agent);
-    
-    // Configurar listeners do agente
+    const agentName = agent.getConfig().name;
+    if (this.agents.has(agentName)) {
+      console.warn(`⚠️ Agente ${agentName} já registado. A substituir.`);
+    }
+    this.agents.set(agentName, agent);
+
+    // Configurar listeners do agente para comunicação com o Core
     agent.on('task_completed', (result: TaskResult) => {
       this.taskHistory.push(result);
-      this.emit('agent_task_completed', { agent: config.name, result });
+      this.emit('agent_task_completed', { agent: agentName, result });
     });
 
     agent.on('task_failed', (result: TaskResult) => {
       this.taskHistory.push(result);
-      this.emit('agent_task_failed', { agent: config.name, result });
+      this.emit('agent_task_failed', { agent: agentName, result });
     });
 
     agent.on('task_created', ({ target, task }) => {
       this.routeTask(target, task);
     });
 
-    console.log(`🔌 Agente registrado: ${config.name} v${config.version}`);
+    console.log(`🔌 Agente registado: ${agentName} v${agent.getConfig().version}`);
   }
 
   async start(): Promise<void> {
     this.isRunning = true;
-    
-    // Inicializar todos os agentes
-    for (const [name, agent] of Array.from(this.agents.entries())) {
+    for (const [name, agent] of this.agents.entries()) {
       try {
         await agent.start();
       } catch (error) {
         console.error(`❌ Erro ao iniciar agente ${name}: ${error}`);
       }
     }
-
     console.log(`🚀 AgnoS Core iniciado com ${this.agents.size} agentes`);
   }
 
   async stop(): Promise<void> {
     this.isRunning = false;
-
-    // Finalizar todos os agentes
-    for (const [name, agent] of Array.from(this.agents.entries())) {
+    for (const [name, agent] of this.agents.entries()) {
       try {
         await agent.stop();
       } catch (error) {
         console.error(`❌ Erro ao finalizar agente ${name}: ${error}`);
       }
     }
-
     console.log('⏹️ AgnoS Core finalizado');
   }
 
   async executeTask(agentName: string, type: string, data: any, priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'): Promise<TaskResult> {
     if (!this.isRunning) {
-      throw new Error('Sistema não está em execução');
+      throw new Error('Sistema não está em execução.');
     }
-
     const agent = this.agents.get(agentName);
     if (!agent) {
       throw new Error(`Agente não encontrado: ${agentName}`);
     }
-
     const task: TaskData = {
       id: uuidv4(),
       type,
@@ -268,16 +255,14 @@ export class AgnoSCore extends EventEmitter {
       timestamp: new Date(),
       priority
     };
-
-    return await agent.executeTask(task);
+    return agent.executeTask(task);
   }
 
   private routeTask(targetAgentName: string, task: TaskData): void {
     const targetAgent = this.agents.get(targetAgentName);
     if (targetAgent) {
-      // Executar task de forma assíncrona
       targetAgent.executeTask(task).catch(error => {
-        console.error(`❌ Erro no roteamento de task para ${targetAgentName}: ${error}`);
+        console.error(`❌ Erro no roteamento de tarefa para ${targetAgentName}: ${error}`);
       });
     } else {
       console.error(`❌ Agente destino não encontrado: ${targetAgentName}`);
@@ -288,8 +273,8 @@ export class AgnoSCore extends EventEmitter {
     return this.agents.get(name);
   }
 
-  getAgents(): string[] {
-    return Array.from(this.agents.keys());
+  getAgents(): BaseAgent[] {
+    return Array.from(this.agents.values());
   }
 
   getTaskHistory(): TaskResult[] {
@@ -297,17 +282,15 @@ export class AgnoSCore extends EventEmitter {
   }
 
   getSystemStatus(): any {
-    const status = {
+    const status: any = {
       isRunning: this.isRunning,
       totalAgents: this.agents.size,
       totalTasksProcessed: this.taskHistory.length,
-      agents: {} as any
+      agents: {}
     };
-
-    for (const [name, agent] of Array.from(this.agents.entries())) {
+    for (const [name, agent] of this.agents.entries()) {
       status.agents[name] = agent.getStatus();
     }
-
     return status;
   }
 }

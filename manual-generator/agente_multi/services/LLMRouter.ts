@@ -1,6 +1,7 @@
 import { GeminiKeyManager } from './GeminiKeyManager.js';
 import { GroqKeyManager } from './GroqKeyManager.js';
 import { logger } from '../utils/logger.js';
+import { Part } from '@google/generative-ai';
 
 export interface LLMConfig {
   provider: 'gemini' | 'groq';
@@ -46,88 +47,78 @@ export class LLMRouter {
       timeout: 30000,
       ...config
     };
-    this.providerPriority = ['gemini', 'groq'];
+    // Prioridade padrão: Gemini para tarefas de visão, Groq para texto rápido
+    this.providerPriority = ['groq', 'gemini'];
     this.circuitBreaker = new Map();
   }
 
   /**
-   * Rota a requisição para o melhor provedor disponível
+   * Rota a requisição para o melhor provedor disponível.
+   * Suporta tanto texto-puro quanto multimodal (texto + imagem).
    */
-  async route(prompt: string, config?: Partial<LLMConfig>): Promise<LLMResponse> {
+  async route(prompt: string, config: Partial<LLMConfig> = {}, image?: Buffer): Promise<LLMResponse> {
     const finalConfig = { ...this.defaultConfig, ...config };
     const startTime = Date.now();
     
-    logger.info(`[LLMRouter] Iniciando roteamento para prompt de ${prompt.length} caracteres`);
+    // Se uma imagem for fornecida, a tarefa é visual e deve usar o Gemini.
+    const providersToTry: ('gemini' | 'groq')[] = image ? ['gemini'] : this.providerPriority;
     
-    // Validar prompt
-    this.validatePrompt(prompt);
+    logger.info(`[LLMRouter] Roteando para: ${providersToTry.join(', ')}.`);
     
-    // Tentar provedores em ordem de prioridade
     const errors: LLMError[] = [];
     
-    for (const provider of this.providerPriority) {
+    for (const provider of providersToTry) {
       if (this.isCircuitBreakerOpen(provider)) {
-        logger.warn(`[LLMRouter] Circuit breaker aberto para ${provider}, pulando`);
+        logger.warn(`[LLMRouter] Circuit breaker aberto para ${provider}, pulando.`);
         continue;
       }
       
       try {
-        const response = await this.callProvider(provider, prompt, finalConfig);
+        const response = await this.callProvider(provider, prompt, finalConfig, image);
         this.recordSuccess(provider);
-        
         const responseTime = Date.now() - startTime;
         logger.info(`[LLMRouter] Sucesso com ${provider} em ${responseTime}ms`);
-        
-        return {
-          ...response,
-          responseTime
-        };
+        return { ...response, responseTime };
       } catch (error) {
         const llmError: LLMError = {
           provider,
           error: error instanceof Error ? error.message : String(error),
           retryable: this.isRetryableError(error)
         };
-        
         errors.push(llmError);
         this.recordFailure(provider);
-        
         logger.warn(`[LLMRouter] Falha com ${provider}: ${llmError.error}`);
-        
-        // Se não é um erro que vale a pena tentar novamente, pular para próximo provedor
-        if (!llmError.retryable) {
-          continue;
-        }
       }
     }
     
-    // Se chegou aqui, todos os provedores falharam
     const totalTime = Date.now() - startTime;
     logger.error(`[LLMRouter] Todos os provedores falharam após ${totalTime}ms`);
-    
     throw new Error(`Todos os provedores LLM falharam: ${errors.map(e => `${e.provider}: ${e.error}`).join(', ')}`);
   }
 
-  /**
-   * Chama um provedor específico
-   */
-  private async callProvider(provider: 'gemini' | 'groq', prompt: string, config: LLMConfig): Promise<Omit<LLMResponse, 'responseTime'>> {
+  private async callProvider(provider: 'gemini' | 'groq', prompt: string, config: LLMConfig, image?: Buffer): Promise<Omit<LLMResponse, 'responseTime'>> {
     switch (provider) {
       case 'gemini':
-        return await this.callGemini(prompt, config);
+        return this.callGemini(prompt, config, image);
       case 'groq':
-        return await this.callGroq(prompt, config);
+        if (image) throw new Error('Groq não suporta input de imagem nesta implementação.');
+        return this.callGroq(prompt, config);
       default:
         throw new Error(`Provedor não suportado: ${provider}`);
     }
   }
 
-  /**
-   * Chama o Gemini
-   */
-  private async callGemini(prompt: string, config: LLMConfig): Promise<Omit<LLMResponse, 'responseTime'>> {
+  private async callGemini(prompt: string, config: LLMConfig, image?: Buffer): Promise<Omit<LLMResponse, 'responseTime'>> {
+    const modelParts: (string | Part)[] = [prompt];
+    if (image) {
+      modelParts.push({
+        inlineData: { mimeType: 'image/png', data: image.toString('base64') },
+      });
+    }
+    
     const result = await this.geminiManager.handleApiCall(async (model) => {
-      return await model.generateContent(prompt);
+      // O SDK do Gemini usa um objeto de conteúdo para chamadas multimodais
+      return model.generateContent({ contents: [{ role: 'user', parts: modelParts }] });
     });
     
     return {
@@ -138,147 +129,64 @@ export class LLMRouter {
     };
   }
 
-  /**
-   * Chama o Groq
-   */
   private async callGroq(prompt: string, config: LLMConfig): Promise<Omit<LLMResponse, 'responseTime'>> {
     const result = await this.groqManager.handleApiCall(prompt);
-    
+    const content = result?.response?.text ? result.response.text() : (result?.choices?.[0]?.message?.content || '');
+
     return {
-      content: result.choices[0].message.content || '',
+      content: content,
       provider: 'groq',
-      model: config.model || 'llama-3.1-70b-versatile',
+      model: config.model || 'mixtral-8x7b-32768',
       tokensUsed: result.usage?.total_tokens
     };
   }
 
-  /**
-   * Valida o prompt antes do envio
-   */
   private validatePrompt(prompt: string): void {
-    if (!prompt || prompt.trim().length === 0) {
-      throw new Error('Prompt não pode estar vazio');
-    }
-    
-    if (prompt.length > 100000) {
-      throw new Error('Prompt muito longo (máximo 100.000 caracteres)');
-    }
-    
-    // Verificar se contém placeholders não resolvidos
-    const placeholderPattern = /\{\{[^}]+\}\}/g;
-    const placeholders = prompt.match(placeholderPattern);
-    if (placeholders) {
-      logger.warn(`[LLMRouter] Placeholders não resolvidos encontrados: ${placeholders.join(', ')}`);
+    if (!prompt || prompt.trim() === '') {
+      throw new Error('O prompt não pode ser vazio.');
     }
   }
 
-  /**
-   * Verifica se um erro é passível de retry
-   */
   private isRetryableError(error: any): boolean {
-    const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-    
-    // Erros de rede e temporários são passíveis de retry
-    const retryablePatterns = [
-      'timeout',
-      'network',
-      'connection',
-      'rate limit',
-      'quota exceeded',
-      'service unavailable',
-      '429',
-      '500',
-      '502',
-      '503',
-      '504'
-    ];
-    
-    return retryablePatterns.some(pattern => errorMessage.includes(pattern));
+    // Implemente a lógica para determinar se o erro é retentável
+    // Ex: Erros de rede, timeouts, limites de taxa
+    const errorMessage = String(error).toLowerCase();
+    return errorMessage.includes('network') || errorMessage.includes('timeout') || errorMessage.includes('rate limit');
   }
 
-  /**
-   * Gerenciamento do Circuit Breaker
-   */
   private isCircuitBreakerOpen(provider: string): boolean {
-    const breaker = this.circuitBreaker.get(provider);
-    if (!breaker) return false;
-    
-    if (breaker.isOpen) {
-      // Verificar se é hora de tentar novamente
-      if (Date.now() - breaker.lastFailure > this.resetTimeout) {
-        breaker.isOpen = false;
-        breaker.failures = 0;
-        logger.info(`[LLMRouter] Circuit breaker resetado para ${provider}`);
-        return false;
-      }
-      return true;
-    }
-    
-    return false;
-  }
+    const state = this.circuitBreaker.get(provider);
+    if (!state) return false;
 
-  private recordSuccess(provider: string): void {
-    const breaker = this.circuitBreaker.get(provider);
-    if (breaker) {
-      breaker.failures = 0;
-      breaker.isOpen = false;
+    if (state.isOpen && (Date.now() - state.lastFailure > this.resetTimeout)) {
+      // Tempo de reset passou, tentar fechar o circuit breaker
+      state.isOpen = false;
+      state.failures = 0;
+      this.circuitBreaker.set(provider, state);
+      return false;
     }
+    return state.isOpen;
   }
 
   private recordFailure(provider: string): void {
-    let breaker = this.circuitBreaker.get(provider);
-    if (!breaker) {
-      breaker = { failures: 0, lastFailure: 0, isOpen: false };
-      this.circuitBreaker.set(provider, breaker);
+    const state = this.circuitBreaker.get(provider) || { failures: 0, lastFailure: 0, isOpen: false };
+    state.failures++;
+    state.lastFailure = Date.now();
+    if (state.failures >= this.maxFailures) {
+      state.isOpen = true;
+      logger.error(`[LLMRouter] Circuit breaker aberto para ${provider} após ${state.failures} falhas.`);
     }
-    
-    breaker.failures++;
-    breaker.lastFailure = Date.now();
-    
-    if (breaker.failures >= this.maxFailures) {
-      breaker.isOpen = true;
-      logger.warn(`[LLMRouter] Circuit breaker aberto para ${provider} após ${breaker.failures} falhas`);
-    }
+    this.circuitBreaker.set(provider, state);
   }
 
-  /**
-   * Obtém estatísticas dos provedores
-   */
-  getProviderStats(): Record<string, any> {
-    const stats: Record<string, any> = {};
-    
-    for (const [provider, breaker] of this.circuitBreaker.entries()) {
-      stats[provider] = {
-        failures: breaker.failures,
-        isOpen: breaker.isOpen,
-        lastFailure: breaker.lastFailure ? new Date(breaker.lastFailure).toISOString() : null
-      };
-    }
-    
-    return stats;
-  }
-
-  /**
-   * Define a prioridade dos provedores
-   */
-  setProviderPriority(priority: ('gemini' | 'groq')[]): void {
-    this.providerPriority = [...priority];
-    logger.info(`[LLMRouter] Prioridade de provedores atualizada: ${priority.join(' -> ')}`);
-  }
-
-  /**
-   * Força o reset de um circuit breaker
-   */
-  resetCircuitBreaker(provider: string): void {
-    const breaker = this.circuitBreaker.get(provider);
-    if (breaker) {
-      breaker.failures = 0;
-      breaker.isOpen = false;
-      breaker.lastFailure = 0;
-      logger.info(`[LLMRouter] Circuit breaker resetado manualmente para ${provider}`);
+  private recordSuccess(provider: string): void {
+    const state = this.circuitBreaker.get(provider);
+    if (state) {
+      state.failures = 0;
+      state.isOpen = false;
+      this.circuitBreaker.set(provider, state);
     }
   }
 }
 
-// Instância singleton
 export const llmRouter = new LLMRouter();

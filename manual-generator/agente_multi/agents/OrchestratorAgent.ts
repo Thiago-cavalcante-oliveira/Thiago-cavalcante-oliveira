@@ -1,39 +1,30 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { AgnoSCore } from '../core/AgnoSCore.js';
 import { MinIOService } from '../services/MinIOService.js';
-import { LoginAgent } from './LoginAgent';
-import { SmartLoginAgent } from './SmartLoginAgent';
-import { CrawlerAgent } from './CrawlerAgent';
-import { AnalysisAgent } from './AnalysisAgent';
-import { ContentAgent } from './ContentAgent';
-import { GeneratorAgent } from './GeneratorAgent';
-import { MenuModalAgent } from './MenuModalAgent';
+import { LoginAgent } from './LoginAgent.js';
+import { SmartLoginAgent } from './SmartLoginAgent.js';
+import { CrawlerAgent } from './CrawlerAgent.js';
+import { VisionAgent } from './VisionAgent.js';
+import { AnalysisAgent } from './AnalysisAgent.js';
+import { ContentAgent } from './ContentAgent.js';
+import { GeneratorAgent } from './GeneratorAgent.js';
 import { Browser, Page, chromium, BrowserContext } from 'playwright';
-import { explorePage } from '../crawler/index.js';
 import { env } from '../config/env.js';
 import { Semaphore } from '../core/sem.js';
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { v4 as uuidv4 } from 'uuid';
 
-// Shim global para evitar erro '__name is not defined'
-if (typeof (globalThis as any).__name === 'undefined') {
-  (globalThis as any).__name = 'OrchestratorAgent';
-}
-
+// As interfaces podem ser movidas para um ficheiro de tipos dedicado (e.g., 'interfaces.ts')
 export interface OrchestrationConfig {
+  targetUrl: string;
+  outputDir: string;
   maxRetries: number;
   timeoutMinutes: number;
   enableScreenshots: boolean;
   outputFormats: ('markdown' | 'html' | 'pdf')[];
-  targetUrl: string;
-  outputDir?: string;
-  crawlingStrategy?: 'basic' | 'advanced';
-  stopAfterPhase?: 'login' | 'crawling';
   credentials?: {
     username: string;
     password: string;
     loginUrl?: string;
-    customSteps?: Array<{ type: 'fill' | 'click' | 'wait' | 'waitForSelector'; selector: string; value?: string; timeout?: number }>;
   };
-  authConfig?: { type: 'basic' | 'oauth' | 'custom'; credentials?: { username?: string; password?: string; customFlow?: any } };
 }
 
 export interface OrchestrationResult {
@@ -44,433 +35,228 @@ export interface OrchestrationResult {
   totalDuration: number;
   agentsExecuted: string[];
   documentsGenerated: { markdown?: string; html?: string; pdf?: string };
-  statistics: { pagesProcessed: number; elementsAnalyzed: number; totalElements: number; screenshotsCaptured: number; wordCount: number };
-  reports: { [agentName: string]: string };
+  statistics: { pagesProcessed: number; elementsAnalyzed: number; screenshotsCaptured: number };
   errors: string[];
 }
 
 export class OrchestratorAgent extends BaseAgent {
   private minioService: MinIOService;
-  private agents: Map<string, any> = new Map();
+  private core: AgnoSCore;
   private semaphore: Semaphore;
-  private readonly agentConfig: AgentConfig;
-  private orchestrationConfig: OrchestrationConfig;
 
   constructor() {
     const config: AgentConfig = {
       name: 'OrchestratorAgent',
-      version: '1.1.0',
-      description: 'Orquestra login com fallback, crawl com MenuModalAgent, análise e geração',
+      version: '2.1.0',
+      description: 'Orquestra o pipeline de agentes, incluindo a capacidade de análise visual.',
       capabilities: [
-        { name: 'agent_coordination', description: 'Coordenação de múltiplos agentes especializados', version: '1.0.0' },
-        { name: 'pipeline_management', description: 'Gerenciamento do pipeline de execução', version: '1.0.0' },
-        { name: 'execution_monitoring', description: 'Monitoramento da execução', version: '1.0.0' }
+        { name: 'pipeline_management', description: 'Gerencia o fluxo de execução completo.', version: '2.1.0' },
+        { name: 'agent_coordination', description: 'Coordena tarefas entre agentes.', version: '2.1.0' },
       ]
     };
+    // 1. Chamar super() primeiro
     super(config);
-    this.agentConfig = config;
+
+    // 2. Inicializar todas as propriedades
     this.minioService = new MinIOService();
-    this.orchestrationConfig = OrchestratorAgent.createDefaultConfig();
     this.semaphore = new Semaphore(env.MAX_CONCURRENCY);
+    this.core = new AgnoSCore();
 
-    // registra agentes
-    this.agents.set('LoginAgent', new LoginAgent({ name: 'LoginAgent', version: '1.0.0', description: 'Agente de login', capabilities: [] }));
-    this.agents.set('SmartLoginAgent', new SmartLoginAgent({ name: 'SmartLoginAgent', version: '1.0.0', description: 'Agente de login inteligente', capabilities: [] }));
-    this.agents.set('CrawlerAgent', new CrawlerAgent({ name: 'CrawlerAgent', version: '1.0.0', description: 'Agente de rastreamento', capabilities: [] }));
-    this.agents.set('AnalysisAgent', new AnalysisAgent({ name: 'AnalysisAgent', version: '1.0.0', description: 'Análise inteligente de dados de crawling', capabilities: [] }));
-    // ContentAgent (7 parâmetros): prompt, minio, keyManager, llmManager, cache, logDir, logFile
-    this.agents.set('ContentAgent', new ContentAgent(
-      this.minioService,      // MinIOService
-      null,                   // GeminiKeyManager (opcional)
-      null,                   // LLMManager (opcional) → fallbacks serão usados
-      'logs',                 // logDir
-      'content.log'           // logFile
-    ));
-    this.agents.set('GeneratorAgent', new GeneratorAgent({
-      name: 'GeneratorAgent',
-      version: '1.0.0',
-      description: 'Agent responsible for generating final documentation',
-      capabilities: []
-    }));
-    // registra MenuModalAgent (necessário para o crawler)
-    this.agents.set('MenuModalAgent', new MenuModalAgent({ name: 'MenuModalAgent', version: '1.0.0', description: 'Agente para interagir com modais de menu', capabilities: [] }));
+    // 3. Chamar outros métodos
+    this.registerAgents();
+  }
+  
+  // Implementação dos métodos abstratos de BaseAgent
+  async initialize(): Promise<void> {
+    this.log('Inicializando OrchestratorAgent e seus serviços...');
+    await this.minioService.initialize();
+    for (const agent of this.core.getAgents()) {
+        await agent.initialize();
+    }
+    this.log('OrchestratorAgent e todos os sub-agentes foram inicializados com sucesso.');
   }
 
-  static createDefaultConfig(overrides: Partial<OrchestrationConfig> = {}): OrchestrationConfig {
-    return {
-      maxRetries: env.MAX_RETRIES || 2,
-      timeoutMinutes: 15,
-      enableScreenshots: true,
-      outputFormats: ['markdown'],
-      targetUrl: overrides.targetUrl || env.SAEB_URL,
-      crawlingStrategy: 'advanced',
-      credentials: env.SAEB_USERNAME && env.SAEB_PASSWORD ? {
-        username: env.SAEB_USERNAME,
-        password: env.SAEB_PASSWORD,
-        loginUrl: overrides.loginUrl || env.SAEB_URL
-      } : undefined,
-      ...overrides
-    };
-  }
-
-  async executeWithEnvConfig(overrides: Partial<OrchestrationConfig> = {}): Promise<OrchestrationResult> {
-    this.orchestrationConfig = OrchestratorAgent.createDefaultConfig(overrides);
-    return this.executeFullPipeline(this.orchestrationConfig);
-  }
-
-  protected override log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
-    const timestamp = new Date().toISOString();
-    const emoji = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
-    console.log(`${emoji} [${this.agentConfig.name}] ${timestamp} - ${message}`);
+  async cleanup(): Promise<void> {
+    this.log('Finalizando OrchestratorAgent e todos os sub-agentes...');
+    for (const agent of this.core.getAgents()) {
+        await agent.cleanup();
+    }
+    this.log('OrchestratorAgent finalizado.');
   }
 
   async processTask(task: TaskData): Promise<TaskResult> {
-    this.orchestrationConfig = task.config as OrchestrationConfig;
-    const startTime = Date.now();
-    try {
-      let result: any;
-      switch (task.type) {
-        case 'execute_pipeline':
-          result = await this.executeFullPipeline(task.data);
-          break;
-        case 'execute_with_env':
-          result = await this.executeWithEnvConfig(task.data);
-          break;
-        case 'login_only':
-          result = await this.executeLoginOnly(task.data);
-          break;
-        case 'execute_page_explore':
-          // Certifique-se de que pageInstance está presente no task.data
-          if (!task.data.pageInstance) {
-            throw new Error('pageInstance é necessária para execute_page_explore');
-          }
-          result = await this.executePageExplore(task.data);
-          break;
-        default:
-          throw new Error(`Tipo de tarefa não suportado: ${task.type}`);
-      }
-      return {
-        id: `result_${Date.now()}`,
-        taskId: task.id,
-        success: true,
-        data: result,
-        timestamp: new Date(),
-        processingTime: Date.now() - startTime
-      };
-    } catch (error: any) {
-      throw error;
+    this.log(`Tarefa recebida: ${task.type}.`);
+    if (task.type !== 'execute_full_pipeline' || !task.data) {
+        throw new Error('Tipo de tarefa inválido ou dados em falta para o OrchestratorAgent.');
     }
-  }
-
-  private async executeAgentTask(agentName: string, taskType: string, data: any): Promise<TaskResult> {
-    const agent = this.agents.get(agentName);
-    if (!agent) throw new Error(`Agente ${agentName} não encontrado`);
-
-    // Integra MenuModalAgent ao Crawler (se existir)
-    if (agentName === 'CrawlerAgent') {
-      const crawler = agent as CrawlerAgent;
-      const menuModal = this.agents.get('MenuModalAgent');
-      crawler?.setMenuModalAgent?.(menuModal);
-    }
-
-    const task: TaskData = {
-      id: `task_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-      type: taskType,
-      data,
-      priority: 'high',
+    const result = await this.executeFullPipeline(task.data as OrchestrationConfig);
+    return {
+      id: uuidv4(),
+      taskId: task.id,
+      success: result.success,
+      data: result,
       timestamp: new Date(),
-      sender: 'OrchestratorAgent'
+      processingTime: result.totalDuration
     };
-    return await agent.processTask(task);
-  }
-
-  async executeFullPipeline(config: OrchestrationConfig, browserInstance?: Browser, pageInstance?: Page, browserContextInstance?: BrowserContext): Promise<OrchestrationResult> {
-    this.log(`Configuração de execução: ${JSON.stringify(config)}`);
-    const executionId = `exec_${Date.now()}`;
-    const startTime = new Date();
-    this.log(`Iniciando o pipeline de orquestração para a URL: ${config.targetUrl}`);
-
-    const result: OrchestrationResult = {
-      success: false,
-      executionId,
-      startTime,
-      endTime: new Date(),
-      totalDuration: 0,
-      agentsExecuted: [],
-      documentsGenerated: {},
-      statistics: { pagesProcessed: 0, elementsAnalyzed: 0, totalElements: 0, screenshotsCaptured: 0, wordCount: 0 },
-      reports: {},
-      errors: []
-    };
-
-     await this.semaphore.acquire();
-     let browser: Browser | undefined;
-     let context: BrowserContext | undefined;
-     let page: Page | undefined;
-
-     if (browserInstance && pageInstance && browserContextInstance) {
-       this.log(`Reutilizando navegador e página existentes...`);
-       browser = browserInstance;
-       context = browserContextInstance;
-       page = pageInstance;
-     } else {
-       this.log(`Lançando novo navegador...`);
-       try {
-         const launchOptions: any = { headless: env.HEADLESS === 'true', args: ['--no-sandbox', '--disable-setuid-sandbox'] };
-         browser = await chromium.launch(launchOptions);
-         context = await browser.newContext();
-         page = await context.newPage();
-         if (env.HEADLESS !== 'true') {
-           await page.waitForTimeout(3000); // Pausa para visualização inicial
-         }
-       } catch (error: any) {
-         // Ensure browser is closed if an error occurs during context/page creation
-         if (browser) {
-           await browser.close();
-         }
-         throw error; // Re-throw the original error
-       }
-     }
-
-     // Add defensive checks before setting timeouts, as context/page might theoretically be undefined
-     // if an error occurred during their creation, though the 'throw error' would prevent reaching here.
-     // This makes the code more robust against unexpected control flows or future refactors.
-     if (context) {
-       context.setDefaultTimeout(env.NAV_TIMEOUT_MS);
-       context.setDefaultNavigationTimeout(env.NAV_TIMEOUT_MS);
-     }
-     if (page) {
-       page.setDefaultTimeout(env.NAV_TIMEOUT_MS);
-       page.setDefaultNavigationTimeout(env.NAV_TIMEOUT_MS);
-     }
-     this.log(`Playwright timeouts set to ${env.NAV_TIMEOUT_MS}ms.`);
-
-      // Passa a instância da página e do navegador para o CrawlerAgent
-      const crawlerAgent = this.agents.get('CrawlerAgent') as CrawlerAgent;
-      if (page) {
-        crawlerAgent.setPage(page);
-      }
-      if (browser) {
-        crawlerAgent.setBrowser(browser);
-      }
-
-      const menuModalAgent = this.agents.get('MenuModalAgent') as MenuModalAgent;
-      if (menuModalAgent && page) {
-        menuModalAgent.setPage(page);
-        // Se houver uma timeline global ou se ela for criada aqui, passe-a.
-        // Por enquanto, passaremos null, assumindo que a timeline não é estritamente necessária para a inicialização.
-        // Ou, se a timeline for um serviço, ela deve ser injetada de forma semelhante ao MinIOService.
-        // menuModalAgent.setTimeline(this.timelineService); // Exemplo se timeline for um serviço
-      }
-
-      if (config.enableScreenshots) {
-        await page.context().tracing.start({ screenshots: true, snapshots: true, sources: true });
-      }
-
-      // FASE 1: Login com fallback
-      const loginUrl = config.credentials?.loginUrl || config.targetUrl;
-      if (config?.credentials?.username && config?.credentials?.password) {
-        this.log('FASE 1: Login (LoginAgent)');
-        const loginRes = await this.executeAgentTask('LoginAgent', 'authenticate', { credentials: config.credentials, loginUrl, page });
-         if (loginRes.success) {
-           this.log('Login bem-sucedido com LoginAgent.');
-           if (env.HEADLESS !== 'true') {
-             await page?.waitForTimeout(3000); // Pausa para visualização após login
-           }
-         } else {
-           this.log(`LoginAgent falhou: ${loginRes.error}. Fallback SmartLogin.`, 'warn');
-           const smartRes = await this.executeAgentTask('SmartLoginAgent', 'smart_login', { baseUrl: loginUrl, credentials: { username: config.credentials.username, password: config.credentials.password }, page, outputDir: config.outputDir });
-           if (smartRes.success) {
-             this.log('Login bem-sucedido com SmartLoginAgent.');
-             if (env.HEADLESS !== 'true') {
-               await page?.waitForTimeout(3000); // Pausa para visualização após login
-             }
-           } else {
-             throw new Error('Falha de autenticação (SmartLogin também falhou)');
-           }
-         }
-      } else {
-        this.log('FASE 1: Login pulado (sem credenciais)');
-      }
-
-      if (config.stopAfterPhase === 'login') {
-        result.success = true;
-        result.endTime = new Date();
-        result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
-        return result;
-      }
-
-      // FASE 2: Crawling (mesma sessão da page autenticada)
-      this.log('FASE 2: Crawling');
-      const startUrl = config.targetUrl;
-      const crawlerRes = await this.executeAgentTask('CrawlerAgent', 'crawl_site', { baseUrl: startUrl, enableScreenshots: config.enableScreenshots, useCurrentPage: true, crawlingStrategy: config.crawlingStrategy || 'basic', outputDir: config.outputDir || 'output', page, browser });
-      if (!crawlerRes.success) throw new Error(`CrawlerAgent falhou: ${crawlerRes.error}`);
-      result.agentsExecuted.push('CrawlerAgent');
-
-      const payload = crawlerRes.data || {};
-      let totalElements = 0;
-      if (Array.isArray(payload.pages)) {
-        totalElements = payload.pages.reduce((a: number, p: any) => a + (p.elements?.length || 0), 0);
-      }
-      result.statistics = { pagesProcessed: payload.stats?.pages ?? (payload.pages?.length ?? 1), elementsAnalyzed: totalElements, totalElements, screenshotsCaptured: 0, wordCount: 0 };
-
-      if (config.stopAfterPhase === 'crawling') {
-        result.success = true;
-        result.endTime = new Date();
-        result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
-        return result;
-      }
-
-      // FASE 3: Análise (AnalysisAgent)
-      this.log('FASE 3: Análise');
-      if (!crawlerRes.data) {
-        throw new Error('Dados de crawling ausentes para o AnalysisAgent.');
-      }
-      const analysisRes = await this.executeAgentTask('AnalysisAgent', 'analyze', { crawlResult: crawlerRes.data, outputDir: config.outputDir });
-      if (!analysisRes.success) throw new Error(`AnalysisAgent falhou: ${analysisRes.error}`);
-      result.agentsExecuted.push('AnalysisAgent');
-
-      // FASE 4: Content (novo ContentAgent)
-      this.log('FASE 4: Content');
-      const contentRes = await this.executeAgentTask('ContentAgent', 'generate_user_friendly_content', { crawlAnalysis: analysisRes.data || { pages: payload.pages }, rawData: payload.pages });
-      if (!contentRes.success) this.log(`ContentAgent aviso: ${contentRes.error}`, 'warn');
-      result.agentsExecuted.push('ContentAgent');
-
-      // FASE 5: Generator
-      this.log('FASE 5: Generator');
-      const userContentForGenerator = contentRes.data || { sections: [], introduction: { requirements: [] } }; // Garante que userContent tenha a estrutura mínima
-      const genRes = await this.executeAgentTask('GeneratorAgent', 'generate_final_documents', { userContent: userContentForGenerator, crawlAnalysis: analysisRes.data || payload });
-      if (!genRes.success) this.log(`GeneratorAgent aviso: ${genRes.error}`, 'warn');
-      result.agentsExecuted.push('GeneratorAgent');
-
-      if (genRes.data?.metadata?.wordCount) result.statistics.wordCount = genRes.data.metadata.wordCount;
-      result.documentsGenerated = { markdown: genRes.data?.minioUrls?.markdown, html: genRes.data?.minioUrls?.html, pdf: genRes.data?.minioUrls?.pdf };
-
-      result.success = true;
-      result.endTime = new Date();
-      result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
-      return result;
-    } catch (e: any) {
-      result.errors.push(e?.message || String(e));
-      result.endTime = new Date();
-      result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
-      this.log(`Pipeline falhou: ${e}`, 'error');
-      return result;
-    } finally {
-      if (browser && !browserInstance) {
-        this.log('Fechando navegador Playwright...');
-        await browser.close();
-      }
-      if (browser && !browserInstance) {
-        await browser.close();
-        this.log('Navegador fechado.');
-      }
-      this.semaphore.release();
-    }
-  }
-
-  async executePageExplore(config: any): Promise<any> {
-    const startTime = Date.now();
-    let success = true;
-    let errors: string[] = [];
-    let pagesProcessed = 0;
-    let elementsAnalyzed = 0;
-    let documentsGenerated: { [key: string]: string | undefined } = {};
-
-    try {
-      const { pageReport } = await explorePage(config.pageInstance, {
-        startUrl: config.startUrl,
-        outputDir: config.outputDir,
-        enableScreenshots: config.enableScreenshots,
-      });
-
-      await (this.agents.get('AnalysisAgent') as AnalysisAgent).processTask({
-        id: `analyze_page_${Date.now()}`,
-        type: 'analyze_page',
-        data: pageReport,
-        timestamp: new Date(),
-        sender: this.agentConfig.name,
-        priority: 'high',
-      });
-
-      pagesProcessed = 1;
-    } catch (error: any) {
-      success = false;
-      errors.push(error.message);
-      this.log(`Erro durante a exploração da página: ${error.message}`, 'error');
-    } finally {
-      const totalDuration = Date.now() - startTime;
-      this.log(`Exploração de página concluída em ${totalDuration}ms com sucesso: ${success}`);
-      return { success, totalDuration, agentsExecuted: ['OrchestratorAgent', 'AnalysisAgent', 'ContentAgent'], statistics: { pagesProcessed, elementsAnalyzed }, errors, documentsGenerated };
-    }
   }
 
   async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
-    const { success, data, error, processingTime } = taskResult;
-    let report = `# Relatório de Execução - OrchestratorAgent\n\n`;
-    report += `**Status:** ${success ? '✅ Sucesso' : '❌ Falha'}\n`;
-    report += `**Tempo de Processamento:** ${processingTime}ms\n`;
-    report += `**Timestamp:** ${taskResult.timestamp.toISOString()}\n\n`;
-    if (success && data) {
-      report += `## Resultados\n\n`;
-      if (data.agentsExecuted) report += `**Agentes Executados:** ${data.agentsExecuted.join(', ')}\n`;
-      if (data.statistics) {
-        report += `\n### Estatísticas\n`;
-        report += `- Páginas processadas: ${data.statistics.pagesProcessed || 0}\n`;
-        report += `- Elementos analisados: ${data.statistics.elementsAnalyzed || 0}\n`;
-        report += `- Screenshots capturados: ${data.statistics.screenshotsCaptured || 0}\n`;
-      }
-      if (data.documentsGenerated) {
-        report += `\n### Documentos Gerados\n`;
-        Object.entries(data.documentsGenerated).forEach(([format, path]) => { if (path) report += `- ${format.toUpperCase()}: \`${path}\`\n`; });
-      }
+    const result = taskResult.data as OrchestrationResult;
+    if (!result) return "## Relatório de Orquestração\n\nNenhum resultado para reportar.";
+    
+    let report = `# Relatório de Orquestração\n\n- **ID da Execução:** ${result.executionId}\n- **Status:** ${result.success ? '✅ Sucesso' : '❌ Falha'}\n- **Duração:** ${result.totalDuration}ms\n`;
+    if (result.agentsExecuted.length > 0) {
+        report += `- **Agentes Executados:** ${result.agentsExecuted.join(', ')}\n`;
     }
-    if (error) report += `## Erro\n\n\`\`\`\n${error}\n\`\`\`\n`;
-    if (data?.errors && data.errors.length > 0) {
-      report += `\n## Erros Adicionais\n\n`;
-      data.errors.forEach((err: string, index: number) => { report += `${index + 1}. ${err}\n`; });
+    if (result.errors.length > 0) {
+        report += `- **Erros:** ${result.errors.join(', ')}\n`;
     }
     return report;
   }
+  
+  private registerAgents(): void {
+    const visionAgent = new VisionAgent();
+    this.core.registerAgent(visionAgent);
+    this.core.registerAgent(new CrawlerAgent(visionAgent));
+    this.core.registerAgent(new LoginAgent({ name: 'LoginAgent', version: '1.0.0', description: 'Agente de login', capabilities: [{ name: 'login', description: 'Autenticação padrão', version: '1.0.0' }] }));
+    this.core.registerAgent(new SmartLoginAgent({ name: 'SmartLoginAgent', version: '1.0.0', description: 'Agente de login inteligente', capabilities: [{ name: 'smart_login', description: 'Autenticação avançada', version: '1.0.0' }] }));
+    this.core.registerAgent(new AnalysisAgent({ name: 'AnalysisAgent', version: '1.0.0', description: 'Análise de dados de crawling', capabilities: [{ name: 'data_analysis', description: 'Síntese de dados', version: '1.0.0' }] }));
+    this.core.registerAgent(new ContentAgent(
+      { name: 'ContentAgent', version: '1.0.0', description: 'Transforma dados técnicos em conteúdo user-friendly.', capabilities: [{ name: 'content_generation', description: 'Criação de conteúdo didático', version: '1.0.0' }] },
+      this.minioService
+    ));
+this.core.registerAgent(new GeneratorAgent({ 
+    name: 'GeneratorAgent', 
+    version: '1.0.0', 
+    description: 'Gerador de documentos', 
+    capabilities: [{ name: 'document_generation', description: 'Criação de PDF/HTML', version: '1.0.0' }] 
+}));  }
 
-  registerAgent(name: string, agent: any): void { this.agents.set(name, agent); }
-
-  async launchBrowser(): Promise<Browser> {
-    this.log('Lançando navegador para exploração de página...');
-    const launchOptions: any = { headless: env.HEADLESS === 'true', args: ['--no-sandbox', '--disable-setuid-sandbox'] };
-    return await chromium.launch(launchOptions);
+  static createDefaultConfig(overrides: Partial<OrchestrationConfig> = {}): OrchestrationConfig {
+    const defaultConfig: OrchestrationConfig = {
+      maxRetries: env.MAX_RETRIES,
+      timeoutMinutes: 15,
+      enableScreenshots: true,
+      outputFormats: ['markdown'],
+      targetUrl: env.SAEB_URL || '',
+      outputDir: 'output',
+      credentials: (env.SAEB_USERNAME && env.SAEB_PASSWORD) ? {
+        username: env.SAEB_USERNAME,
+        password: env.SAEB_PASSWORD,
+      } : undefined,
+    };
+    return { ...defaultConfig, ...overrides };
   }
 
-  async initialize(): Promise<void> {
-    this.log('Inicializando OrchestratorAgent...');
-    // Inicializa o MinIOService primeiro
-    if (this.minioService && !this.minioService.isAvailable) {
-      await this.minioService.initialize();
-      this.log('MinIOService inicializado');
-    }
+  public async executeFullPipeline(config: OrchestrationConfig): Promise<OrchestrationResult> {
+    const executionId = `exec_${uuidv4()}`;
+    const startTime = new Date();
+    this.log(`Iniciando pipeline [${executionId}] para a URL: ${config.targetUrl}`);
 
-    // Inicializa os outros agentes
-    for (const [name, agent] of this.agents) {
-      if (agent.initialize && agent !== this.minioService) { // Evita inicializar MinIOService novamente
-        await agent.initialize();
-        this.log(`Agente ${name} inicializado`);
+    const result: OrchestrationResult = {
+      success: false, executionId, startTime, endTime: new Date(), totalDuration: 0,
+      agentsExecuted: [], documentsGenerated: {},
+      statistics: { pagesProcessed: 0, elementsAnalyzed: 0, screenshotsCaptured: 0 },
+      errors: []
+    };
+    
+    await this.semaphore.acquire();
+    let browser: Browser | undefined;
+    try {
+      this.log(`Lançando navegador...`);
+      browser = await chromium.launch({ headless: env.HEADLESS === 'true' });
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      context.setDefaultTimeout(env.NAV_TIMEOUT_MS);
+      
+      // FASE 1: Login (se houver credenciais)
+      if (config.credentials) {
+        this.log("FASE 1: Autenticação");
+        const loginRes = await this.core.executeTask('LoginAgent', 'authenticate', { page, credentials: config.credentials });
+        if (!loginRes.success) {
+            this.log("Login padrão falhou, a tentar SmartLogin...", "warn");
+            const smartLoginRes = await this.core.executeTask('SmartLoginAgent', 'smart_authenticate', { page, credentials: config.credentials });
+            if (!smartLoginRes.success) throw new Error(`Autenticação falhou: ${smartLoginRes.error}`);
+            result.agentsExecuted.push('SmartLoginAgent');
+        } else {
+            result.agentsExecuted.push('LoginAgent');
+        }
       }
+
+      // FASE 2: Crawling Visual
+      this.log('FASE 2: Crawling Visual');
+      const crawlerRes = await this.core.executeTask('CrawlerAgent', 'crawl_site', { targetUrl: config.targetUrl, page });
+      if (!crawlerRes.success) throw new Error(`CrawlerAgent falhou: ${crawlerRes.error}`);
+      result.agentsExecuted.push('CrawlerAgent');
+      result.statistics.pagesProcessed = crawlerRes.data?.visitedPages?.length || 0;
+      const crawlData = crawlerRes.data;
+
+      // FASE 3: Análise
+      this.log('FASE 3: Análise de Conteúdo');
+      const analysisRes = await this.core.executeTask('AnalysisAgent', 'analyze_crawl_data', { crawlData });
+      if(!analysisRes.success) throw new Error(`AnalysisAgent falhou: ${analysisRes.error}`);
+      result.agentsExecuted.push('AnalysisAgent');
+      const analysisData = analysisRes.data;
+
+      // FASE 4: Geração de Conteúdo
+      this.log('FASE 4: Geração de Conteúdo User-Friendly');
+      const contentRes = await this.core.executeTask('ContentAgent', 'generate_content', { analysisData });
+      if(!contentRes.success) throw new Error(`ContentAgent falhou: ${contentRes.error}`);
+      result.agentsExecuted.push('ContentAgent');
+      const markdownContent = contentRes.data.markdownContent;
+
+      // FASE 5: Geração de Documentos Finais
+      this.log('FASE 5: Geração de Documentos Finais');
+      const generatorRes = await this.core.executeTask('GeneratorAgent', 'generate_documents', { markdownContent, outputDir: config.outputDir, formats: config.outputFormats });
+      if(!generatorRes.success) throw new Error(`GeneratorAgent falhou: ${generatorRes.error}`);
+      result.agentsExecuted.push('GeneratorAgent');
+      result.documentsGenerated = generatorRes.data.documents;
+
+      result.success = true;
+    } catch (e: any) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      result.errors.push(errorMessage);
+      this.log(`Pipeline falhou: ${errorMessage}`, 'error');
+    } finally {
+      if (browser) {
+        this.log('Fechando o navegador...');
+        await browser.close();
+      }
+      this.semaphore.release();
+      result.endTime = new Date();
+      result.totalDuration = result.endTime.getTime() - result.startTime.getTime();
+      this.log(`Pipeline [${executionId}] finalizado em ${result.totalDuration}ms.`);
     }
-    this.log('OrchestratorAgent inicializado com sucesso');
+    return result;
   }
 
-  public async cleanup(): Promise<void> {
-    try { for (const [, agent] of this.agents) { await agent.cleanup?.(); } } catch { /* noop */ } 
-    this.log('OrchestratorAgent finalizado');
+  public async launchBrowser(): Promise<Browser> {
+    this.log('Lançando navegador para exploração de página...');
+    return await chromium.launch({ headless: env.HEADLESS === 'true' });
   }
 
-  getAgent(agentName: string): any { return this.agents.get(agentName); }
+  public async executePageExplore(config: { startUrl: string, outputDir: string, enableScreenshots: boolean, pageInstance: Page }): Promise<Partial<OrchestrationResult>> {
+    this.log(`Iniciando exploração de página única: ${config.startUrl}`);
+    const startTime = new Date();
+    
+    const crawlerResult = await this.core.executeTask('CrawlerAgent', 'crawl_site', {
+      targetUrl: config.startUrl,
+      page: config.pageInstance
+    });
 
-  async executeLoginOnly(config: { url: string; credentials: { username: string; password: string }; outputDir?: string }): Promise<{ success: boolean; method?: string; duration?: number; errors?: string[]; screenshots?: string[] }> {
-    const orchestrationConfig: OrchestrationConfig = { maxRetries: 2, timeoutMinutes: 5, enableScreenshots: true, outputFormats: ['markdown'], targetUrl: config.url, outputDir: config.outputDir, stopAfterPhase: 'login', credentials: config.credentials };
-    const result = await this.executeFullPipeline(orchestrationConfig);
-    return { success: result.success, method: result.agentsExecuted.join(', '), duration: result.totalDuration, errors: result.errors, screenshots: [] };
+    const endTime = new Date();
+    return {
+      success: crawlerResult.success,
+      startTime: startTime,
+      endTime: endTime,
+      totalDuration: endTime.getTime() - startTime.getTime(),
+      agentsExecuted: ['CrawlerAgent'],
+      statistics: {
+        pagesProcessed: crawlerResult.data?.visitedPages?.length || 0,
+        elementsAnalyzed: crawlerResult.data?.discoveredData?.[0]?.elements?.length || 0,
+        screenshotsCaptured: crawlerResult.data?.discoveredData?.length || 0,
+      },
+      errors: crawlerResult.error ? [crawlerResult.error] : [],
+    };
   }
 }
-
-export default OrchestratorAgent;
