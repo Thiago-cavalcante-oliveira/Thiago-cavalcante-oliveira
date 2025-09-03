@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-09-02T19:19:29.182Z",
+  "url": "https://accounts.google.com/v3/signin/identifier?ifkv=AdBytiOQztJeStDqnpZDBOFxYsWKL4cN4w0XUjthDYCqR8lEShCMM7ieqbLxSnZ5UfTxwoL5nJgtBQ&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S1244624195%3A1756840765807537",
+  "forms": [
+    {
+      "text": "email or phoneforgot email?type the text you hear or see",
+      "type": "form",
+      "action": "https://accounts.google.com/v3/signin/identifier?ifkv=AdBytiOQztJeStDqnpZDBOFxYsWKL4cN4w0XUjthDYCqR8lEShCMM7ieqbLxSnZ5UfTxwoL5nJgtBQ&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S1244624195%3A1756840765807537",
+      "href": "",
+      "className": "",
+      "isSpecial": true
+    },
+    {
+      "text": "forgot email?",
+      "type": "button",
+      "action": "",
+      "href": "",
+      "className": "",
+      "isSpecial": true
+    }
+  ],
+  "description": "Formulários de recuperação de senha e registro identificados para processamento futuro"
+}

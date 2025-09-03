@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const Env = z.object({
    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-   HEADLESS: z.enum(['true','false']).default('true'),
+   HEADLESS: z.enum(['true','false']).default('false'),
    NAV_TIMEOUT_MS: z.coerce.number().default(15000),
    STEP_TIMEOUT_MS: z.coerce.number().default(25000),
    MAX_CONCURRENCY: z.coerce.number().int().positive().default(5),

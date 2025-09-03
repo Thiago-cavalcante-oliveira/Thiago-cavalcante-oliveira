@@ -1,0 +1,28 @@
+{
+  "pages": [
+    {
+      "url": "https://homologacao.pmfi.pr.gov.br/authorize?response_type=code&client_id=&scope=&redirect_uri=&state=d1081ce6-52dc-4729-95dc-23ab99d31ce5",
+      "meta": {
+        "breadcrumb": "",
+        "title": "404 - File or directory not found."
+      },
+      "classification": {
+        "kind": "unknown",
+        "hints": [],
+        "title": "Server Error"
+      },
+      "elements": []
+    }
+  ],
+  "siteMap": [
+    {
+      "url": "https://homologacao.pmfi.pr.gov.br/authorize?response_type=code&client_id=&scope=&redirect_uri=&state=d1081ce6-52dc-4729-95dc-23ab99d31ce5",
+      "title": "Server Error"
+    }
+  ],
+  "stats": {
+    "pages": 1,
+    "totalElements": 0
+  },
+  "generatedAt": "2025-09-02T14:55:38.461Z"
+}

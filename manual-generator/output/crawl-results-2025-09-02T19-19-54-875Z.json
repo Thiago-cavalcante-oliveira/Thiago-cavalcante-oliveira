@@ -1,0 +1,145 @@
+{
+  "stats": {
+    "totalElements": 22,
+    "pages": 1,
+    "visited": [
+      null
+    ],
+    "durationMs": 94
+  },
+  "elements": [
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#identifierId"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Forgot email?",
+      "selector": "button"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": ".Hvu6D"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#ca"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#ct"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#fidoUserHandle"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Learn more about using Guest mode",
+      "selector": "a"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Next",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Create account",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "For my personal use",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "For my child",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "For work or my business",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Learn more",
+      "selector": "a"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#identifierId"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "",
+      "selector": ".WpHeLc"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Help",
+      "selector": ".AVAq4d"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Privacy",
+      "selector": ".AVAq4d"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Terms",
+      "selector": ".AVAq4d"
+    }
+  ],
+  "workflows": []
+}

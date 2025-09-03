@@ -1,0 +1,127 @@
+{
+  "stats": {
+    "totalElements": 19,
+    "pages": 1,
+    "visited": [
+      null
+    ],
+    "durationMs": 50
+  },
+  "elements": [
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#identifierId"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Esqueceu seu e-mail?",
+      "selector": "button"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": ".Hvu6D"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#ca"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#ct"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "input"
+    },
+    {
+      "type": "input",
+      "role": "",
+      "text": "",
+      "selector": "#fidoUserHandle"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Saiba como usar o modo visitante.",
+      "selector": "a"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Avançar",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Criar conta",
+      "selector": ".VfPpkd-LgbsSe"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "Para uso pessoal",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "Para uma criança",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "li",
+      "role": "menuitem",
+      "text": "Para trabalho ou empresa",
+      "selector": ".gNVsKb"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Ajuda",
+      "selector": ".AVAq4d"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Privacidade",
+      "selector": ".AVAq4d"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Termos",
+      "selector": ".AVAq4d"
+    }
+  ],
+  "workflows": []
+}

@@ -453,7 +453,7 @@ export class SmartLoginAgent extends BaseAgent {
     return report;
   }
 
-  protected async waitForDomSteady(page: Page, maxRetries = 3, delay = 500) {
+  protected override async waitForDomSteady(page: Page, maxRetries = 3, delay = 500) {
     for (let i = 0; i < maxRetries; i++) {
         const initialHtml = await page.content();
         await new Promise(resolve => setTimeout(resolve, delay));

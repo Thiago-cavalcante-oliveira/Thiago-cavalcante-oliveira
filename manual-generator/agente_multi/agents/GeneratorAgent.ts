@@ -248,7 +248,7 @@ export class GeneratorAgent extends BaseAgent {
 
   private async generateMarkdown(userContent: any): Promise<string> {
     const metadata = userContent.metadata;
-    const introduction = userContent.introduction;
+    const introduction = userContent.introduction || {};
     const sections = userContent.sections || [];
     const appendices = userContent.appendices;
     const summary = userContent.summary;
@@ -293,7 +293,7 @@ ${introduction.overview}
 
 `;
 
-    introduction.requirements.forEach((req: string) => {
+    (introduction.requirements || []).forEach((req: string) => {
       markdown += `- ${req}\n`;
     });
 
@@ -316,7 +316,7 @@ ${section.description}
 
 `;
 
-      section.steps.forEach((step: any) => {
+      (section.steps || []).forEach((step: any) => {
         markdown += `#### ${step.stepNumber}. ${step.action}
 
 ${step.description}
@@ -331,7 +331,7 @@ ${step.description}
 
         if (step.notes && step.notes.length > 0) {
           markdown += `**Observações:**\n`;
-          step.notes.forEach((note: string) => {
+          (step.notes || []).forEach((note: string) => {
             markdown += `- ${note}\n`;
           });
           markdown += '\n';
@@ -342,7 +342,7 @@ ${step.description}
         markdown += `### 💡 Dicas Úteis
 
 `;
-        section.tips.forEach((tip: string) => {
+        (section.tips || []).forEach((tip: string) => {
           markdown += `- ${tip}\n`;
         });
         markdown += '\n';
@@ -352,7 +352,7 @@ ${step.description}
         markdown += `### ⚠️ Problemas Comuns
 
 `;
-        section.troubleshooting.forEach((issue: string) => {
+        (section.troubleshooting || []).forEach((issue: string) => {
           markdown += `- ${issue}\n`;
         });
         markdown += '\n';
@@ -368,26 +368,26 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    appendices.troubleshooting.forEach((item: any) => {
+    (appendices.troubleshooting || []).forEach((item: any) => {
       markdown += `### ${item.problem}
 
 **Sintomas:**
 `;
-      item.symptoms.forEach((symptom: string) => {
+      (item.symptoms || []).forEach((symptom: string) => {
         markdown += `- ${symptom}\n`;
       });
 
       markdown += `
 **Soluções:**
 `;
-      item.solutions.forEach((solution: string) => {
+      (item.solutions || []).forEach((solution: string) => {
         markdown += `- ${solution}\n`;
       });
 
       markdown += `
 **Prevenção:**
 `;
-      item.prevention.forEach((prev: string) => {
+      (item.prevention || []).forEach((prev: string) => {
         markdown += `- ${prev}\n`;
       });
 
@@ -398,7 +398,7 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    appendices.glossary.forEach((item: any) => {
+    (appendices.glossary || []).forEach((item: any) => {
       markdown += `**${item.term}:** ${item.definition}`;
       if (item.example) {
         markdown += ` *Exemplo: ${item.example}*`;
@@ -410,12 +410,12 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    const categories = Array.from(new Set(appendices.faqs.map((faq: any) => faq.category))) as string[];
+    const categories = Array.from(new Set((appendices.faqs || []).map((faq: any) => faq.category))) as string[];
     
-    categories.forEach((category: string) => {
+    (categories || []).forEach((category: string) => {
       markdown += `### ${category}\n\n`;
       
-      appendices.faqs
+      (appendices.faqs || [])
         .filter((faq: any) => faq.category === category)
         .forEach((faq: any) => {
           markdown += `**P: ${faq.question}**\n\nR: ${faq.answer}\n\n`;
@@ -428,7 +428,7 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    summary.keyTakeaways.forEach((takeaway: string) => {
+    (summary.keyTakeaways || []).forEach((takeaway: string) => {
       markdown += `- ${takeaway}\n`;
     });
 
@@ -437,7 +437,7 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    summary.nextSteps.forEach((step: string) => {
+    (summary.nextSteps || []).forEach((step: string) => {
       markdown += `- ${step}\n`;
     });
 
@@ -446,7 +446,7 @@ Esta seção contém soluções para os problemas mais comuns:
 
 `;
 
-    summary.supportContacts.forEach((contact: string) => {
+    (summary.supportContacts || []).forEach((contact: string) => {
       markdown += `- ${contact}\n`;
     });
 

@@ -1,0 +1,73 @@
+{
+  "stats": {
+    "totalElements": 10,
+    "pages": 1,
+    "visited": [
+      null
+    ],
+    "durationMs": 56
+  },
+  "elements": [
+    {
+      "type": "button",
+      "role": "",
+      "text": "",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "button",
+      "role": "",
+      "text": "Admin Sistema",
+      "selector": "#mantine-6vpiwhuh1-target"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "DashboardVisão geral do sistema",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Correção de GabaritoCorrigir gabaritos",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Corrigir Gabarito ManualmenteCorrigir gabaritos manualmente por aluno",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Cadastrar GabaritoCadastrar gabaritos",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Gabaritos CadastradosVisualizar gabaritos cadastrados",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "Cadastrar Aplicação de ProvaCadastrar aplicações de provas",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "AdministrativoOpções administrativas",
+      "selector": ".mantine-focus-auto"
+    },
+    {
+      "type": "a",
+      "role": "",
+      "text": "SairLogout do sistema",
+      "selector": ".mantine-focus-auto"
+    }
+  ],
+  "workflows": []
+}

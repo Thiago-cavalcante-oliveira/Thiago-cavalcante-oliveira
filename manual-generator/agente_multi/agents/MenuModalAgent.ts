@@ -1,18 +1,32 @@
 import { Page } from 'playwright';
 import { InteractiveElement, UserClickRequest } from './interfaces/CrawlerTypes';
 
-export class MenuModalAgent {
-  private page: Page;
+import { AgentConfig } from '../core/AgnoSCore';
+import { BaseAgent } from '../core/AgnoSCore';
+import { Page } from 'playwright';
+
+export class MenuModalAgent extends BaseAgent {
+  private page: Page | undefined;
   private timeline: any;
 
-  constructor(page: Page, timeline: any) {
+  constructor(config: AgentConfig) {
+    super(config);
+  }
+
+  setPage(page: Page) {
     this.page = page;
+  }
+
+  setTimeline(timeline: any) {
     this.timeline = timeline;
   }
 
   setBrowser(browser: any) { /* Implementar lógica se necessário */ }
 
   async run(): Promise<any> {
+    if (!this.page) {
+      throw new Error('Page not set for MenuModalAgent. Call setPage() first.');
+    }
     // Implementar a lógica de execução do MenuModalAgent
     // Por exemplo, detectar menus e retornar os resultados
     const menus = await this.detectMenus();
@@ -31,6 +45,9 @@ export class MenuModalAgent {
   }
 
   async detectMenus() {
+    if (!this.page) {
+      throw new Error('Page not set for MenuModalAgent. Call setPage() first.');
+    }
     const data = await this.page.evaluate(() => {
       const menus: Array<{ selector: string; items: Array<{ selector: string; label: string; href?: string }> }> = [];
       const navs = document.querySelectorAll('nav, [role="navigation"], .menu, .sidebar, .navbar');

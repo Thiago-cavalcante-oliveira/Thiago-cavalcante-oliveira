@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { safeValidateEnvironment } from '../config/environment.js';
+import { env } from '../config/env.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -41,24 +41,20 @@ export class GeminiKeyManager {
   private loadApiKeys(): void {
     const keys: string[] = [];
     
-    // Validar variáveis de ambiente usando Zod
-    const envValidation = safeValidateEnvironment();
-    
-    if (!envValidation.success) {
-      console.warn('⚠️ [GeminiKeyManager] Erro na validação de ambiente:', envValidation.error);
-      throw new Error('Erro na validação das variáveis de ambiente para Gemini API');
+    // Verificar se a chave do Gemini está disponível
+    if (!process.env.GOOGLE_API_KEY) {
+      console.warn('⚠️ [GeminiKeyManager] GOOGLE_API_KEY não encontrada nas variáveis de ambiente');
+      throw new Error('GOOGLE_API_KEY é obrigatória para usar o Gemini API');
     }
     
-    const env = envValidation.data;
-    
     // Carregar todas as chaves configuradas no .env
-    if (env.GEMINI_API_KEY_1) keys.push(env.GEMINI_API_KEY_1.trim());
-    if (env.GEMINI_API_KEY_2) keys.push(env.GEMINI_API_KEY_2.trim());
-    if (env.GEMINI_API_KEY_3) keys.push(env.GEMINI_API_KEY_3.trim());
+    if (process.env.GEMINI_API_KEY_1) keys.push(process.env.GEMINI_API_KEY_1.trim());
+    if (process.env.GEMINI_API_KEY_2) keys.push(process.env.GEMINI_API_KEY_2.trim());
+    if (process.env.GEMINI_API_KEY_3) keys.push(process.env.GEMINI_API_KEY_3.trim());
 
     // Compatibilidade com chave única (versão anterior)
-    if (env.GOOGLE_API_KEY && !keys.includes(env.GOOGLE_API_KEY.trim())) {
-      keys.push(env.GOOGLE_API_KEY.trim());
+    if (process.env.GOOGLE_API_KEY && !keys.includes(process.env.GOOGLE_API_KEY.trim())) {
+      keys.push(process.env.GOOGLE_API_KEY.trim());
     }
 
     if (keys.length === 0) {

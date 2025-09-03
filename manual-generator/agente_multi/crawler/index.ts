@@ -1,16 +1,11 @@
 // Barrel exports for crawler module
 export * from './routeDiscovery';
-export * from './elementHeuristics';
-export * from './smartCrawler';
 
 // Named exports for convenience
-export { SmartCrawler, quickCrawl } from './smartCrawler';
 export { discoverRoutes, interactiveDiscovery } from './routeDiscovery';
-export { analyzeCurrentPage, extractPagePurpose, extractMainActions } from './elementHeuristics';
 
 // Type exports
 export type { RouteInfo, DiscoveryOptions } from './routeDiscovery';
-export type { ElementAction, PageAnalysis } from './elementHeuristics';
 
 import { Page } from 'playwright';
 import * as path from 'path';
@@ -20,6 +15,12 @@ interface ExplorePageOptions {
   startUrl: string;
   outputDir: string;
   enableScreenshots: boolean;
+}
+
+// Helper function to wait for DOM to be steady
+async function waitForDomSteady(page: Page, timeout = 3000): Promise<void> {
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500); // Small delay to ensure stability
 }
 
 export async function explorePage(page: Page, options: ExplorePageOptions) {
@@ -42,7 +43,7 @@ export async function explorePage(page: Page, options: ExplorePageOptions) {
 
   try {
     await page.goto(startUrl, { waitUntil: 'domcontentloaded' });
-    await this.waitForDomSteady(page);
+    await waitForDomSteady(page);
     pageReport.title = await page.title();
 
     // Monitorar chamadas de API
@@ -73,36 +74,50 @@ export async function explorePage(page: Page, options: ExplorePageOptions) {
       pageReport.screenshots.push(screenshotPath);
     }
 
-    // Exemplo de interação: clicar em todos os links visíveis
+    // Coletar todos os links visíveis primeiro
     const links = await page.$$('a[href]');
+    const linkData: { href: string | null; text: string | null; selector: string }[] = [];
     for (const link of links) {
+      const href = await link.getAttribute('href');
+      const text = await link.textContent();
+      if (href) {
+          linkData.push({ href, text, selector: `a[href="${href}"]` });
+        }
+      }
+
+    // Iterar sobre os links coletados e interagir
+    for (const { href, text, selector } of linkData) {
       try {
-        const href = await link.getAttribute('href');
-        const text = await link.textContent();
         console.log(`
 🔗 Tentando clicar no link: ${text} (${href})`);
-        await link.click();
+        // Navegar para o link
+        await page.goto(href!, { waitUntil: 'domcontentloaded' });
+        await waitForDomSteady(page);
+
         pageReport.attemptedActions.push({
-          type: 'click',
-          selector: `a[href="${href}"]`,
+          type: 'navigate',
+          selector,
           text,
           status: 'success',
         });
-        await page.waitForLoadState('networkidle'); // Esperar a rede estabilizar
+
         if (enableScreenshots) {
-          const screenshotPath = path.join(outputDir, `screenshot-after-click-${Date.now()}.png`);
+          const screenshotPath = path.join(outputDir, `screenshot-after-navigation-${Date.now()}.png`);
           await page.screenshot({ path: screenshotPath, fullPage: true });
           pageReport.screenshots.push(screenshotPath);
         }
-        await page.goBack(); // Voltar para a página original para continuar a exploração
+
+        // Voltar para a página original para continuar a exploração
+        await page.goBack();
         await page.waitForLoadState('domcontentloaded');
+        await waitForDomSteady(page);
       } catch (error: any) {
         console.error(`
-❌ Erro ao clicar no link: ${error.message}`);
+❌ Erro ao navegar para o link: ${error.message}`);
         pageReport.attemptedActions.push({
-          type: 'click',
-          selector: `a[href="${await link.getAttribute('href')}"]`,
-          text: await link.textContent(),
+          type: 'navigate',
+          selector,
+          text,
           status: 'failure',
           error: error.message,
         });

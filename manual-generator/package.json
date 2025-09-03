@@ -30,7 +30,8 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "tsx": "^4.20.5",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@playwright/test": "^1.40.0"
   },
   "keywords": [
     "automation",

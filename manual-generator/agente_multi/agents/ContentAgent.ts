@@ -76,11 +76,9 @@ export class ContentAgent extends BaseAgent {
   // private currentContent: UserManualContent | null = null; // Não utilizado no momento
 
   constructor(
-    // private _prompt: string, // Não utilizado no momento
     private minioService: MinIOService,
     private keyManager: GeminiKeyManager | null,
     private llmManager: LLMManager | null,
-    // private _contentCacheFile: string, // Não utilizado no momento
     private logDir: string,
     private logFile: string
   ) {
@@ -148,8 +146,7 @@ export class ContentAgent extends BaseAgent {
   }
 
   override async initialize(): Promise<void> {
-    await this.minioService.initialize();
-    if (this.keyManager) {
+    if (this.keyManager && typeof this.keyManager.loadStatus === 'function') {
       await this.keyManager.loadStatus();
     }
     this.log('ContentAgent inicializado para criação de conteúdo user-friendly');

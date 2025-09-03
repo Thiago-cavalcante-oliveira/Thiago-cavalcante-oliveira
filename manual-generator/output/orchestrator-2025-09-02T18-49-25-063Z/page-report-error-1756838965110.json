@@ -1,0 +1,10 @@
+{
+  "url": "https://www.google.com",
+  "title": "",
+  "attemptedActions": [],
+  "apiCalls": [],
+  "consoleErrors": [],
+  "domMutations": [],
+  "screenshots": [],
+  "error": "Cannot read properties of undefined (reading 'goto')"
+}

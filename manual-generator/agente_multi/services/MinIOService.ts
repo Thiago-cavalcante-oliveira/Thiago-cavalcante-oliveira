@@ -1,8 +1,9 @@
 import { Client } from 'minio';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { safeValidateEnvironment } from '../config/environment.js';
+import { env } from '../config/env.js';
 import * as dotenv from 'dotenv';
+import { Client } from 'minio';
 
 dotenv.config();
 
@@ -14,31 +15,19 @@ export class MinIOService {
   private enabled: boolean = false;
 
   constructor() {
-    // Validar variáveis de ambiente usando Zod
-    const envValidation = safeValidateEnvironment();
-    
+    // Usar variáveis de ambiente diretamente do env
     let endpoint: string;
     let useSSL: boolean;
     let accessKey: string;
     let secretKey: string;
     let bucketName: string;
     
-    if (!envValidation.success) {
-       console.warn('⚠️ [MinIO] Erro na validação de ambiente, usando valores padrão:', envValidation.error);
-       // Usar valores padrão se a validação falhar
-       endpoint = 'localhost';
-       useSSL = false;
-       accessKey = 'minioadmin';
-       secretKey = 'minioadmin';
-       bucketName = 'documentacao';
-     } else {
-       const env = envValidation.data;
-       endpoint = env.MINIO_ENDPOINT || 'localhost';
-       useSSL = env.MINIO_USE_SSL || false;
-       accessKey = env.MINIO_ACCESS_KEY || 'minioadmin';
-       secretKey = env.MINIO_SECRET_KEY || 'minioadmin';
-       bucketName = env.MINIO_BUCKET_NAME || 'documentacao';
-     }
+    // Usar valores padrão se as variáveis não estiverem definidas
+    endpoint = process.env.MINIO_ENDPOINT || 'localhost';
+    useSSL = process.env.MINIO_USE_SSL === 'true';
+    accessKey = process.env.MINIO_ACCESS_KEY || 'minioadmin';
+    secretKey = process.env.MINIO_SECRET_KEY || 'minioadmin';
+    bucketName = process.env.MINIO_BUCKET_NAME || 'documentacao';
     
     this.bucketName = bucketName;
     this.endPoint = endpoint;

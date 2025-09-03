@@ -1,0 +1,295 @@
+{
+  "url": "https://www.google.com",
+  "title": "Google",
+  "attemptedActions": [
+    {
+      "type": "click",
+      "selector": "a[href=\"https://mail.google.com/mail/&ogbl\"]",
+      "text": "Gmail",
+      "status": "success"
+    }
+  ],
+  "apiCalls": [
+    {
+      "url": "https://play.google.com/log?format=json&hasfast=true",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "referer": "https://www.google.com/",
+        "content-encoding": "gzip",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "content-type": "application/binary",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://www.google.com/xjs/_/ss/k=xjs.hd.DCY_wncCXe4.L.B1.O/am=AAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAAAAAAxCQLAAAAAAOAACkAAAAAEAAAAAAAIAAAIAAAAAAAAAAAIAAAgAIAAQgsCkAEIAQAQBAUAAAgAAABAgSAAAJgAwAAEgCiAIAAAAATAINABAIIAAAAKABEAAACAAAAAAAAAAAAAAAAAAAAAAAAIAAAAABBICLIASECoCkA4AECAwAAAAABAAICAAAAAQABIAAARAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAEYAwAAASAAMUTQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACCACAAUAAAAAAAAAAAAAAAAAAAAAAAAABA/d=0/br=1/rs=ACT90oGIyi69J9-BJFYVakEz_qHZV7NuhA/m=syr0,syrd?cb=73095377&xjs=s4",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.google.com/wizrpcui/_/WizRpcUi/data/batchexecute?rpcids=VeQe9d&source-path=%2F&hl=pt-BR&_reqid=57231&rt=c",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "x-same-domain": "1",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "x-client-pctx": "CgcSBWjR7PMq",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "content-type": "text/plain;charset=UTF-8",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "x-goog-authuser": "0",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.gstatic.com/glue/cookienotificationbar/config/2a.json?hl=en",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "referer": "https://workspace.google.com/",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://feedback-pa.clients6.google.com/v1/survey/startup_config?key=AIzaSyCB6OnnfuitFnaYWu4BvtGKaoLFk4cm-GE",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.PLtFj_-5DjQ.O%2Fd%3D1%2Frs%3DAHpOoo-J85zQk73PCqZPyWTydWEIq3_4KA%2Fm%3D__features__",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "x-referer": "https://workspace.google.com",
+        "sec-ch-ua-mobile": "?0",
+        "x-goog-encode-response-if-executable": "base64",
+        "x-clientdetails": "appVersion=5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F140.0.0.0%20Safari%2F537.36&platform=Linux%20x86_64&userAgent=Mozilla%2F5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F140.0.0.0%20Safari%2F537.36",
+        "x-javascript-user-agent": "google-api-javascript-client/1.1.0",
+        "x-goog-api-key": "AIzaSyCB6OnnfuitFnaYWu4BvtGKaoLFk4cm-GE",
+        "x-origin": "https://workspace.google.com",
+        "x-requested-with": "XMLHttpRequest",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "content-type": "application/json+protobuf"
+      }
+    },
+    {
+      "url": "https://feedback-pa.clients6.google.com/v1/survey/trigger/trigger_anonymous?key=AIzaSyD3LJeW4Q6gtdgJlyeFZUp-GhpIoc6EUeg",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "referer": "https://feedback-pa.clients6.google.com/static/proxy.html?usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.PLtFj_-5DjQ.O%2Fd%3D1%2Frs%3DAHpOoo-J85zQk73PCqZPyWTydWEIq3_4KA%2Fm%3D__features__",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "x-referer": "https://workspace.google.com",
+        "sec-ch-ua-mobile": "?0",
+        "x-goog-encode-response-if-executable": "base64",
+        "x-clientdetails": "appVersion=5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F140.0.0.0%20Safari%2F537.36&platform=Linux%20x86_64&userAgent=Mozilla%2F5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F140.0.0.0%20Safari%2F537.36",
+        "x-javascript-user-agent": "google-api-javascript-client/1.1.0",
+        "x-goog-api-key": "AIzaSyD3LJeW4Q6gtdgJlyeFZUp-GhpIoc6EUeg",
+        "x-origin": "https://workspace.google.com",
+        "x-requested-with": "XMLHttpRequest",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "content-type": "application/json+protobuf"
+      }
+    },
+    {
+      "url": "https://www.google.com/async/hpba?yv=3&cs=0&ei=Rj23aJGREtDY1sQPkLWMoAg&async=_basejs:/xjs/_/js/k%3Dxjs.hd.pt_BR.O3lsf0c_DgA.2018.O/am%3DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAEAAQAAAEAQEAAAAAAAIBAAEAAAAAAAAAAAAiAAIAIAAAAAAAAAAAAAAgAAAAAAAGCAAEIAQAQBgEAAAAAAAAAAAAABAAAQAAAAADADwx8AIAAABCQAAAAAAAAAAFwAACQAAAAIAAAAAAAAAAAAAAIAAAAAAAAABAACAAAAACgAAAAAAAAAAAACAAAAAAAAAAAAIAIAACAAAAAAAAAAAAAAAAAAAAKAHAAAAAAAAAAAAAAAAAAAAAA4AQAgAAAAMUTQAAAAAAAAAOgAEHjCkoAAAAAAAAAAAAAAAAAAAAAQoCOZCAgEBAgAAAAAAAAAAAAAAAAAAAAAAhGpioQE/dg%3D0/br%3D1/rs%3DACT90oFP2kl0yBSEmPFPkHWurqcUHkqlOw?cb%3D73095377,_basecss:/xjs/_/ss/k%3Dxjs.hd.DCY_wncCXe4.L.B1.O/am%3DAAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAAAAAAxCQLAAAAAAOAACkAAAAAEAAAAAAAIAAAIAAAAAAAAAAAIAAAgAIAAQgsCkAEIAQAQBAUAAAgAAABAgSAAAJgAwAAEgCiAIAAAAATAINABAIIAAAAKABEAAACAAAAAAAAAAAAAAAAAAAAAAAAIAAAAABBICLIASECoCkA4AECAwAAAAABAAICAAAAAQABIAAARAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAEYAwAAASAAMUTQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACCACAAUAAAAAAAAAAAAAAAAAAAAAAAAABA/br%3D1/rs%3DACT90oGIyi69J9-BJFYVakEz_qHZV7NuhA?cb%3D73095377,_basecomb:/xjs/_/js/k%3Dxjs.hd.pt_BR.O3lsf0c_DgA.2018.O/ck%3Dxjs.hd.DCY_wncCXe4.L.B1.O/am%3DAAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAQAAAExSULAAAAAAOBACkAAAAAEAAAAAAiIAIAIAAAAAAAAAAAIAAggAIAAQguCkAEIAQAQBgUAAAgAAABAgSAABJgAwAAEgCjALwx8AITAINCRAIIAAAAKABFwAACQAAAAIAAAAAAAAAAAAAAIAAAIAAAAABBICLIASECoCkA4AECAwAAACABAAICAAAAAQIBIAACRAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAE4AwAgASAAMUTQAAAAAAAAAOgAEHjCkoAAAAAAAAAAAAAAAAAAAAAQoCOZCAgUBAgAAAAAAAAAAAAAAAAAAAAAAhGpioQE/d%3D1/ed%3D1/dg%3D0/br%3D1/ujg%3D1/rs%3DACT90oH0JsbaHPioiJmxrmoPB2TL-yW6qg?cb%3D73095377,_fmt:prog,_id:_Rj23aJGREtDY1sQPkLWMoAg_7&sp_imghp=false&sp_hpep=2&sp_hpte=0&vet=10ahUKEwiRzOeV4LqPAxVQrJUCHZAaA4QQj-0KCBI..i",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
+      "method": "POST",
+      "headers": {
+        "sec-ch-ua-platform": "\"Linux\"",
+        "x-user-agent": "grpc-web-javascript/0.1",
+        "referer": "https://www.google.com/",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0",
+        "x-goog-api-key": "AIzaSyCbsbvGCe7C9mCtdaTycZB2eUFuzsYKG_E",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "content-type": "application/json+protobuf"
+      }
+    },
+    {
+      "url": "https://www.google.com/complete/search?q&cp=0&client=gws-wiz&xssi=t&gs_pcrt=2&hl=pt-BR&authuser=0&psi=Rj23aJGREtDY1sQPkLWMoAg.1756839238950&dpr=1&nolsbt=1",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.google.com/xjs/_/js/md=2/k=xjs.hd.pt_BR.O3lsf0c_DgA.2018.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAEAAQAAAEAQEAAAAAAAIBAAEAAAAAAAAAAAAiIAIAIAAAAAAAAAAAAAAgAAAAAAAGCAAEIAQAQBgEAAAAAAAAAAAAABAAAQAAAAADADwx8AIAAABCQAAAAAAAAAAFwAACQAAAAIAAAAAAAAAAAAAAIAAAAAAAAABAACAAAAACgAAAAAAAAAAAACAAAAAAAAAAAAIAIAACAAAAAAAAAAAAAAAAAAAAKAHAAAAAAAAAAAAAAAAAAAAAA4AQAgAAAAMUTQAAAAAAAAAOgAEHjCkoAAAAAAAAAAAAAAAAAAAAAQoCOZCAgUBAgAAAAAAAAAAAAAAAAAAAAAAhGpioQE/rs=ACT90oE2TH2ccEWReymwa9meFp01iBN3uw?cb=73095377",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.google.com/xjs/_/ss/k=xjs.hd.DCY_wncCXe4.L.B1.O/am=AAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAAAAAAxCQLAAAAAAOAACkAAAAAEAAAAAAAIAAAIAAAAAAAAAAAIAAAgAIAAQgsCkAEIAQAQBAUAAAgAAABAgSAAAJgAwAAEgCiAIAAAAATAINABAIIAAAAKABEAAACAAAAAAAAAAAAAAAAAAAAAAAAIAAAAABBICLIASECoCkA4AECAwAAAAABAAICAAAAAQABIAAARAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAEYAwAAASAAMUTQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACCACAAUAAAAAAAAAAAAAAAAAAAAAAAAABA/d=0/br=1/rs=ACT90oGIyi69J9-BJFYVakEz_qHZV7NuhA/m=sykg,syo7?cb=73095377&xjs=s4",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    },
+    {
+      "url": "https://www.google.com/async/hpba?vet=10ahUKEwiRzOeV4LqPAxVQrJUCHZAaA4QQj-0KCBM..i&ei=Rj23aJGREtDY1sQPkLWMoAg&opi=89978449&yv=3&sp_imghp=false&sp_hpte=1&sp_hpep=1&stick=&cs=0&async=_basejs:%2Fxjs%2F_%2Fjs%2Fk%3Dxjs.hd.pt_BR.O3lsf0c_DgA.2018.O%2Fam%3DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAEAAQAAAEAQEAAAAAAAIBAAEAAAAAAAAAAAAiAAIAIAAAAAAAAAAAAAAgAAAAAAAGCAAEIAQAQBgEAAAAAAAAAAAAABAAAQAAAAADADwx8AIAAABCQAAAAAAAAAAFwAACQAAAAIAAAAAAAAAAAAAAIAAAAAAAAABAACAAAAACgAAAAAAAAAAAACAAAAAAAAAAAAIAIAACAAAAAAAAAAAAAAAAAAAAKAHAAAAAAAAAAAAAAAAAAAAAA4AQAgAAAAMUTQAAAAAAAAAOgAEHjCkoAAAAAAAAAAAAAAAAAAAAAQoCOZCAgEBAgAAAAAAAAAAAAAAAAAAAAAAhGpioQE%2Fdg%3D0%2Fbr%3D1%2Frs%3DACT90oFP2kl0yBSEmPFPkHWurqcUHkqlOw%3Fcb%3D73095377,_basecss:%2Fxjs%2F_%2Fss%2Fk%3Dxjs.hd.DCY_wncCXe4.L.B1.O%2Fam%3DAAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAAAAAAxCQLAAAAAAOAACkAAAAAEAAAAAAAIAAAIAAAAAAAAAAAIAAAgAIAAQgsCkAEIAQAQBAUAAAgAAABAgSAAAJgAwAAEgCiAIAAAAATAINABAIIAAAAKABEAAACAAAAAAAAAAAAAAAAAAAAAAAAIAAAAABBICLIASECoCkA4AECAwAAAAABAAICAAAAAQABIAAARAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAEYAwAAASAAMUTQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACCACAAUAAAAAAAAAAAAAAAAAAAAAAAAABA%2Fbr%3D1%2Frs%3DACT90oGIyi69J9-BJFYVakEz_qHZV7NuhA%3Fcb%3D73095377,_basecomb:%2Fxjs%2F_%2Fjs%2Fk%3Dxjs.hd.pt_BR.O3lsf0c_DgA.2018.O%2Fck%3Dxjs.hd.DCY_wncCXe4.L.B1.O%2Fam%3DAAKUCgQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAkAAQAAAExSULAAAAAAOBACkAAAAAEAAAAAAiIAIAIAAAAAAAAAAAIAAggAIAAQguCkAEIAQAQBgUAAAgAAABAgSAABJgAwAAEgCjALwx8AITAINCRAIIAAAAKABFwAACQAAAAIAAAAAAAAAAAAAAIAAAIAAAAABBICLIASECoCkA4AECAwAAACABAAICAAAAAQIBIAACRAQEAB4AwQeAACAIAgAAKQHACgAgAAAQCAAAAAAAACAAE4AwAgASAAMUTQAAAAAAAAAOgAEHjCkoAAAAAAAAAAAAAAAAAAAAAQoCOZCAgUBAgAAAAAAAAAAAAAAAAAAAAAAhGpioQE%2Fd%3D1%2Fed%3D1%2Fdg%3D0%2Fbr%3D1%2Fujg%3D1%2Frs%3DACT90oH0JsbaHPioiJmxrmoPB2TL-yW6qg%3Fcb%3D73095377,_fmt:prog,_id:_Rj23aJGREtDY1sQPkLWMoAg_8",
+      "method": "GET",
+      "headers": {
+        "sec-ch-ua-full-version-list": "\"Not=A?Brand\";v=\"24.0.0.0\", \"Chromium\";v=\"140.0.7339.16\"",
+        "sec-ch-ua-platform": "\"Linux\"",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-bitness": "\"64\"",
+        "sec-ch-ua-model": "\"\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-form-factors": "\"Desktop\"",
+        "sec-ch-ua-wow64": "?0",
+        "sec-ch-ua-arch": "\"x86\"",
+        "sec-ch-ua-full-version": "\"140.0.7339.16\"",
+        "downlink": "10",
+        "referer": "https://www.google.com/",
+        "sec-ch-prefers-color-scheme": "light",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "rtt": "100",
+        "sec-ch-ua-platform-version": "\"6.6.87\""
+      }
+    }
+  ],
+  "consoleErrors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 407 (Proxy Authentication Required)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 407 (Proxy Authentication Required)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 407 (Proxy Authentication Required)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 429 ()"
+    }
+  ],
+  "domMutations": [],
+  "screenshots": [
+    "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/output/orchestrator-2025-09-02T18-53-47-332Z/screenshot-1756839230317.png",
+    "/home/thiagotco/stim/Thiago-cavalcante-oliveira/manual-generator/output/orchestrator-2025-09-02T18-53-47-332Z/screenshot-after-click-1756839236850.png"
+  ],
+  "error": "elementHandle.getAttribute: Execution context was destroyed, most likely because of a navigation\nCall log:\n\u001b[2m  - waiting for locator(':scope')\u001b[22m\n"
+}

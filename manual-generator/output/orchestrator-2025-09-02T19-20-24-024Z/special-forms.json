@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-02T19:20:40.745Z",
+  "url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.google.com%2F&ec=futura_exp_og_so_72776762_e&hl=pt-BR&ifkv=AdBytiOQIlaLui7N4wxQx74C7E-7eTRzuOx3souunMWdd17HfVIIhXA5oLJw4wC-m4pUDfHggjfTtg&passive=true&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S456206942%3A1756840837480624",
+  "forms": [
+    {
+      "text": "criar conta",
+      "type": "button",
+      "action": "",
+      "href": "",
+      "className": "VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-dgl2Hf ksBjEc lKxP2d LQeN7 BqKGqe eR0mzb TrZEUc  J7pUA",
+      "isSpecial": true
+    }
+  ],
+  "description": "Formulários de recuperação de senha e registro identificados para processamento futuro"
+}

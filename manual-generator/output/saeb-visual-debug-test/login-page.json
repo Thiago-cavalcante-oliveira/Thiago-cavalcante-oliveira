@@ -1,0 +1,55 @@
+{
+  "inputs": [
+    {
+      "name": "username",
+      "id": "username",
+      "type": "text",
+      "placeholder": "",
+      "required": false
+    },
+    {
+      "name": "password",
+      "id": "password",
+      "type": "password",
+      "placeholder": "",
+      "required": false
+    },
+    {
+      "name": "credentialId",
+      "id": "id-hidden-input",
+      "type": "hidden",
+      "placeholder": "",
+      "required": false
+    }
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "id": "",
+      "type": "button",
+      "className": "pf-v5-c-button pf-m-control"
+    },
+    {
+      "text": "Sign In",
+      "id": "kc-login",
+      "type": "submit",
+      "className": "pf-v5-c-button pf-m-primary pf-m-block "
+    }
+  ],
+  "forms": [
+    {
+      "action": "https://keycloak.pmfi.pr.gov.br/realms/ideb-realm/login-actions/authenticate?session_code=Z6L_sS4MzmcAr6e9HklU6gnldudPafkuQllE41VHfqc&execution=47ecfa33-2e03-4463-b99f-2a949e36b775&client_id=ideb-app&tab_id=LBmq7VBAypk&client_data=eyJydSI6Imh0dHBzOi8vc2FlYi1oMS5wbWZpLnByLmdvdi5ici9hcGkvYXV0aC9jYWxsYmFjay9rZXljbG9hayIsInJ0IjoiY29kZSIsInN0IjoiT002X3RNTTJMa3N2eG1MeGRwOU9RZ0NzMnUzMHpXaGJ4VDRpUGExalVWRSJ9",
+      "method": "post",
+      "id": "kc-form-login"
+    }
+  ],
+  "links": [
+    {
+      "text": "Forgot Password?",
+      "href": "https://keycloak.pmfi.pr.gov.br/realms/ideb-realm/login-actions/reset-credentials?client_id=ideb-app&tab_id=LBmq7VBAypk&client_data=eyJydSI6Imh0dHBzOi8vc2FlYi1oMS5wbWZpLnByLmdvdi5ici9hcGkvYXV0aC9jYWxsYmFjay9rZXljbG9hayIsInJ0IjoiY29kZSIsInN0IjoiT002X3RNTTJMa3N2eG1MeGRwOU9RZ0NzMnUzMHpXaGJ4VDRpUGExalVWRSJ9",
+      "className": ""
+    }
+  ],
+  "title": "Sign in to IDEB App Realm",
+  "url": "https://keycloak.pmfi.pr.gov.br/realms/ideb-realm/protocol/openid-connect/auth?client_id=ideb-app&scope=openid%20email%20profile&response_type=code&redirect_uri=https%3A%2F%2Fsaeb-h1.pmfi.pr.gov.br%2Fapi%2Fauth%2Fcallback%2Fkeycloak&state=OM6_tMM2LksvxmLxdp9OQgCs2u30zWhbxT4iPa1jUVE&code_challenge=-ZH_WmR6LTpHC2eEoOAQoTbhV0S53fWm7Jvz9vC-Hes&code_challenge_method=S256"
+}

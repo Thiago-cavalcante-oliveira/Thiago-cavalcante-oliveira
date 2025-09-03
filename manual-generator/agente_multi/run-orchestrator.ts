@@ -22,19 +22,22 @@ async function main() {
   console.log('🚀 Iniciando OrchestratorAgent com configurações do ambiente...');
   
   // Verificar se as variáveis de ambiente estão definidas
-  const requiredEnvVars = ['SAEB_URL', 'SAEB_USERNAME', 'SAEB_PASSWORD'];
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
-  if (missingVars.length > 0) {
-    console.warn('⚠️  Variáveis de ambiente não encontradas:', missingVars.join(', '));
-    console.warn('   Usando valores padrão...');
-  }
-  
+  const args = process.argv.slice(2);
+  const getArg = (name: string) => {
+    const index = args.indexOf(`--${name}`);
+    return index > -1 && args[index + 1] ? args[index + 1] : undefined;
+  };
+
+  const url = getArg('url') || process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin';
+  const username = getArg('username') || process.env.SAEB_USERNAME || 'admin';
+  const password = getArg('password') || process.env.SAEB_PASSWORD || 'admin123';
+  const loginUrl = getArg('login-url') || process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin';
+
   // Mostrar configurações que serão usadas
   console.log('📋 Configurações:');
-  console.log(`   URL: ${process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin'}`);
-  console.log(`   Usuário: ${process.env.SAEB_USERNAME || 'admin'}`);
-  console.log(`   Senha: ${process.env.SAEB_PASSWORD ? '[DEFINIDA]' : '[PADRÃO]'}`);
+  console.log(`   URL: ${url}`);
+  console.log(`   Usuário: ${username}`);
+  console.log(`   Senha: ${password ? '[DEFINIDA]' : '[PADRÃO]'}`);
   
   // Criar diretório de saída
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -48,24 +51,45 @@ async function main() {
     await orchestrator.initialize();
     // Executar pipeline com configurações do ambiente
     const config = OrchestratorAgent.createDefaultConfig({
+      targetUrl: url,
       outputDir,
       enableScreenshots: true,
       outputFormats: ['markdown', 'html'],
-      stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined
+      stopAfterPhase: process.argv.includes('--login-only') ? 'login' : undefined,
+      credentials: {
+        username: username,
+        password: password,
+        loginUrl: loginUrl
+      }
     });
 
     let result;
-    if (process.argv.includes('--explore-page')) {
-      const startUrl = process.env.SAEB_URL || 'https://saeb-h1.pmfi.pr.gov.br/auth/signin';
-      console.log(`
-🧭 Explorando página: ${startUrl}`);
-      result = await orchestrator.executePageExplore({
-        startUrl,
-        outputDir,
-        enableScreenshots: config.enableScreenshots,
-      });
-    } else {
-      result = await orchestrator.executeFullPipeline(config);
+    let browser;
+    let page;
+    let context;
+
+    try {
+      if (args.includes('--explore-page')) {
+        console.log(`\n🧭 Explorando página: ${url}`);
+        // Lançar navegador e criar página para explorePage
+        browser = await orchestrator.launchBrowser(); // Supondo que OrchestratorAgent tenha um método launchBrowser
+        context = await browser.newContext();
+        page = await context.newPage();
+
+        result = await orchestrator.executePageExplore({
+          startUrl: url,
+          outputDir,
+          enableScreenshots: config.enableScreenshots,
+          pageInstance: page, // Passa a instância da página
+        });
+      } else {
+        result = await orchestrator.executeFullPipeline(config);
+      }
+    } finally {
+      if (browser) {
+        await browser.close();
+        console.log('Navegador fechado após exploração de página.');
+      }
     }
     
     // Mostrar resultados
@@ -101,7 +125,7 @@ async function main() {
 }
 
 // Executar apenas se chamado diretamente
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 

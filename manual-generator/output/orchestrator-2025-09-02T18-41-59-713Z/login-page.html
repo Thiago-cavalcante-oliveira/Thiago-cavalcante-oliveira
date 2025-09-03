@@ -1,0 +1,163 @@
+<!DOCTYPE html><html class="login-pf" lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Sign in to IDEB App Realm</title>
+    <link rel="icon" href="/resources/xptso/login/keycloak.v2/img/favicon.ico">
+            <link href="/resources/xptso/common/keycloak/vendor/patternfly-v5/patternfly.min.css" rel="stylesheet">
+            <link href="/resources/xptso/common/keycloak/vendor/patternfly-v5/patternfly-addons.css" rel="stylesheet">
+            <link href="/resources/xptso/login/keycloak.v2/css/styles.css" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "rfc4648": "/resources/xptso/common/keycloak/vendor/rfc4648/rfc4648.js"
+            }
+        }
+    </script>
+      <script type="module" async="" blocking="render">
+          const DARK_MODE_CLASS = "pf-v5-theme-dark";
+          const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+          updateDarkMode(mediaQuery.matches);
+          mediaQuery.addEventListener("change", (event) => updateDarkMode(event.matches));
+
+          function updateDarkMode(isEnabled) {
+            const { classList } = document.documentElement;
+
+            if (isEnabled) {
+              classList.add(DARK_MODE_CLASS);
+            } else {
+              classList.remove(DARK_MODE_CLASS);
+            }
+          }
+      </script>
+    <script type="module" src="/resources/xptso/login/keycloak.v2/js/passwordVisibility.js"></script>
+    <script type="module">
+        import { startSessionPolling } from "/resources/xptso/login/keycloak.v2/js/authChecker.js";
+
+        startSessionPolling(
+            "/realms/ideb-realm/login-actions/restart?client_id=ideb-app&tab_id=IZVFxrnQX8I&client_data=eyJydSI6Imh0dHBzOi8vc2FlYi1oMS5wbWZpLnByLmdvdi5ici9hcGkvYXV0aC9jYWxsYmFjay9rZXljbG9hayIsInJ0IjoiY29kZSIsInN0IjoiWWszeW82NTZiWnNhZC1XYXVzN1p4T1YtQnBaV0N5eVhqaEsxQnZSeVE3OCJ9&skip_logout=true"
+        );
+    </script>
+        <script type="module">
+            import { checkAuthSession } from "/resources/xptso/login/keycloak.v2/js/authChecker.js";
+
+            checkAuthSession(
+                "sfdJKU9XUHks0c5mKIbntzCRbn/TqV/1cpo7+j9f1t4"
+            );
+        </script>
+    <script>
+      // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1404468
+      const isFirefox = true;
+    </script>
+</head>
+
+<body id="keycloak-bg" class="">
+<div class="pf-v5-c-login">
+  <div class="pf-v5-c-login__container">
+    <header id="kc-header" class="pf-v5-c-login__header">
+      <div id="kc-header-wrapper" class="pf-v5-c-brand">IDEB App Realm</div>
+    </header>
+    <main class="pf-v5-c-login__main">
+      <div class="pf-v5-c-login__main-header">
+        <h1 class="pf-v5-c-title pf-m-3xl" id="kc-page-title"><!-- template: login.ftl -->
+
+        Sign in to your account
+
+</h1>
+      </div>
+      <div class="pf-v5-c-login__main-body">
+
+
+<!-- template: login.ftl -->
+
+        <div id="kc-form">
+          <div id="kc-form-wrapper">
+                <form id="kc-form-login" class="pf-v5-c-form" onsubmit="login.disabled = true; return true;" action="https://keycloak.pmfi.pr.gov.br/realms/ideb-realm/login-actions/authenticate?session_code=FxsLchW4xFGS4mUvLQM4aW2rFJqhpJsa5ESLjvPFIqc&amp;execution=47ecfa33-2e03-4463-b99f-2a949e36b775&amp;client_id=ideb-app&amp;tab_id=IZVFxrnQX8I&amp;client_data=eyJydSI6Imh0dHBzOi8vc2FlYi1oMS5wbWZpLnByLmdvdi5ici9hcGkvYXV0aC9jYWxsYmFjay9rZXljbG9hayIsInJ0IjoiY29kZSIsInN0IjoiWWszeW82NTZiWnNhZC1XYXVzN1p4T1YtQnBaV0N5eVhqaEsxQnZSeVE3OCJ9" method="post" novalidate="novalidate">
+
+<div class="pf-v5-c-form__group">
+    <div class="pf-v5-c-form__label">
+        <label for="username" class="pf-v5-c-form__label">
+        <span class="pf-v5-c-form__label-text">
+                                        Username or email
+
+        </span>
+        </label>
+    </div>
+
+    <span class="pf-v5-c-form-control ">
+        <input id="username" name="username" value="" type="text" autocomplete="username" autofocus="" aria-invalid="" style="">
+    </span>
+
+    <div id="input-error-container-username">
+    </div>
+</div>
+
+
+<div class="pf-v5-c-form__group">
+    <div class="pf-v5-c-form__label">
+        <label for="password" class="pf-v5-c-form__label">
+        <span class="pf-v5-c-form__label-text">
+            Password
+        </span>
+        </label>
+    </div>
+
+    <div class="pf-v5-c-input-group">
+      <div class="pf-v5-c-input-group__item pf-m-fill">
+        <span class="pf-v5-c-form-control ">
+          <input id="password" name="password" value="" type="password" autocomplete="current-password" aria-invalid="" style="">
+        </span>
+      </div>
+      <div class="pf-v5-c-input-group__item">
+        <button class="pf-v5-c-button pf-m-control" type="button" aria-label="Show password" aria-controls="password" data-password-toggle="" data-icon-show="fa-eye fas" data-icon-hide="fa-eye-slash fas" data-label-show="Show password" data-label-hide="Hide password">
+            <i class="fa-eye fas" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+        <div class="pf-v5-c-form__helper-text" aria-live="polite">
+            <div class="pf-v5-c-helper-text">
+                <div class="pf-v5-c-helper-text__item">
+                    <span class="pf-v5-c-helper-text__item-text">
+                        <a href="/realms/ideb-realm/login-actions/reset-credentials?client_id=ideb-app&amp;tab_id=IZVFxrnQX8I&amp;client_data=eyJydSI6Imh0dHBzOi8vc2FlYi1oMS5wbWZpLnByLmdvdi5ici9hcGkvYXV0aC9jYWxsYmFjay9rZXljbG9hayIsInJ0IjoiY29kZSIsInN0IjoiWWszeW82NTZiWnNhZC1XYXVzN1p4T1YtQnBaV0N5eVhqaEsxQnZSeVE3OCJ9">Forgot Password?</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    <div id="input-error-container-password">
+    </div>
+</div>
+
+
+                    <div class="pf-v5-c-form__group">
+                    </div>
+
+                    <input type="hidden" id="id-hidden-input" name="credentialId" style="">
+  <div class="pf-v5-c-form__group">
+    <div class="pf-v5-c-form__actions">
+  <button class="pf-v5-c-button pf-m-primary pf-m-block " name="login" id="kc-login" type="submit">Sign In</button>
+    </div>
+  </div>
+                </form>
+            </div>
+        </div>
+
+
+
+      </div>
+      <div class="pf-v5-c-login__main-footer">
+<!-- template: login.ftl -->
+
+
+      </div>
+    </main>
+
+  </div>
+</div>
+
+
+</body></html>
