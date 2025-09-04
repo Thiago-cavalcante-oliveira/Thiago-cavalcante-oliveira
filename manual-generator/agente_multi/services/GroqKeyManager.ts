@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import { env } from '../config/env.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { env } from '../config/env.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -41,24 +40,24 @@ export class GeminiKeyManager {
   private loadApiKeys(): void {
     const keys: string[] = [];
     
-    // Verificar se a chave do Gemini está disponível
-    if (!process.env.GOOGLE_API_KEY) {
-      console.warn('⚠️ [GeminiKeyManager] GOOGLE_API_KEY não encontrada nas variáveis de ambiente');
-      throw new Error('GOOGLE_API_KEY é obrigatória para usar o Gemini API');
-    }
-    
     // Carregar todas as chaves configuradas no .env
-    if (process.env.GEMINI_API_KEY_1) keys.push(process.env.GEMINI_API_KEY_1.trim());
-    if (process.env.GEMINI_API_KEY_2) keys.push(process.env.GEMINI_API_KEY_2.trim());
-    if (process.env.GEMINI_API_KEY_3) keys.push(process.env.GEMINI_API_KEY_3.trim());
+    for (let i = 1; i <= 5; i++) {
+      const key = process.env[`GEMINI_API_KEY_${i}`];
+      if (key) {
+        keys.push(key.trim());
+      }
+    }
 
-    // Compatibilidade com chave única (versão anterior)
-    if (process.env.GOOGLE_API_KEY && !keys.includes(process.env.GOOGLE_API_KEY.trim())) {
+    // Compatibilidade com chave única (versão anterior), se nenhuma chave numerada for encontrada
+    if (keys.length === 0 && process.env.GOOGLE_API_KEY) {
       keys.push(process.env.GOOGLE_API_KEY.trim());
     }
 
+    
+
     if (keys.length === 0) {
-      throw new Error('Nenhuma chave API do Gemini configurada');
+      console.warn('⚠️ [GeminiKeyManager] Nenhuma chave API do Gemini encontrada nas variáveis de ambiente (GEMINI_API_KEY_1 a 5 ou GOOGLE_API_KEY)');
+      throw new Error('Pelo menos uma chave API do Gemini (GEMINI_API_KEY_N ou GOOGLE_API_KEY) é obrigatória para usar o Gemini API');
     }
 
     const now = new Date();
@@ -91,8 +90,9 @@ export class GeminiKeyManager {
   async loadStatus(): Promise<void> {
     try {
       const data = await fs.readFile(this.statusFile, 'utf-8');
-      const saved = JSON.parse(data) as ApiKeyManager;
-      const now = new Date();
+       const saved = JSON.parse(data) as ApiKeyManager;
+
+    const now = new Date();
       
       // Manter apenas chaves que ainda existem na configuração
       const currentKeys = this.keyManager.keys.map(k => k.key);

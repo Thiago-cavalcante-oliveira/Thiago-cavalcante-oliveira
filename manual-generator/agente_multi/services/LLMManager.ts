@@ -1,35 +1,51 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import fetch from 'node-fetch';
-import { GroqKeyManager } from './GroqKeyManager.js';
+import { GeminiKeyManager } from './GeminiKeyManager';
+import { GroqKeyManager } from './GroqKeyManager';
 
 export class LLMManager {
-  private geminiKeyManager: any;
-  private groqKeyManager: GroqKeyManager;
+  private keyManagers: (GeminiKeyManager | GroqKeyManager)[];
+  private currentKeyManagerIndex: number;
 
-  constructor(geminiKeyManager: any) {
-    this.geminiKeyManager = geminiKeyManager;
-    this.groqKeyManager = new GroqKeyManager();
-  }
+  constructor() {
+    this.keyManagers = [];
+    this.currentKeyManagerIndex = 0;
 
-  async generateContent(prompt: string): Promise<any> {
-    // 1. Tenta Groq primeiro (API padrão)
-    try {
-      console.log('🚀 Tentando Groq como API principal...');
-      return await this.groqKeyManager.handleApiCall(prompt);
-    } catch (groqError) {
-      const errorMessage = groqError instanceof Error ? groqError.message : String(groqError);
-      console.warn('⚠️ Groq indisponível, fallback para Gemini:', errorMessage);
-      
-      // 2. Fallback para Gemini
+    // Initialize GeminiKeyManager if API key is available
+    if (process.env.GEMINI_API_KEY) {
       try {
-        console.log('🔄 Usando Gemini como fallback...');
-        return await this.geminiKeyManager.handleApiCall(async (model: any) => {
-          return await model.generateContent(prompt);
-        });
-      } catch (geminiError) {
-        const geminiErrorMessage = geminiError instanceof Error ? geminiError.message : String(geminiError);
-        throw new Error(`Falha em ambas as APIs - Groq: ${errorMessage}, Gemini: ${geminiErrorMessage}`);
+        this.keyManagers.push(new GeminiKeyManager());
+      } catch (error) {
+        console.warn('Failed to initialize GeminiKeyManager:', error);
       }
     }
+
+    // Initialize GroqKeyManager if API key is available
+    if (process.env.GROQ_API_KEY) {
+      try {
+        this.keyManagers.push(new GroqKeyManager());
+      } catch (error) {
+        console.warn('Failed to initialize GroqKeyManager:', error);
+      }
+    }
+
+    if (this.keyManagers.length === 0) {
+      throw new Error('No LLM key managers could be initialized. Please check your API keys.');
+    }
+  }
+
+  private getNextKeyManager(): GeminiKeyManager | GroqKeyManager {
+    if (this.keyManagers.length === 0) {
+      throw new Error('No active LLM key managers available.');
+    }
+    const manager = this.keyManagers[this.currentKeyManagerIndex];
+    this.currentKeyManagerIndex = (this.currentKeyManagerIndex + 1) % this.keyManagers.length;
+    return manager;
+  }
+
+  public async generateResponse(prompt: string): Promise<string> {
+    const keyManager = this.getNextKeyManager();
+    console.log(`Using ${keyManager.constructor.name} for prompt: ${prompt}`);
+    // In a real scenario, this would interact with an LLM using the keyManager
+    // For now, it's a placeholder.
+    return `Response from ${keyManager.constructor.name} to: ${prompt}`;
   }
 }

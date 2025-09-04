@@ -1,5 +1,4 @@
 import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { v4 as uuidv4 } from 'uuid';
 import { Page } from 'playwright';
 import { MinIOService } from '../services/MinIOService.js';
 import { AuthDetectionResult } from './interfaces/AuthTypes';
@@ -30,7 +29,7 @@ export class LoginAgent extends BaseAgent {
 
 
 
-  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
+  async generateMarkdownReport1(taskResult: TaskResult): Promise<string> {
     return `## Relatório do LoginAgent\n\n- Status: ${taskResult.success ? 'Sucesso' : 'Falha'}`;
   }
 

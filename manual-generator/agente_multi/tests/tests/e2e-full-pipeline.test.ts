@@ -66,13 +66,18 @@ test.describe('Teste de Pipeline Completo E2E', () => {
     expect(result.errors, 'O pipeline não deve conter erros').toHaveLength(0);
 
     // 2. Verificar se os agentes corretos foram executados
-    expect(result.agentsExecuted, 'Deve ter executado o LoginAgent').toContain('LoginAgent');
+    const hasLoginAgent = result.agentsExecuted.includes('LoginAgent');
+    const hasSmartLoginAgent = result.agentsExecuted.includes('SmartLoginAgent');
+    expect(hasLoginAgent || hasSmartLoginAgent, 'Deve ter executado o LoginAgent ou SmartLoginAgent').toBe(true);
     expect(result.agentsExecuted, 'Deve ter executado o CrawlerAgent').toContain('CrawlerAgent');
     expect(result.agentsExecuted, 'Deve ter executado o AnalysisAgent').toContain('AnalysisAgent');
     expect(result.agentsExecuted, 'Deve ter executado o ContentAgent').toContain('ContentAgent');
     expect(result.agentsExecuted, 'Deve ter executado o GeneratorAgent').toContain('GeneratorAgent');
 
-    // 3. Verificar se o crawling processou pelo menos uma página
+    // 3. Verificar se os documentos foram gerados (pelo menos um formato)
+    expect(Object.keys(result.documentsGenerated).length).toBeGreaterThan(0);
+
+    // 4. Verificar estatísticas
     expect(result.statistics.pagesProcessed, 'Deve ter processado pelo menos uma página').toBeGreaterThan(0);
     
     // 4. Verificar se os caminhos dos documentos foram gerados no resultado

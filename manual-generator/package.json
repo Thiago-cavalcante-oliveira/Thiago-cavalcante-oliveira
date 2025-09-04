@@ -9,7 +9,7 @@
     "orchestrator": "tsx agente_multi/run-orchestrator.ts",
     "dev": "tsx --watch agente_multi/main.ts",
     "build": "tsc --project tsconfig.json",
-    "test": "tsx agente_multi/tests/smoke.test.ts"
+    "test": "playwright test agente_multi/tests/tests/e2e-full-pipeline.test.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.0",

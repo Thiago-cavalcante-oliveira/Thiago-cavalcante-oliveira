@@ -1,4 +1,4 @@
-import { AgnoSCore } from '../core/AgnoSCore.js';
+import { BaseAgent, AgentConfig, AgnoSCore, TaskData, TaskResult } from '../core/AgnoSCore.js';
 import { MinIOService } from '../services/MinIOService.js';
 import { LoginAgent } from './LoginAgent.js';
 import { SmartLoginAgent } from './SmartLoginAgent.js';
@@ -7,10 +7,11 @@ import { VisionAgent } from './VisionAgent.js';
 import { AnalysisAgent } from './AnalysisAgent.js';
 import { ContentAgent } from './ContentAgent.js';
 import { GeneratorAgent } from './GeneratorAgent.js';
-import { Browser, Page, chromium, BrowserContext } from 'playwright';
+import { Browser, Page, chromium } from 'playwright';
 import { env } from '../config/env.js';
 import { Semaphore } from '../core/sem.js';
 import { v4 as uuidv4 } from 'uuid';
+
 
 // As interfaces podem ser movidas para um ficheiro de tipos dedicado (e.g., 'interfaces.ts')
 export interface OrchestrationConfig {
@@ -70,6 +71,7 @@ export class OrchestratorAgent extends BaseAgent {
   async initialize(): Promise<void> {
     this.log('Inicializando OrchestratorAgent e seus serviços...');
     await this.minioService.initialize();
+    await this.core.start(); // Iniciar o AgnoSCore
     for (const agent of this.core.getAgents()) {
         await agent.initialize();
     }
@@ -81,6 +83,7 @@ export class OrchestratorAgent extends BaseAgent {
     for (const agent of this.core.getAgents()) {
         await agent.cleanup();
     }
+    await this.core.stop(); // Parar o AgnoSCore
     this.log('OrchestratorAgent finalizado.');
   }
 
@@ -172,10 +175,10 @@ this.core.registerAgent(new GeneratorAgent({
       // FASE 1: Login (se houver credenciais)
       if (config.credentials) {
         this.log("FASE 1: Autenticação");
-        const loginRes = await this.core.executeTask('LoginAgent', 'authenticate', { page, credentials: config.credentials });
+        const loginRes = await this.core.executeTask('LoginAgent', 'authenticate', { page, credentials: { ...config.credentials, loginUrl: config.targetUrl } });
         if (!loginRes.success) {
             this.log("Login padrão falhou, a tentar SmartLogin...", "warn");
-            const smartLoginRes = await this.core.executeTask('SmartLoginAgent', 'smart_authenticate', { page, credentials: config.credentials });
+            const smartLoginRes = await this.core.executeTask('SmartLoginAgent', 'smart_login', { page, credentials: config.credentials, baseUrl: config.targetUrl });
             if (!smartLoginRes.success) throw new Error(`Autenticação falhou: ${smartLoginRes.error}`);
             result.agentsExecuted.push('SmartLoginAgent');
         } else {
@@ -199,18 +202,18 @@ this.core.registerAgent(new GeneratorAgent({
       const analysisData = analysisRes.data;
 
       // FASE 4: Geração de Conteúdo
-      this.log('FASE 4: Geração de Conteúdo User-Friendly');
-      const contentRes = await this.core.executeTask('ContentAgent', 'generate_content', { analysisData });
-      if(!contentRes.success) throw new Error(`ContentAgent falhou: ${contentRes.error}`);
+      this.log('FASE 4: Geração de Conteúdo');
+      const contentRes = await this.core.executeTask('ContentAgent', 'generate_content', { analysisData: analysisRes.data, crawlData });
+      if (!contentRes.success) throw new Error(`ContentAgent falhou: ${contentRes.error}`);
       result.agentsExecuted.push('ContentAgent');
-      const markdownContent = contentRes.data.markdownContent;
+      const { markdownContent, analysisData: contentAnalysisData } = contentRes.data;
 
-      // FASE 5: Geração de Documentos Finais
-      this.log('FASE 5: Geração de Documentos Finais');
-      const generatorRes = await this.core.executeTask('GeneratorAgent', 'generate_documents', { markdownContent, outputDir: config.outputDir, formats: config.outputFormats });
+      // FASE 5: Geração de Documentos
+      this.log('FASE 5: Geração de Documentos');
+      const generatorRes = await this.core.executeTask('GeneratorAgent', 'generate_documents', { markdownContent, analysisData: contentAnalysisData });
       if(!generatorRes.success) throw new Error(`GeneratorAgent falhou: ${generatorRes.error}`);
       result.agentsExecuted.push('GeneratorAgent');
-      result.documentsGenerated = generatorRes.data.documents;
+      result.documentsGenerated = generatorRes.data.filePaths;
 
       result.success = true;
     } catch (e: any) {

@@ -1,10 +1,11 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { v4 as uuidv4 } from 'uuid';
+import { BaseAgent, AgentConfig, TaskData, TaskResult, AgentCapability } from '../core/AgnoSCore.js';
 import { MinIOService } from '../services/MinIOService.js';
 import { GeminiKeyManager } from '../services/GeminiKeyManager.js';
-import { LLMManager } from '../services/LLMManager.js';
+import { LLMRouter } from '../services/LLMRouter.js';
+import { LLMManager } from '@services/LLMManager';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface ElementAnalysis {
   id: string;
@@ -49,23 +50,27 @@ export interface CrawlAnalysis {
 
 export class AnalysisAgent extends BaseAgent {
   private keyManager: GeminiKeyManager | null;
-  private llmManager: LLMManager | null;
+  private llmRouter: LLMRouter | null; // Permitir que seja nulo
+  private llmManager: LLMManager | null; // Adicionado
   private minioService: MinIOService;
-  private currentAnalysis: CrawlAnalysis | null = null;
+  private currentAnalysis: CrawlAnalysis | null = null; // Adicionar declaração da propriedade
+
   private componentCache = new Map<string, ElementAnalysis>();
   private cacheFile: string;
-  private prompt: string;
+
 
   constructor(config: AgentConfig) {
     super(config);
-    this.prompt = (config as any).prompt || ''; // Adicionei um prompt padrão caso não seja fornecido
+
     try {
       this.keyManager = new GeminiKeyManager();
-      this.llmManager = new LLMManager(this.keyManager);
+      this.llmRouter = new LLMRouter();
+      this.llmManager = new LLMManager(); // Inicializado
     } catch (error) {
-      this.log('Não foi possível inicializar o GeminiKeyManager/LLMManager. O agente de análise continuará sem as capacidades de IA.', 'warn');
+      this.log('Não foi possível inicializar o GeminiKeyManager/LLMRouter. O agente de análise continuará sem as capacidades de IA.', 'warn');
       this.keyManager = null;
-      this.llmManager = null;
+      this.llmRouter = null;
+      this.llmManager = null; // Definir como nulo em caso de erro
     }
     this.minioService = new MinIOService();
     this.cacheFile = path.join(process.cwd(), 'output', 'component-analysis-cache.json');
@@ -110,9 +115,6 @@ export class AnalysisAgent extends BaseAgent {
     }
   }
 
-  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
-    return `## Relatório do AnalysisAgent\n\n- Status: ${taskResult.success ? 'Sucesso' : 'Falha'}\n\n### Detalhes da Análise\n\n\`\`\`json\n${JSON.stringify(taskResult.data, null, 2)}\n\`\`\``;
-  }
 
 
 
@@ -136,7 +138,7 @@ export class AnalysisAgent extends BaseAgent {
       }
 
       // Análise geral do crawling
-      const crawlAnalysis = await this.generateCrawlAnalysis(crawlResults, pageAnalyses, authContext);
+      const crawlAnalysis = await this.generateCrawlAnalysis(pages, pageAnalyses, authContext);
       this.currentAnalysis = crawlAnalysis;
 
       // Enviar para o próximo agente
@@ -241,7 +243,6 @@ Responda em formato JSON estruturado.
 
     try {
       if (!this.keyManager || !this.llmManager) {
-      this.llmManager = new LLMManager(this.keyManager);
         throw new Error('KeyManager or LLMManager not initialized.');
       }
       const response = await this.keyManager.handleApiCall(async (model) => {
@@ -319,7 +320,6 @@ Responda em formato JSON com array de objetos.
 
       try {
         if (!this.keyManager || !this.llmManager) {
-          this.llmManager = new LLMManager(this.keyManager);
           throw new Error('KeyManager or LLMManager not initialized.');
         }
         const response = await this.keyManager.handleApiCall(async (model) => {
@@ -544,129 +544,7 @@ Responda em formato JSON estruturado.
     };
   }
 
-  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
-    const timestamp = new Date().toISOString();
 
-    let report = `# Relatório do AnalysisAgent
-
-**Task ID:** ${taskResult.taskId}
-**Timestamp:** ${timestamp}
-**Status:** ${taskResult.success ? '✅ Sucesso' : '❌ Falha'}
-**Tempo de Processamento:** ${taskResult.processingTime}ms
-
-`;
-
-    if (taskResult.success && taskResult.data) {
-      const analysis = taskResult.data as CrawlAnalysis;
-      // Proteção extra e log
-      if (!analysis) {
-        this.log('AVISO: analysis está undefined em generateMarkdownReport', 'warn');
-      }
-      if (typeof analysis?.totalElements !== 'number') {
-        this.log('AVISO: analysis.totalElements não é um número em generateMarkdownReport', 'warn');
-        this.log(`DEBUG: analysis: ${JSON.stringify(analysis)}`);
-      }
-
-      report += `## 📊 Resumo da Análise
-
-${analysis?.summary || 'Sem resumo'}
-
-### Estatísticas Gerais
-
-- **Páginas Analisadas:** ${analysis?.totalPages ?? 'N/A'}
-- **Total de Elementos:** ${typeof analysis?.totalElements === 'number' ? analysis.totalElements : 0}
-- **Complexidade:** ${analysis?.technicalInsights?.complexity ?? 'N/A'}
-
-## 🎯 Funcionalidades Principais
-
-`;
-
-      if (Array.isArray(analysis?.keyFunctionalities)) {
-        analysis.keyFunctionalities.forEach((func, index) => {
-          report += `${index + 1}. ${func}\n`;
-        });
-      }
-
-      report += `
-## 🔄 Fluxos de Trabalho do Usuário
-
-`;
-
-      analysis.userWorkflows.forEach((workflow, index) => {
-        report += `${index + 1}. ${workflow}\n`;
-      });
-
-      report += `
-## 📱 Análise por Página
-
-`;
-
-      analysis.pageAnalyses.forEach((page, index) => {
-        report += `### ${index + 1}. ${page.title}
-
-- **URL:** ${page.url}
-- **Propósito:** ${page.purpose}
-- **Elementos Analisados:** ${page.elementAnalyses.length}
-- **Score de Acessibilidade:** ${page.accessibility.score}/100
-
-**Recursos Principais:**
-`;
-
-        page.keyFeatures.forEach(feature => {
-          report += `- ${feature}\n`;
-        });
-
-        report += `
-**Jornada do Usuário:**
-${page.userJourney.join(' → ')}
-
-`;
-      });
-
-      report += `
-## 💡 Recomendações
-
-`;
-
-      analysis.recommendations.forEach((rec, index) => {
-        report += `${index + 1}. ${rec}\n`;
-      });
-
-      report += `
-## 🔧 Insights Técnicos
-
-**Tecnologias Identificadas:**
-${analysis.technicalInsights.technologies.join(', ')}
-
-**Padrões Arquiteturais:**
-${analysis.technicalInsights.patterns.join(', ')}
-
-## Próximas Etapas
-
-✅ Análise com IA concluída
-🔄 Dados encaminhados para ContentAgent
-📝 Aguardando geração de conteúdo user-friendly
-
-`;
-    } else {
-      report += `## ❌ Erro na Análise
-
-**Erro:** ${taskResult.error}
-
-## Ações Recomendadas
-
-- Verificar configuração da API Gemini
-- Verificar qualidade dos dados de entrada
-- Tentar novamente com dados diferentes
-
-`;
-    }
-
-    // Salvar relatório no MinIO
-    await this.minioService.uploadReportMarkdown(report, this.config.name, taskResult.taskId);
-
-    return report;
-  }
 
   // 🔧 MÉTODOS ADICIONAIS PARA CACHE E PERSISTÊNCIA
 
@@ -705,7 +583,7 @@ ${analysis.technicalInsights.patterns.join(', ')}
     return crypto.createHash('md5').update(elementKey).digest('hex');
   }
 
-  private async getCachedAnalysis(element: any): Promise<ElementAnalysis | null> {
+  private getCachedAnalysis(element: any): ElementAnalysis | null {
     const hash = this.generateElementHash(element);
     return this.componentCache.get(hash) || null;
   }
@@ -713,12 +591,11 @@ ${analysis.technicalInsights.patterns.join(', ')}
   private async cacheAnalysis(element: any, analysis: ElementAnalysis): Promise<void> {
     const hash = this.generateElementHash(element);
     this.componentCache.set(hash, analysis);
-    
-    // Salvar cache a cada 10 análises novas
     if (this.componentCache.size % 10 === 0) {
       await this.saveComponentCache();
     }
   }
+
 
   async saveAnalysisResults(analysis: CrawlAnalysis, filename?: string): Promise<string> {
     const outputDir = path.join(process.cwd(), 'output', 'final_documents');
@@ -816,6 +693,13 @@ ${pagesContent}
     this.currentAnalysis = null;
     await this.saveComponentCache();
     this.log('AnalysisAgent cleanup finalizado');
+  }
+
+  async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
+    if (!taskResult.success) {
+      return `## Relatório de Análise\n\n**Falha:** ${taskResult.error}`;
+    }
+    return `## Relatório de Análise\n\n- **Status:** Sucesso\n- **Sumário:** ${taskResult.data?.summary}`;
   }
 
 }

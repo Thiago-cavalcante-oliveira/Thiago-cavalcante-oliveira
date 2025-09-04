@@ -141,12 +141,7 @@ export class LLMRouter {
     };
   }
 
-  private validatePrompt(prompt: string): void {
-    if (!prompt || prompt.trim() === '') {
-      throw new Error('O prompt não pode ser vazio.');
-    }
-  }
-
+  
   private isRetryableError(error: any): boolean {
     // Implemente a lógica para determinar se o erro é retentável
     // Ex: Erros de rede, timeouts, limites de taxa

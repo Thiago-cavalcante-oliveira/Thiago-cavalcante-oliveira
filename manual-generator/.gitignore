@@ -40,3 +40,4 @@ output/screenshot-cache.json
 # Backup de configuração
 config-backup/
 \n# Environment Variables\n.env\n*.env
+.env
