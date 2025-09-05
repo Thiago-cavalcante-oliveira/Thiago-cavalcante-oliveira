@@ -1,4 +1,5 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
+import { BaseAgent } from '../core/AgnoSCore.js';
+import { AgentConfig, TaskData, TaskResult } from '../../types/types.js';
 import { Page } from 'playwright';
 import { MinIOService } from '../services/MinIOService.js';
 import { LoginAgent } from './LoginAgent.js';
@@ -24,7 +25,7 @@ export class SmartLoginAgent extends BaseAgent {
   }
 
   override async initialize(): Promise<void> {
-    this.log('SmartLoginAgent inicializado');
+    this.log.info('SmartLoginAgent inicializado');
   }
 
   override async processTask(task: TaskData): Promise<TaskResult> {
@@ -108,7 +109,7 @@ export class SmartLoginAgent extends BaseAgent {
       }
 
       if (fallbackAgent) {
-        this.log('SmartLogin falhou, tentando fallback com LoginAgent...');
+        this.log.info('SmartLogin falhou, tentando fallback com LoginAgent...');
         const fallbackResult = await fallbackAgent.processTask(task);
         return {
           ...fallbackResult,
@@ -132,7 +133,7 @@ export class SmartLoginAgent extends BaseAgent {
       };
 
     } catch (error: any) {
-      this.log(`Erro no login: ${error.message}`, 'error');
+      this.log.error(`Erro no login: ${error.message}`);
       await this.saveLoginReport(outputDir, minioService);
       throw error;
     }
@@ -144,7 +145,7 @@ export class SmartLoginAgent extends BaseAgent {
     outputDir: string,
     { baseUrl, credentials }: { baseUrl: string; credentials: LoginCredentials; }
   ): Promise<boolean> {
-    this.log('Iniciando processo de SmartLogin...');
+    this.log.info('Iniciando processo de SmartLogin...');
     await this.captureStep(page, 'smartlogin-start', outputDir, minioService);
 
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -154,7 +155,7 @@ export class SmartLoginAgent extends BaseAgent {
     let formFound = await this.detectLoginForm(page);
 
     if (!formFound) {
-      this.log('Campos de login não visíveis, procurando gatilhos...');
+      this.log.info('Campos de login não visíveis, procurando gatilhos...');
       const triggerClicked = await this.findAndClickLoginTrigger(page, outputDir, minioService, 0, 5);
 
       if (triggerClicked) {
@@ -164,7 +165,7 @@ export class SmartLoginAgent extends BaseAgent {
     }
 
     if (!formFound) {
-      this.log('Não foi possível localizar tela de login', 'error');
+      this.log.error('Não foi possível localizar tela de login');
       return false;
     }
 
@@ -197,7 +198,7 @@ export class SmartLoginAgent extends BaseAgent {
       const userField = await page.locator('input[type="text"], input[type="email"], input[name*="user"], input[name*="login"], input[name*="email"]').first();
       return await userField.isVisible();
     } catch (error) {
-      this.log(`Erro ao detectar formulário: ${error}`, 'error');
+      this.log.error(`Erro ao detectar formulário: ${error}`);
       return false;
     }
   }
@@ -229,14 +230,14 @@ export class SmartLoginAgent extends BaseAgent {
             const isOAuth = oauthTerms.some(term => text.includes(term) || classAttribute.toLowerCase().includes(term));
             
             if (text.includes(trigger) && !isOAuth && await element.isVisible()) {
-                this.log(`Encontrado gatilho de login: "${trigger}" (ignorando OAuth)`);
+                this.log.info(`Encontrado gatilho de login: "${trigger}" (ignorando OAuth)`);
                 await this.captureStep(page, `before-click-${trigger}`, outputDir, minioService);
                 await element.click();
                 await page.waitForLoadState('networkidle');
                 await this.captureStep(page, `after-click-${trigger}`, outputDir, minioService);
 
                 const newUrl = await page.url();
-                this.log(`Navegou para: ${newUrl}`);
+                this.log.info(`Navegou para: ${newUrl}`);
 
                 const formFound = await this.detectLoginForm(page);
                 if (formFound) {
@@ -252,7 +253,7 @@ export class SmartLoginAgent extends BaseAgent {
       }
       return false;
     } catch (error) {
-      this.log(`Erro ao procurar gatilhos: ${error}`, 'error');
+      this.log.error(`Erro ao procurar gatilhos: ${error}`);
       return false;
     }
   }
@@ -266,13 +267,13 @@ export class SmartLoginAgent extends BaseAgent {
         throw new Error('Campos de login não encontrados');
       }
 
-      this.log('Preenchendo credenciais...');
+      this.log.info('Preenchendo credenciais...');
       await userField.fill('');
       await userField.type(credentials.username, { delay: 100 });
       await passwordField.fill('');
       await passwordField.type(credentials.password, { delay: 100 });
     } catch (error) {
-      this.log(`Erro ao preencher formulário: ${error}`, 'error');
+      this.log.error(`Erro ao preencher formulário: ${error}`);
       throw error;
     }
   }
@@ -282,10 +283,10 @@ export class SmartLoginAgent extends BaseAgent {
       const submitButton = page.locator('button[type="submit"], input[type="submit"], button[class*="login"], button[class*="submit"], button[class*="signin"]').first();
 
       if (await submitButton.isVisible()) {
-        this.log('Clicando no botão de submit...');
+        this.log.info('Clicando no botão de submit...');
         await submitButton.click();
       } else {
-        this.log('Botão não encontrado, usando Enter...');
+        this.log.info('Botão não encontrado, usando Enter...');
         const passwordField = page.locator('input[type="password"]').first();
         if (await passwordField.isVisible()) {
           await passwordField.press('Enter');
@@ -298,7 +299,7 @@ export class SmartLoginAgent extends BaseAgent {
       }
       await page.waitForLoadState('networkidle');
     } catch (error) {
-      this.log(`Erro ao submeter login: ${error}`, 'error');
+      this.log.error(`Erro ao submeter login: ${error}`);
       throw error;
     }
   }
@@ -318,10 +319,10 @@ export class SmartLoginAgent extends BaseAgent {
           title: document.title
         };
       });
-      this.log(`Verificação de login: ${JSON.stringify(result)}`);
+      this.log.info(`Verificação de login: ${JSON.stringify(result)}`);
       return result.noPasswordFields || (result.hasSuccessIndicators && !result.hasErrorIndicators);
     } catch (error) {
-      this.log(`Erro na verificação: ${error}`, 'error');
+      this.log.error(`Erro na verificação: ${error}`);
       return false;
     }
   }
@@ -329,19 +330,19 @@ export class SmartLoginAgent extends BaseAgent {
   private async captureStep(page: Page, stepName: string, outputDir: string, minioService?: MinIOService): Promise<void> {
      const screenshotPath = path.join(outputDir, `${stepName}-${Date.now()}.png`);
      await page.screenshot({ path: screenshotPath, fullPage: true });
-     this.log(`Screenshot capturado: ${screenshotPath}`);
+     this.log.info(`Screenshot capturado: ${screenshotPath}`);
      if (minioService) {
        try {
         await minioService.uploadFile(screenshotPath, `screenshots/${path.basename(screenshotPath)}`);
        } catch (error) {
-        this.log(`Falha ao fazer upload do screenshot para o MinIO: ${error}`, 'warn');
+        this.log.warn(`Falha ao fazer upload do screenshot para o MinIO: ${error}`);
        }
      }
   }
 
   private async scrapLoginPage(page: Page, outputDir: string): Promise<void> {
     try {
-      this.log('Fazendo scraping da página de login...');
+      this.log.info('Fazendo scraping da página de login...');
       const html = await page.content();
       const metadata = await page.evaluate(() => {
         const inputs = Array.from(document.querySelectorAll('input')).map(input => ({ name: input.name || '', id: input.id || '', type: input.type || '', placeholder: input.placeholder || '', required: input.required }));
@@ -353,9 +354,9 @@ export class SmartLoginAgent extends BaseAgent {
       const loginPageData: LoginPageData = { html, metadata };
       await fs.writeFile(path.join(outputDir, 'login-page.html'), html, 'utf-8');
       await fs.writeFile(path.join(outputDir, 'login-page.json'), JSON.stringify(loginPageData.metadata, null, 2), 'utf-8');
-      this.log('Scraping da página de login concluído');
+      this.log.info('Scraping da página de login concluído');
     } catch (error) {
-      this.log(`Erro no scraping: ${error}`, 'error');
+      this.log.error(`Erro no scraping: ${error}`);
     }
   }
 
@@ -363,7 +364,7 @@ export class SmartLoginAgent extends BaseAgent {
     const reportPath = path.join(outputDir, 'login_report.md');
     let reportContent = `# Relatório de Login - ${new Date().toLocaleString()}\n\n`;
     await fs.writeFile(reportPath, reportContent);
-    this.log(`Relatório de login salvo em: ${reportPath}`);
+    this.log.info(`Relatório de login salvo em: ${reportPath}`);
   }
 
   private async identifySpecialForms(page: Page, recoveryTerms: string[], outputDir: string): Promise<void> {
@@ -382,7 +383,7 @@ export class SmartLoginAgent extends BaseAgent {
       }, recoveryTerms);
 
       if (specialForms.length > 0) {
-        this.log(`Identificados ${specialForms.length} formulários especiais (recuperação/registro)`);
+        this.log.info(`Identificados ${specialForms.length} formulários especiais (recuperação/registro)`);
         const specialFormsData = {
           timestamp: new Date().toISOString(),
           url: await page.url(),
@@ -393,45 +394,45 @@ export class SmartLoginAgent extends BaseAgent {
         await this.captureStep(page, 'special-forms-identified', outputDir, this.minio);
       }
     } catch (error) {
-      this.log(`Erro ao identificar formulários especiais: ${error}`, 'error');
+      this.log.error(`Erro ao identificar formulários especiais: ${error}`);
     }
   }
 
   private async requestUserInteraction(page: Page, outputDir: string, minioService?: MinIOService): Promise<void> {
-    this.log('=== INTERAÇÃO DO USUÁRIO NECESSÁRIA ===', 'warn');
-    this.log('Os agentes automáticos não conseguiram completar o login.', 'warn');
-    this.log('Por favor, complete o login manualmente no navegador.', 'warn');
-    this.log('O sistema aguardará 30 segundos para interação manual...', 'warn');
+    this.log.warn('=== INTERAÇÃO DO USUÁRIO NECESSÁRIA ===');
+    this.log.warn('Os agentes automáticos não conseguiram completar o login.');
+    this.log.warn('Por favor, complete o login manualmente no navegador.');
+    this.log.warn('O sistema aguardará 30 segundos para interação manual...');
     await this.captureStep(page, 'user-interaction-required', outputDir, minioService);
     try {
       await page.waitForNavigation({ timeout: 30000 });
     } catch (e) {
-      this.log('Nenhuma navegação detectada, aguardando inatividade da rede.', 'warn');
+      this.log.warn('Nenhuma navegação detectada, aguardando inatividade da rede.');
       await page.waitForLoadState('networkidle');
     }
     await this.captureStep(page, 'after-user-interaction', outputDir, minioService);
     const success = await this.verifyLoginSuccess(page);
     if (success) {
-      this.log('Login completado com sucesso após interação do usuário!');
+      this.log.info('Login completado com sucesso após interação do usuário!');
     } else {
-      this.log('Login ainda não foi completado. Verifique manualmente.', 'warn');
+      this.log.warn('Login ainda não foi completado. Verifique manualmente.');
     }
   }
 
   override async cleanup(): Promise<void> {
-    this.log('SmartLoginAgent finalizado.');
+    this.log.info('SmartLoginAgent finalizado.');
   }
 
   override async generateMarkdownReport(taskResult: TaskResult): Promise<string> {
-    const { success, error, processingTime, data, timestamp } = taskResult;
+    const { success, error, processingTime, timestamp } = taskResult;
     let report = `# Relatório de Login Inteligente\n\n`;
     report += `**Status:** ${success ? '✅ Sucesso' : '❌ Falha'}\n`;
     report += `**Timestamp:** ${timestamp.toISOString()}\n`;
     report += `**Tempo de Processamento:** ${processingTime}ms\n\n`;
 
-    if (data.skipped) {
+    if (taskResult.data?.skipped) {
       report += `## Login Pulado\n\n`;
-      report += `Motivo: ${data.reason}\n\n`;
+      report += `Motivo: ${taskResult.data.reason}\n\n`;
       return report;
     }
 
@@ -440,29 +441,29 @@ export class SmartLoginAgent extends BaseAgent {
       report += `${error}\n\n`;
     }
 
-    if (data.outputDir) {
+    if (taskResult.data?.outputDir) {
       report += `## Arquivos Gerados\n\n`;
-      report += `Diretório de saída: \`${data.outputDir}\`\n\n`;
+      report += `Diretório de saída: \`${taskResult.data.outputDir}\`\n\n`;
     }
 
-    if (data.finalUrl) {
+    if (taskResult.data?.finalUrl) {
       report += `## Resultado Final\n\n`;
-      report += `URL final após login: ${data.finalUrl}\n\n`;
+      report += `URL final após login: ${taskResult.data.finalUrl}\n\n`;
     }
 
     return report;
   }
 
-  protected override async waitForDomSteady(page: Page, maxRetries = 3, delay = 500) {
+  protected  async waitForDomSteady(page: Page, maxRetries = 3, delay = 500) {
     for (let i = 0; i < maxRetries; i++) {
         const initialHtml = await page.content();
         await new Promise(resolve => setTimeout(resolve, delay));
         const finalHtml = await page.content();
         if (initialHtml === finalHtml) {
-            this.log('DOM está estável.');
+            this.log.info('DOM está estável.');
             return;
         }
     }
-    this.log('DOM não estabilizou após várias tentativas.', 'warn');
+    this.log.warn('DOM não estabilizou após várias tentativas.');
   }
 }

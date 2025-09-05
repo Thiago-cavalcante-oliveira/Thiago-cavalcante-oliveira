@@ -1,15 +1,16 @@
-import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
-import { env } from './config/env.js';
-import { OrchestrationConfig } from './types.js';
+import 'dotenv/config';
+import { OrchestratorAgent } from './agents/OrchestratorAgent';
+import { env } from './config/env';
+import { OrchestrationConfig } from '../types/types';
+import { logger } from './utils/logger';
 
 async function main() {
-  console.log('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais (v3.0)...');
+  logger.info('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais (v3.0)...');
 
-  // Configuração da tarefa a ser executada
   const config: OrchestrationConfig = {
-    targetUrl: env.SAEB_URL || 'https://playwright.dev/', // URL alvo
+    targetUrl: env.SAEB_URL || 'https://www.gov.br/pt-br',
     outputDir: 'output',
-    maxSteps: 20, // Limite de interações para evitar loops infinitos
+    maxSteps: 15,
     enableScreenshots: true,
     outputFormats: ['markdown', 'html', 'pdf'],
     credentials: (env.SAEB_USERNAME && env.SAEB_PASSWORD) ? {
@@ -22,7 +23,7 @@ async function main() {
     const orchestrator = new OrchestratorAgent();
     await orchestrator.initialize();
 
-    console.log(`🎯 Iniciando exploração para: ${config.targetUrl}`);
+    logger.info({ config: { ...config, credentials: '***' } }, `🎯 Iniciando exploração`);
     
     const result = await orchestrator.processTask({
         id: 'main_task_01',
@@ -34,20 +35,21 @@ async function main() {
     });
     
     if (result.success) {
-        console.log('\n✅ Pipeline de geração de manual concluído com sucesso!');
+        logger.info('✅ Pipeline de geração de manual concluído com sucesso!');
     } else {
-        console.error('\n❌ Pipeline de geração de manual falhou.');
+        logger.error('❌ Pipeline de geração de manual falhou.');
         if (result.error) {
-            console.error('   Motivo:', result.error);
+            logger.error(`   Motivo: ${result.error}`);
         }
     }
 
     await orchestrator.cleanup();
 
   } catch (error) {
-    console.error('❌ Erro fatal durante a execução:', error);
+    logger.fatal({ error }, '❌ Erro fatal durante a execução');
     process.exit(1);
   }
 }
 
 main();
+

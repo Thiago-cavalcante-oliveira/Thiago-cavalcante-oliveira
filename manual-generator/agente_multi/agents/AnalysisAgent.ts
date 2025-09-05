@@ -1,21 +1,21 @@
-import { BaseAgent, AgentConfig, TaskData, TaskResult } from '../core/AgnoSCore.js';
-import { llmRouter } from '../services/LLMRouter.js';
+import { BaseAgent } from '../core/AgnoSCore';
+import { llmRouter } from '../services/LLMRouter';
 import { v4 as uuidv4 } from 'uuid';
-import { AggregatedData, FinalAnalysis, ManualStep } from '../../types/types.js';
+import { AggregatedData, FinalAnalysis, ManualStep, AgentConfig, TaskData, TaskResult } from '../../types/types';
 
 export class AnalysisAgent extends BaseAgent {
   constructor() {
     const config: AgentConfig = {
       name: 'AnalysisAgent',
       version: '3.0.0',
-      description: 'Analisa a sequência de passos de exploração para extrair insights e sumarizar a funcionalidade.',
+      description: 'Analisa a sequência de passos para extrair insights.',
       capabilities: [{ name: 'steps_analysis', description: 'Analisa uma sequência de interações.', version: '3.0.0' }],
     };
     super(config);
   }
 
-  async initialize(): Promise<void> { this.log('AnalysisAgent inicializado.'); }
-  async cleanup(): Promise<void> { this.log('AnalysisAgent finalizado.'); }
+  async initialize(): Promise<void> { this.log.info('AnalysisAgent inicializado.'); }
+  async cleanup(): Promise<void> {}
 
   async processTask(task: TaskData): Promise<TaskResult> {
     if (task.type !== 'analyze_steps') {
@@ -23,7 +23,7 @@ export class AnalysisAgent extends BaseAgent {
     }
 
     const { steps } = task.data as AggregatedData;
-    this.log(`Iniciando análise de ${steps.length} passos de exploração...`);
+    this.log.info(`Analisando ${steps.length} passos de exploração...`);
 
     const analysisPrompt = this.createAnalysisPrompt(steps);
     
@@ -42,41 +42,35 @@ export class AnalysisAgent extends BaseAgent {
   
   private createAnalysisPrompt(steps: ManualStep[]): string {
     const stepsSummary = steps.map(step => 
-      `Passo ${step.step}: ${step.actionDescription}\n  - URL: ${step.url}\n  - Elementos Vistos: ${step.analysis.elementsOnPage.map(e => `"${e.purpose}"`).join(', ')}`
-    ).join('\n\n');
+      `Passo ${step.step}: ${step.actionDescription}\n  - URL: ${step.url}`
+    ).join('\n');
 
     return `
-      Você é um especialista em análise de software. Com base na sequência de passos de exploração a seguir, gere uma análise concisa.
+      Você é um especialista em análise de software. Com base na sequência de passos de exploração a seguir, gere uma análise concisa para um manual de utilizador.
 
       Passos de Exploração:
       ${stepsSummary}
 
-      Sua Tarefa:
-      1.  **title**: Crie um título descritivo para o manual (ex: "Manual do Usuário - Sistema de Gestão Acadêmica").
-      2.  **summary**: Escreva um parágrafo de resumo sobre a funcionalidade principal explorada.
-      3.  **keyFunctionalities**: Liste as 3 a 5 funcionalidades mais importantes observadas.
-      4.  **userWorkflows**: Descreva um ou dois fluxos de trabalho do usuário que foram identificados a partir dos passos.
-
-      Responda APENAS em formato JSON com a estrutura:
-      {
-        "title": "string",
-        "summary": "string",
-        "keyFunctionalities": ["string"],
-        "userWorkflows": [["string"]]
-      }
+      Sua Tarefa (Responda APENAS em formato JSON):
+      1.  "title": Crie um título descritivo para o manual.
+      2.  "summary": Escreva um parágrafo de resumo sobre a funcionalidade principal explorada.
+      3.  "keyFunctionalities": Liste as 3 a 5 funcionalidades mais importantes observadas.
+      4.  "userWorkflows": Descreva um ou dois fluxos de trabalho do utilizador em uma lista de passos simples (ex: ["Aceder ao dashboard", "Clicar em 'Novo Relatório'", "Preencher formulário", "Guardar relatório"]).
     `;
   }
   
   private parseAnalysisResponse(response: string): FinalAnalysis {
     try {
-      return JSON.parse(response);
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if(!jsonMatch) throw new Error("Nenhum JSON encontrado na resposta da LLM");
+        return JSON.parse(jsonMatch[0]);
     } catch (error) {
-      this.log(`Erro ao parsear resposta da análise. Usando fallback. Erro: ${error}`, 'warn');
+      this.log.warn({ error, response }, `Erro ao parsear resposta da análise. Usando fallback.`);
       return {
         title: "Manual do Sistema",
         summary: "Este documento descreve as funcionalidades exploradas no sistema.",
         keyFunctionalities: ["Navegação", "Interação com elementos"],
-        userWorkflows: [["O usuário acessa o sistema, navega entre as páginas e clica em funcionalidades."]]
+        userWorkflows: [["O utilizador acede ao sistema, navega entre as páginas e clica em funcionalidades."]]
       };
     }
   }
@@ -87,3 +81,4 @@ export class AnalysisAgent extends BaseAgent {
     return `## Relatório de Análise\n\n- **Status:** Sucesso\n- **Título Proposto:** ${analysis.title}`;
   }
 }
+
