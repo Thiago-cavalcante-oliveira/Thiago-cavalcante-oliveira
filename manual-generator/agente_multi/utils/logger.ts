@@ -1,13 +1,15 @@
-import pino from "pino";
-import { env } from '../config/env.js';
-
-const LOG_LEVEL = env.LOG_LEVEL; // Usar o nível de log validado do ambiente
+import pino from 'pino';
+import { env } from '../config/env';
 
 export const logger = pino({
-  level: LOG_LEVEL,
-  redact: ["password", "authorization", "cookies", "headers.authorization"]
+  level: env.LOG_LEVEL,
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      ignore: 'pid,hostname',
+      translateTime: 'SYS:HH:MM:ss',
+    },
+  },
 });
 
-export function child(bindings: Record<string, any>) {
-  return logger.child(bindings);
-}

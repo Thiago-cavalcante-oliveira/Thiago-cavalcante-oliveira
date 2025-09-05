@@ -1,49 +1,53 @@
-#!/usr/bin/env ts-node
-import 'dotenv/config';
-
-import { OrchestratorAgent, OrchestrationConfig, OrchestrationResult } from './agents/OrchestratorAgent.js';
-import * as path from 'path';
-import * as fs from 'fs/promises';
+import { OrchestratorAgent } from './agents/OrchestratorAgent.js';
 import { env } from './config/env.js';
+import { OrchestrationConfig } from './types.js';
 
 async function main() {
-  // ... (código de setup mantido)
-  
+  console.log('🚀 Iniciando Sistema Multi-Agente para Geração de Manuais (v3.0)...');
+
+  // Configuração da tarefa a ser executada
+  const config: OrchestrationConfig = {
+    targetUrl: env.SAEB_URL || 'https://playwright.dev/', // URL alvo
+    outputDir: 'output',
+    maxSteps: 20, // Limite de interações para evitar loops infinitos
+    enableScreenshots: true,
+    outputFormats: ['markdown', 'html', 'pdf'],
+    credentials: (env.SAEB_USERNAME && env.SAEB_PASSWORD) ? {
+      username: env.SAEB_USERNAME,
+      password: env.SAEB_PASSWORD,
+    } : undefined,
+  };
+
   try {
     const orchestrator = new OrchestratorAgent();
     await orchestrator.initialize();
-    
-    // ✅ Adicionado tipo explícito e seguro
-    let result: Partial<OrchestrationResult> = {}; 
 
-    // ... (lógica de execução mantida)
+    console.log(`🎯 Iniciando exploração para: ${config.targetUrl}`);
     
-    // ✅ Acesso seguro às propriedades do resultado
-    console.log('\n📊 Resultados:');
-    console.log(`   Sucesso: ${result.success ? '✅' : '❌'}`);
-    console.log(`   Duração: ${result.totalDuration ?? 'N/A'}ms`);
-    console.log(`   Agentes Executados: ${result.agentsExecuted?.join(', ') ?? 'Nenhum'}`);
-    console.log(`   Páginas Processadas: ${result.statistics?.pagesProcessed ?? 0}`);
-    console.log(`   Elementos Analisados: ${result.statistics?.elementsAnalyzed ?? 0}`);
+    const result = await orchestrator.processTask({
+        id: 'main_task_01',
+        type: 'generate_manual',
+        sender: 'main',
+        timestamp: new Date(),
+        priority: 'high',
+        data: config
+    });
     
-    if (result.errors && result.errors.length > 0) {
-      console.log('\n❌ Erros Encontrados:');
-      result.errors.forEach((error: string) => console.log(`   - ${error}`));
+    if (result.success) {
+        console.log('\n✅ Pipeline de geração de manual concluído com sucesso!');
+    } else {
+        console.error('\n❌ Pipeline de geração de manual falhou.');
+        if (result.error) {
+            console.error('   Motivo:', result.error);
+        }
     }
-    
-    if (result.documentsGenerated && Object.keys(result.documentsGenerated).length > 0) {
-        // ...
-    }
-    
+
     await orchestrator.cleanup();
-    
-    console.log('\n✅ Execução concluída!');
-    process.exit(result.success ? 0 : 1);
-    
+
   } catch (error) {
     console.error('❌ Erro fatal durante a execução:', error);
     process.exit(1);
   }
 }
 
-main().catch(console.error);
+main();
